@@ -1,0 +1,191 @@
+CX51 COMPILER V7.50   SSTFLASH                                                             09/30/2014 13:53:02 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE SSTFLASH
+OBJECT MODULE PLACED IN SstFlash.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE SstFlash.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define SSTFLASH_C
+   2          #include "device.h"
+   3          #include "SstFlash.h"
+   4          #include "common.h"
+   5          #include <stdio.h>
+   6          #include "debug.h"
+   7          
+   8          void SstFlashPutCh( unsigned long FlashAddr , unsigned char ch )small;
+   9          unsigned char SstFlashGetCh( unsigned long FlashAddr )small;
+  10          //void DelaySectorErase( void )small;
+  11          void DelayFlashOp( void )small;
+  12          /*
+  13          unsigned char SstFlashGetCh( unsigned long FlashAddr )          small
+  14          {
+  15                  unsigned int  data FlashAddrL;
+  16                  unsigned char data FlashAddrH;
+  17          
+  18                  FlashAddrH = ( ( uchar data* )&FlashAddr )[ 1 ];
+  19                  FlashAddrL = FlashAddr & 0xFFFF;
+  20                  PinAddr18 = FlashAddrH & 0x04;
+  21                  PinAddr17 = FlashAddrH & 0x02;
+  22                  PinAddr16 = FlashAddrH & 0x01;
+  23                  return XBYTE[ FlashAddrL ];
+  24          }
+  25          
+  26          bit SstFlashSelfCheck( void )           small
+  27          {
+  28                  unsigned char data ManufacturerID , DeviceID;   
+  29          
+  30                  PinAddr18 = 0;
+  31                  PinAddr17 = 0;
+  32                  PinAddr16 = 0;
+  33                  XBYTE[ 0x555 ] = 0xAA;
+  34                  XBYTE[ 0x2AA ] = 0x55;
+  35                  XBYTE[ 0x555 ] = 0x90;
+  36          
+  37                  ManufacturerID = XBYTE[ 0 ];    
+  38                  ManufacturerID = XBYTE[ 1 ];    
+  39                  if ( ManufacturerID != FLASHMANUFACTURERID || DeviceID != FLASHDEVICEID )
+  40                          return 0;
+  41                  return 1;
+  42          }
+  43          */
+  44          bit SstFlashChipErase( void )           small
+  45          {
+  46   1      
+  47   1              XBYTE[ 0x555 ] = 0xAA;
+  48   1              XBYTE[ 0x2AA ] = 0x55;
+  49   1              XBYTE[ 0x555 ] = 0x80;
+  50   1              XBYTE[ 0x555 ] = 0xAA;
+  51   1              XBYTE[ 0x2AA ] = 0x55;
+  52   1              XBYTE[ 0x555 ] = 0x10;
+  53   1              while( (XBYTE[0] & 0x40) != (XBYTE[0] & 0x40) )
+  54   1                      _nop_();
+  55   1              return 1;
+CX51 COMPILER V7.50   SSTFLASH                                                             09/30/2014 13:53:02 PAGE 2   
+
+  56   1      }
+  57          bit SstFlashSectorErase( unsigned long FlashAddr )              small
+  58          {
+  59   1              unsigned  int data FlashAddrL;
+  60   1              unsigned char data FlashAddrH;
+  61   1              unsigned char data i;
+  62   1      
+  63   1              XBYTE[ 0x555 ] = 0xAA;
+  64   1              XBYTE[ 0x2AA ] = 0x55;
+  65   1              XBYTE[ 0x555 ] = 0x80;
+  66   1              XBYTE[ 0x555 ] = 0xAA;
+  67   1              XBYTE[ 0x2AA ] = 0x55;  
+  68   1      
+  69   1              FlashAddrH = ( ( uchar data* )&FlashAddr )[ 1 ];
+  70   1              FlashAddrL = FlashAddr & 0xFFFF;
+  71   1              PinAddr18 = FlashAddrH & 0x04;
+  72   1              PinAddr17 = FlashAddrH & 0x02;
+  73   1              PinAddr16 = FlashAddrH & 0x01;  
+  74   1              XBYTE[ FlashAddrL ] = 0x20;
+  75   1      
+  76   1              while( (XBYTE[0] & 0x40) != (XBYTE[0] & 0x40) )
+  77   1                      _nop_();
+  78   1      
+  79   1              FlashAddrL  = FlashAddr & 0xffffff80;
+  80   1              for( i = 0 ; i < SECTORSIZE ; i ++ )
+  81   1              {
+  82   2                      if ( XBYTE[ FlashAddrL ++ ] != 0xFF ) 
+  83   2                              return 0;
+  84   2              }
+  85   1              return 1;
+  86   1      }
+  87          
+  88          bit SstFlashStringProgam( unsigned long FlashAddr , unsigned char idata* RamAddr , unsigned char len )          sm
+             -all
+  89          {
+  90   1              unsigned  int data FlashAddrL;
+  91   1              unsigned char data FlashAddrH;
+  92   1      
+  93   1              while( len -- )
+  94   1              {               
+  95   2                      PinAddr18 = 0;
+  96   2                      PinAddr17 = 0;
+  97   2                      PinAddr16 = 0;
+  98   2                      XBYTE[ 0x555 ] = 0xAA;
+  99   2                      XBYTE[ 0x2AA ] = 0x55;
+ 100   2                      XBYTE[ 0x555 ] = 0xA0;
+ 101   2                      
+ 102   2                      FlashAddrH = ( ( uchar data* )&FlashAddr )[ 1 ];
+ 103   2                      FlashAddrL = FlashAddr & 0xFFFF;
+ 104   2                      PinAddr18 = FlashAddrH & 0x04;
+ 105   2                      PinAddr17 = FlashAddrH & 0x02;
+ 106   2                      PinAddr16 = FlashAddrH & 0x01;
+ 107   2                      XBYTE[ FlashAddrL ] = *RamAddr;
+ 108   2              
+ 109   2                      while( (XBYTE[0] & 0x40) != (XBYTE[0] & 0x40) )
+ 110   2                              _nop_();
+ 111   2      
+ 112   2                      FlashAddr++;
+ 113   2                      RamAddr++;
+ 114   2              }
+ 115   1              return 1;
+ 116   1      }
+CX51 COMPILER V7.50   SSTFLASH                                                             09/30/2014 13:53:02 PAGE 3   
+
+ 117          
+ 118          bit SstFlashReadString( unsigned long FlashAddr , unsigned char idata* RamAddr , unsigned char len )            smal
+             -l
+ 119          {
+ 120   1              unsigned int  data FlashAddrL;
+ 121   1              unsigned char data FlashAddrH;
+ 122   1      
+ 123   1              while( len -- )
+ 124   1              {       
+ 125   2                      FlashAddrH = ( ( uchar data* )&FlashAddr )[ 1 ];
+ 126   2                      FlashAddrL = FlashAddr & 0xFFFF;
+ 127   2                      PinAddr18 = FlashAddrH & 0x04;
+ 128   2                      PinAddr17 = FlashAddrH & 0x02;
+ 129   2                      PinAddr16 = FlashAddrH & 0x01;
+ 130   2                      *RamAddr ++ = XBYTE[ FlashAddrL ];
+ 131   2                      FlashAddr ++;
+ 132   2              }
+ 133   1              return 1;
+ 134   1      }
+ 135          /*
+ 136          void SstFlashPutCh( unsigned long FlashAddr , unsigned char ch )                small
+ 137          {
+ 138                  unsigned  int data FlashAddrL;
+ 139                  unsigned char data FlashAddrH;
+ 140                  
+ 141                  FlashAddrH = ( ( uchar data* )&FlashAddr )[ 1 ];
+ 142                  FlashAddrL = FlashAddr & 0xFFFF;
+ 143                  PinAddr18 = FlashAddrH & 0x04;
+ 144                  PinAddr17 = FlashAddrH & 0x02;
+ 145                  PinAddr16 = FlashAddrH & 0x01;
+ 146                  XBYTE[ FlashAddrL ] = ch;
+ 147          
+ 148          
+ 149          }
+ 150          
+ 151          //2005.11.08 liny 合并DelayChipErase和DelaySectorErase函数为DelayFlashOp。
+ 152          void DelayFlashOp( void )               small
+ 153          {
+ 154                  //2005.11.08 liny 原赵汗可程序延时太短，现改为ToggleBit(DQ6)测试确定Flash是否擦除成功
+ 155                  while( (XBYTE[0] & 0x40) != (XBYTE[0] & 0x40) )
+ 156                          _nop_();
+ 157          }
+ 158          */
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    397    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      20
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,491 @@
+CX51 COMPILER V7.50   COINER                                                               07/17/2009 09:42:09 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE COINER
+OBJECT MODULE PLACED IN Coiner.OBJ
+COMPILER INVOKED BY: d:\Program Files\Keil\C51\BIN\CX51.EXE Coiner.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWS
+                    -E DEBUG CODE SYMBOLS
+
+line level    source
+
+   1          #define COINER_C
+   2          #include "device.h"
+   3          #include "casher.h"
+   4          #include "serial1.h"
+   5          #include "debug.h"
+   6          #include "Coiner.h"
+   7          
+   8          
+   9          /*unsigned char xdata CoinAccept[ 8 ] =
+  10          {
+  11                          10 , 20 , 50 , 100 , 200 , -1 , -1, -1
+  12          };*/
+  13          void HykCoinSendCmd( unsigned char idata* buf , unsigned char len )
+  14          {       
+  15   1              unsigned char data i;   
+  16   1      
+  17   1              // 发送帧头
+  18   1      //      Trace( "\n HykCoinSendCmd str = ");
+  19   1              ZhkSerial1PutCh( HYKSERIAL_FRAMEHEAD );
+  20   1      //      Trace( " %02bx", HYKSERIAL_FRAMEHEAD );
+  21   1              // 发送数据长度 
+  22   1              ZhkSerial1PutCh( len + 2 );
+  23   1      //      Trace( " %02bx", len + 2 );             
+  24   1              for( i = 0 ; i < len ; i ++ )
+  25   1              {
+  26   2                      ZhkSerial1PutCh( buf[ i ] );
+  27   2      //              Trace( " %02bx", buf[ i ] );            
+  28   2              }       
+  29   1      }
+  30          
+  31          void HykCoinerReset( void )
+  32          {
+  33   1              unsigned char data buf[ 3 ];    
+  34   1              
+  35   1              buf[ 0 ] = 0x30;
+  36   1              buf[ 1 ] = 0x44;
+  37   1              HykCoinSendCmd( buf , 2 );
+  38   1      }
+  39          
+  40          void HykCoinerEnable( void )
+  41          {
+  42   1              unsigned char data buf[ 4 ];
+  43   1      
+  44   1              buf[ 0 ] = 0x31;
+  45   1      #if COINER_TYPE == 5
+                      buf[ 1 ] = 0x1F;
+              #endif
+  48   1      #if COINER_TYPE == 4
+                      buf[ 1 ] = 0x0F;
+              #endif
+  51   1      #if COINER_TYPE == 3
+                      buf[ 1 ] = 0x07;
+              #endif
+  54   1      #if COINER_TYPE == 2
+CX51 COMPILER V7.50   COINER                                                               07/17/2009 09:42:09 PAGE 2   
+
+                      buf[ 1 ] = 0x03;
+              #endif
+  57   1      #if COINER_TYPE == 1
+  58   1              buf[ 1 ] = 0x01;
+  59   1      #endif
+  60   1              buf[ 2 ] = 0x46 + buf[ 1 ];
+  61   1              HykCoinSendCmd( buf , 3 );
+  62   1      }
+  63          
+  64          void HykCoinerDisable( void )
+  65          {
+  66   1              unsigned char data buf[ 4 ];
+  67   1      
+  68   1              buf[ 0 ] = 0x31;
+  69   1              buf[ 1 ] = 0x00;
+  70   1              buf[ 2 ] = 0x46;
+  71   1              HykCoinSendCmd( buf , 3 );
+  72   1      }
+  73          
+  74          void HykCoinerGetState( void )
+  75          {
+  76   1              unsigned char data buf[ 3 ];    
+  77   1              
+  78   1              buf[ 0 ] = 0x32;
+  79   1              buf[ 1 ] = 0x46;
+  80   1              HykCoinSendCmd( buf , 2 );
+  81   1      }
+CX51 COMPILER V7.50   COINER                                                               07/17/2009 09:42:09 PAGE 3   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _HykCoinSendCmd (BEGIN)
+                                           ; SOURCE LINE # 13
+                 R     MOV     DPTR,#buf
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R5
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 14
+                                           ; SOURCE LINE # 19
+                       MOV     R7,#010H
+                 E     ECALL   _ZhkSerial1PutCh
+                                           ; SOURCE LINE # 22
+                 R     MOV     DPTR,#len
+                       MOVX    A,@DPTR
+                       ADD     A,#02H
+                       MOV     R7,A
+                 E     ECALL   _ZhkSerial1PutCh
+                                           ; SOURCE LINE # 24
+                       CLR     A
+                 R     MOV     i,A
+             ?C0001:
+                 R     MOV     DPTR,#len
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     A,i
+                       CLR     C
+                       SUBB    A,R7
+                 R     xJGE    ?C0004
+                                           ; SOURCE LINE # 25
+                                           ; SOURCE LINE # 26
+                 R     MOV     DPTR,#buf
+                       MOVX    A,@DPTR
+                 R     ADD     A,i
+                       MOV     R0,A
+                       MOV     A,@R0
+                       MOV     R7,A
+                 E     ECALL   _ZhkSerial1PutCh
+                                           ; SOURCE LINE # 28
+                 R     INC     i
+                 R     xJMP    ?C0001
+                                           ; SOURCE LINE # 29
+             ?C0004:
+                       ERET    
+             ; FUNCTION _HykCoinSendCmd (END)
+
+             ; FUNCTION HykCoinerReset (BEGIN)
+                                           ; SOURCE LINE # 31
+                                           ; SOURCE LINE # 32
+                                           ; SOURCE LINE # 35
+                 R     MOV     buf,#030H
+                                           ; SOURCE LINE # 36
+                 R     MOV     buf+01H,#044H
+                                           ; SOURCE LINE # 37
+                 R     MOV     R7,#LOW buf
+                       MOV     R5,#02H
+                 R     EJMP    _HykCoinSendCmd
+             ; FUNCTION HykCoinerReset (END)
+
+CX51 COMPILER V7.50   COINER                                                               07/17/2009 09:42:09 PAGE 4   
+
+             ; FUNCTION HykCoinerEnable (BEGIN)
+                                           ; SOURCE LINE # 40
+                                           ; SOURCE LINE # 41
+                                           ; SOURCE LINE # 44
+                 R     MOV     buf,#031H
+                                           ; SOURCE LINE # 58
+                 R     MOV     buf+01H,#01H
+                                           ; SOURCE LINE # 60
+                 R     MOV     A,buf+01H
+                       ADD     A,#046H
+                 R     MOV     buf+02H,A
+                                           ; SOURCE LINE # 61
+                 R     MOV     R7,#LOW buf
+                       MOV     R5,#03H
+                 R     EJMP    _HykCoinSendCmd
+             ; FUNCTION HykCoinerEnable (END)
+
+             ; FUNCTION HykCoinerDisable (BEGIN)
+                                           ; SOURCE LINE # 64
+                                           ; SOURCE LINE # 65
+                                           ; SOURCE LINE # 68
+                 R     MOV     buf,#031H
+                                           ; SOURCE LINE # 69
+                       CLR     A
+                 R     MOV     buf+01H,A
+                                           ; SOURCE LINE # 70
+                 R     MOV     buf+02H,#046H
+                                           ; SOURCE LINE # 71
+                 R     MOV     R7,#LOW buf
+                       MOV     R5,#03H
+                 R     EJMP    _HykCoinSendCmd
+             ; FUNCTION HykCoinerDisable (END)
+
+             ; FUNCTION HykCoinerGetState (BEGIN)
+                                           ; SOURCE LINE # 74
+                                           ; SOURCE LINE # 75
+                                           ; SOURCE LINE # 78
+                 R     MOV     buf,#032H
+                                           ; SOURCE LINE # 79
+                 R     MOV     buf+01H,#046H
+                                           ; SOURCE LINE # 80
+                 R     MOV     R7,#LOW buf
+                       MOV     R5,#02H
+                 R     EJMP    _HykCoinSendCmd
+             ; FUNCTION HykCoinerGetState (END)
+
+CX51 COMPILER V7.50   COINER                                                               07/17/2009 09:42:09 PAGE 5   
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+CCF2 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00DAH  1
+P0 . . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0080H  1
+CCF3 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00DBH  1
+P1 . . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0090H  1
+CCF4 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00DCH  1
+P2 . . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00A0H  1
+P3 . . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00B0H  1
+AC . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00D6H  1
+T0 . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B4H  1
+EI2C . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00ECH  1
+T1 . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B5H  1
+T2 . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0090H  1
+EA . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00AFH  1
+MXCON. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   01FFH  1
+SPCTL. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00E2H  1
+EC . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00AEH  1
+CF . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00DFH  1
+CH . . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00F9H  1
+_ZhkSerial1PutCh . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+IEN0 . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00A8H  1
+PinAddr16. . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0095H  1
+IEN1 . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00E8H  1
+IE . . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00A8H  1
+PinAddr17. . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0096H  1
+PI2C . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00FCH  1
+CL . . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00E9H  1
+PinAddr18. . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0097H  1
+CEX0 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0093H  1
+CCAP0H . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00FAH  1
+size_t . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+CEX1 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0094H  1
+IP0H . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00B7H  1
+CCAP1H . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00FBH  1
+CEX2 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0095H  1
+IP1H . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00F7H  1
+CCAP2H . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00FCH  1
+PinCTS . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B5H  1
+CEX3 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0096H  1
+CCAP3H . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00FDH  1
+CEX4 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0097H  1
+CR . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00DEH  1
+CCAP4H . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00FEH  1
+CCAP0L . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00EAH  1
+uchar. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+EXF2 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00CEH  1
+RD . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B7H  1
+CCAPM0 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00DAH  1
+CCAP1L . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00EBH  1
+CCAPM1 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00DBH  1
+CCAP2L . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00ECH  1
+CCAPM2 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00DCH  1
+CCAP3L . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00EDH  1
+HykCoinerReset . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     DATA   ARRAY    0000H  3
+IP . . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00B8H  1
+CCAPM3 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00DDH  1
+CCAP4L . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00EEH  1
+CX51 COMPILER V7.50   COINER                                                               07/17/2009 09:42:09 PAGE 6   
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+CCAPM4 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00DEH  1
+FE_0 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      009FH  1
+ES0R . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00ACH  1
+FE_1 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0187H  1
+CY . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00D7H  1
+INT0 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B2H  1
+ES1R . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00E8H  1
+S0ADEN . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00B9H  1
+INT1 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B3H  1
+ES0T . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00E9H  1
+S1ADEN . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0183H  1
+ES1T . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00EAH  1
+RXD0 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B0H  1
+S0ADDR . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00A9H  1
+S1ADDR . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0182H  1
+TXD0 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B1H  1
+RCAP2H . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00CBH  1
+PinRTS . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B4H  1
+SP . . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0081H  1
+T2EX . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0091H  1
+CMOD . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00D9H  1
+CCON . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00D8H  1
+PinAlarmSIn. . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B2H  1
+OV . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00D2H  1
+RCAP2L . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00CAH  1
+PS0R . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00BCH  1
+PS1R . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00F8H  1
+ulong. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+PS0T . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00F9H  1
+C_T2 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00C9H  1
+WR . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B6H  1
+PS1T . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00FAH  1
+RI_0 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0098H  1
+RI_1 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0180H  1
+RCLK . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00CDH  1
+TI_0 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0099H  1
+TI_1 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0181H  1
+PinBuzzer. . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0083H  1
+TCLK . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00CCH  1
+PinStatus. . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0085H  1
+SBUF . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0099H  1
+PCON . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0087H  1
+PinLock. . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0094H  1
+SCON . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0098H  1
+TMOD . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0089H  1
+TCON . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0088H  1
+AD0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0080H  1
+AD1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0081H  1
+AD2. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0082H  1
+AD3. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0083H  1
+HykCoinerGetState. . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     DATA   ARRAY    0000H  3
+MOSI . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0094H  1
+AD4. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0084H  1
+AD5. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0085H  1
+AD6. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0086H  1
+_HykCoinSendCmd. . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+CX51 COMPILER V7.50   COINER                                                               07/17/2009 09:42:09 PAGE 7   
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  buf. . . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  1
+  len. . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0001H  1
+  i. . . . . . . . . . . . . . . . . .  AUTO     DATA   U_CHAR   0000H  1
+AD7. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0087H  1
+AD8. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0080H  1
+BRGCON . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0185H  1
+IE0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0089H  1
+AD9. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0081H  1
+IE1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      008BH  1
+PinCoinerEn. . . . . . . . . . . . . .  ABSBIT   -----  BIT      0084H  1
+S0STAT . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   018CH  1
+B. . . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00F0H  1
+AUXR . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   008EH  1
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+S1STAT . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0184H  1
+CP_RL2 . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00C8H  1
+ACC. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00E0H  1
+SPICLK . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0095H  1
+ES0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00ACH  1
+IP0. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00B8H  1
+ES1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00E8H  1
+ET0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00A9H  1
+TF0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      008DH  1
+IP1. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00F8H  1
+ET1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00ABH  1
+HykCoinerDisable . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     DATA   ARRAY    0000H  4
+TF1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      008FH  1
+ET2. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00ADH  1
+TH0. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   008CH  1
+TF2. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00CFH  1
+TH1. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   008DH  1
+IT0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0088H  1
+EX0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00A8H  1
+TH2. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00CDH  1
+IT1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      008AH  1
+EX1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00AAH  1
+P. . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00D0H  1
+TL0. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   008AH  1
+PinPowerCtrl . . . . . . . . . . . . .  ABSBIT   -----  BIT      0086H  1
+TL1. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   008BH  1
+ECI. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0092H  1
+TL2. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00CCH  1
+PS0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00BCH  1
+I2CLH. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0096H  1
+I2ADR. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0094H  1
+PS1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00F8H  1
+PT0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B9H  1
+RS0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00D3H  1
+PT1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00BBH  1
+I2DAT. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0093H  1
+PinPowerOff. . . . . . . . . . . . . .  ABSBIT   -----  BIT      0081H  1
+TR0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      008CH  1
+RS1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00D4H  1
+PT2. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00BDH  1
+TR1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      008EH  1
+I2CLL. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0095H  1
+CX51 COMPILER V7.50   COINER                                                               07/17/2009 09:42:09 PAGE 8   
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+TR2. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00CAH  1
+PX0. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B8H  1
+PX1. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00BAH  1
+RB8_0. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      009AH  1
+I2CON. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0091H  1
+DPH. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0083H  1
+HykCoinerEnable. . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     DATA   ARRAY    0000H  4
+PinSa. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0080H  1
+RB8_1. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0182H  1
+EPH. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   01FEH  1
+PinSb. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0081H  1
+TB8_0. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      009BH  1
+BRGR0. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0186H  1
+PinSc. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0082H  1
+TB8_1. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0183H  1
+BRGR1. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0187H  1
+SM0_0. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      009FH  1
+DPL. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0082H  1
+SM0_1. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0187H  1
+S0BUF. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0099H  1
+SM1_0. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      009EH  1
+IPH. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00B7H  1
+EPL. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   01FCH  1
+S1BUF. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0181H  1
+SM1_1. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0186H  1
+SM2_0. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      009DH  1
+EPM. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   01FDH  1
+EXEN2. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00CBH  1
+SM2_1. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0185H  1
+PPC. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00BEH  1
+S0CON. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0098H  1
+I2STA. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0092H  1
+S1CON. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0180H  1
+AD10 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0082H  1
+SERAIL1PARAM . . . . . . . . . . . . .  TYPEDEF  -----  ARRAY    -----  6
+T2MOD. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00C9H  1
+T2CON. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00C8H  1
+AD11 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0083H  1
+AD20 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0084H  1
+SPE. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   01FBH  1
+AD12 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0084H  1
+AD21 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0085H  1
+AD13 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0085H  1
+AD22 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0086H  1
+WDTRST . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00A6H  1
+AD14 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0086H  1
+AD15 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0087H  1
+PinCoinIn. . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B3H  1
+AD16 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0080H  1
+AD17 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0081H  1
+RXD. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B0H  1
+AD18 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0082H  1
+AD19 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0083H  1
+TXD. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B1H  1
+AUXR1. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00A2H  1
+SPCFG. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00E1H  1
+CX51 COMPILER V7.50   COINER                                                               07/17/2009 09:42:09 PAGE 9   
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+REN_0. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      009CH  1
+F0 . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00D5H  1
+REN_1. . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0184H  1
+F1 . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00D1H  1
+PSW. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00D0H  1
+PinModeSw. . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0080H  1
+WDCON. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   018FH  1
+CCF0 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00D8H  1
+SPDAT. . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00E3H  1
+CCF1 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00D9H  1
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    120    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       2
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      15
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

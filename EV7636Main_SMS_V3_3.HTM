@@ -1,0 +1,4014 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>LX51 Static Call Analysis</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<style type="text/css">
+<!--
+p            { font-family: Verdana; font-size: 8pt; margin-top: 2; margin-bottom: 2 }
+.LI2         { margin-top: 2; margin-bottom: 2 }
+.Release     { background-color: #CCCCCC; font-weight: bold; padding: 6 }
+.ToolT       { font-size: 8pt; color: #808080 }
+.TinyT       { font-size: 8pt; text-align: Center }
+ul           { font-family: Verdana; font-size: 8pt; list-style-type: square;  margin-top: 2; margin-bottom: 2 }
+ol           { font-family: Verdana; font-size: 8pt }
+h1           { font-family: Verdana; font-size: 14pt; color: #000080; font-weight: bold; text-align: Center; margin-right: 3 }
+h2           { font-family: Verdana; font-size: 8pt; color: #000080; font-weight: bold; margin-top: 12; margin-bottom: 3; background-color: #CCCCCC; padding: 6 }
+h3           { font-family: Verdana; font-size: 8pt; font-weight: bold; margin-top: 12; margin-bottom: 3; background-color: #CCCCCC; padding: 6 }
+pre          { font-family: Courier New; font-size: 8pt; background-color: #CCFFCC; margin-left: 24; margin-right: 24 }
+li           { margin-top: 3; margin-bottom: 0 }
+-->
+</style>
+</head>
+<body>
+<h1>Static Call Analysis for<br>EV7636Main_SMS_V3_3 (MAINFLOW)</h1>
+
+<p class="TinyT">
+Created from: <b>LX51 LINKER/LOCATER V3.65b</b><br>
+Creation time: <b>09/06/2010  14:47:00</b><p>
+
+<hr>
+
+
+<h2><a name="S0"></a>?PR?CHECKTIMERORMONEY?MAINFLOW (000000H - 00002CH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=51 Bytes (<a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S83"></a>?PR?RUNFLOW?MAINFLOW (8077F3H - 807AD6H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=225 Bytes (<a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S77">?PR?ALLGOODSWAYERROR?MAINFLOW</a></li>
+<li><a href="#S69">?PR?CHEAPERONEPLZ?MAINFLOW</a></li>
+<li><a href="#S71">?PR?CHECKCHANGEPERMIT?MAINFLOW</a></li>
+<li><a href="#S39">?PR?CHECKGOODSSUMANDLOAD?MAINFLOW</a></li>
+<li><a href="#S34">?PR?CHECKHARDWARESTATE?MAINFLOW</a></li>
+<li><a href="#S43">?PR?CHECKKEYPRESS?MAINFLOW</a></li>
+<li><a href="#S33">?PR?CHECKOPERSTATUS?MAINFLOW</a></li>
+<li><a href="#S35">?PR?CHECKQUREYCMD?MAINFLOW</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S37">?PR?CYCLESENDSMS?MAINFLOW</a></li>
+<li><a href="#S28">?PR?DEVICEDEFAULTSETTING?MAINFLOW</a></li>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+<li><a href="#S73">?PR?DISPGETCOIN?MAINFLOW</a></li>
+<li><a href="#S66">?PR?DISPINPUTMONEY?MAINFLOW</a></li>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S30">?PR?DISPLAYOUTSERVER?MAINFLOW</a></li>
+<li><a href="#S75">?PR?DISPTHX?MAINFLOW</a></li>
+<li><a href="#S48">?PR?DISPWELOROUTSERV?MAINFLOW</a></li>
+<li><a href="#S6">?PR?ENABLEBILLDEV?MAINFLOW</a></li>
+<li><a href="#S68">?PR?EXISTANYCHOOSE?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S57">?PR?GOODSWAYERR?MAINFLOW</a></li>
+<li><a href="#S55">?PR?ISGOODSWAY?MAINFLOW</a></li>
+<li><a href="#S52">?PR?ISINPUTGOODSNO?MAINFLOW</a></li>
+<li><a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a></li>
+<li><a href="#S56">?PR?ISMONEYENOUGH?MAINFLOW</a></li>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a></li>
+<li><a href="#S44">?PR?QUERYDISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S46">?PR?QUERYISGOODSWAY?MAINFLOW</a></li>
+<li><a href="#S61">?PR?REBUY?MAINFLOW</a></li>
+<li><a href="#S74">?PR?RETURNCHANGE?MAINFLOW</a></li>
+<li><a href="#S20">?PR?SCANISSENDALARM?MAINFLOW</a></li>
+<li><a href="#S76">?PR?SELLCODEOVER?MAINFLOW</a></li>
+<li><a href="#S31">?PR?SYSINITPARAM?MAINFLOW</a></li>
+<li><a href="#S26">?PR?SYSTEMINIT?MAINFLOW</a></li>
+<li><a href="#S63">?PR?TESTHARDWARE?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S84"></a>?PR?MAIN?MAINFLOW (8077E9H - 8077F2H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S439">?PR?ZHKINIT?INITIALIZATION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S439">?PR?ZHKINIT?INITIALIZATION</a></li>
+</ul>
+
+<h2><a name="S0"></a>?PR?FLASHINIT?COMMONFUNCTION (000000H - 000017H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S0">?PR?SSTFLASHCHIPERASE?SSTFLASH</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S0">?PR?SSTFLASHCHIPERASE?SSTFLASH</a></li>
+</ul>
+
+<h2><a name="S241"></a>?PR?_MOVSRAMTOFLASH?DATAEXCHANGE (80C063H - 80C17AH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S243">?PR?_MOVFLASHTOSRAM?DATAEXCHANGE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S243">?PR?_MOVFLASHTOSRAM?DATAEXCHANGE</a></li>
+<li><a href="#S237">?PR?_MOVSRAMTOSRAM?DATAEXCHANGE</a></li>
+<li><a href="#S239">?PR?_POGRAMFLASH?DATAEXCHANGE</a></li>
+<li><a href="#S247">?PR?_SSTFLASHSECTORERASE?SSTFLASH</a></li>
+</ul>
+
+<h2><a name="S254"></a>?PR?ZHKTMR0?TIMER (81133CH - 81142EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=17 Bytes (<a href="#S373">?PR?ZHKKEYSCANISR?KEY</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S400">?PR?ZHKHARDBUZZEROFF?DEVICE</a></li>
+<li><a href="#S356">?PR?ZHKIOINPUTISR?IOINPUT</a></li>
+<li><a href="#S373">?PR?ZHKKEYSCANISR?KEY</a></li>
+<li><a href="#S363">?PR?ZYZCHKCOINCHNSTA?IOINPUT</a></li>
+</ul>
+
+<h2><a name="S0"></a>?PR?_DISPLAYCHARACTERSET?SCHEDULER (000000H - 000095H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S0"></a>?PR?DISPLAYBKLIGHTON?SCHEDULER (000000H - 00002DH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S0"></a>?PR?DISPLAYBKLIGHTOFF?SCHEDULER (000000H - 00002EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S381"></a>?PR?_ZHKVTISENDCMD?CASHER (80FE58H - 80FEC1H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S410">?PR?_ZHKSERIAL1PUTCH?SERIAL1</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S410">?PR?_ZHKSERIAL1PUTCH?SERIAL1</a></li>
+</ul>
+
+<h2><a name="S430"></a>?PR?ZHKSERIAL_ISR?SERIAL (807241H - 8072D6H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S429">?PR?ZHKSERIALISTXBUFNULL?SERIAL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S429">?PR?ZHKSERIALISTXBUFNULL?SERIAL</a></li>
+</ul>
+
+<h2><a name="S0"></a>?PR?_ZHKSERIAL1PRINTF?DEBUG (000000H - 000089H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S410">?PR?_ZHKSERIAL1PUTCH?SERIAL1</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S0">?PR?_VSPRINTF?VSPRINTF</a></li>
+<li><a href="#S410">?PR?_ZHKSERIAL1PUTCH?SERIAL1</a></li>
+</ul>
+
+<h2><a name="S467"></a>?PR?COMMDOSENDSMS?COMMMODULE (81397AH - 813A0EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S488">?PR?_PUTSHORTMSG?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S488">?PR?_PUTSHORTMSG?MOBILE</a></li>
+<li><a href="#S485">?PR?ISMESSAGERBUZY?MOBILE</a></li>
+</ul>
+
+<h2><a name="S1"></a>?PR?_CHECKHARDWARE?MAINFLOW (8075BCH - 807779H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=63 Bytes (<a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a>) Top=9 Bytes (<a href="#S15">?PR?GETHOPPERLIST?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S15">?PR?GETHOPPERLIST?MAINFLOW</a></li>
+<li><a href="#S76">?PR?SELLCODEOVER?MAINFLOW</a></li>
+<li><a href="#S63">?PR?TESTHARDWARE?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S3"></a>?PR?REJECTBILL?MAINFLOW (8087F9H - 808882H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=45 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>) Top=6 Bytes (<a href="#S50">?PR?GETBILL?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S285">?PR?_TESTDEVICECOMMOK?SCHEDULER</a></li>
+<li><a href="#S283">?PR?_TESTDEVICETIMEOUT?SCHEDULER</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S312">?PR?CASHERREJECT?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S5"></a>?PR?DISABLEBILLDEV?MAINFLOW (808FD7H - 808FF9H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=45 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>) Top=9 Bytes (<a href="#S7">?PR?SETOFFFLAG?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S320">?PR?CASHERQUERYDISABLE?SCHEDULER</a></li>
+<li><a href="#S360">?PR?COINERDISABLE?IOINPUT</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+<li><a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a></li>
+<li><a href="#S7">?PR?SETOFFFLAG?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S6"></a>?PR?ENABLEBILLDEV?MAINFLOW (808FFAH - 809028H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=45 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>) Top=6 Bytes (<a href="#S66">?PR?DISPINPUTMONEY?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S317">?PR?CASHERQUERYENABLE?SCHEDULER</a></li>
+<li><a href="#S359">?PR?COINERENABLE?IOINPUT</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S66">?PR?DISPINPUTMONEY?MAINFLOW</a></li>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S7"></a>?PR?SETOFFFLAG?MAINFLOW (8097FCH - 80980FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=48 Bytes (<a href="#S5">?PR?DISABLEBILLDEV?MAINFLOW</a>) Top=6 Bytes (<a href="#S30">?PR?DISPLAYOUTSERVER?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S5">?PR?DISABLEBILLDEV?MAINFLOW</a></li>
+<li><a href="#S369">?PR?KEYLOCK?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S30">?PR?DISPLAYOUTSERVER?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S8"></a>?PR?LOGICOPEN?MAINFLOW (809810H - 809823H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S370">?PR?KEYUNLOCK?KEY</a>) Top=6 Bytes (<a href="#S39">?PR?CHECKGOODSSUMANDLOAD?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S370">?PR?KEYUNLOCK?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S39">?PR?CHECKGOODSSUMANDLOAD?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S9"></a>?PR?CHOOSERETURN?MAINFLOW (80198FH - 801A0CH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a>) Top=6 Bytes (<a href="#S66">?PR?DISPINPUTMONEY?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S69">?PR?CHEAPERONEPLZ?MAINFLOW</a></li>
+<li><a href="#S66">?PR?DISPINPUTMONEY?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S11"></a>?PR?_CAL?MAINFLOW (8098DBH - 809AFCH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=9 Bytes (<a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S13"></a>?PR?_DISPLAYCURRENTMONEY?MAINFLOW (801AB1H - 801CAFH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=6 Bytes (<a href="#S50">?PR?GETBILL?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S66">?PR?DISPINPUTMONEY?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S61">?PR?REBUY?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S15"></a>?PR?GETHOPPERLIST?MAINFLOW (809AFDH - 809F03H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=66 Bytes (<a href="#S1">?PR?_CHECKHARDWARE?MAINFLOW</a>) Top=6 Bytes (<a href="#S31">?PR?SYSINITPARAM?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S1">?PR?_CHECKHARDWARE?MAINFLOW</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+<li><a href="#S31">?PR?SYSINITPARAM?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S17"></a>?PR?GETMINHOPPER?MAINFLOW (809F04H - 809F21H)</h2>
+<p><br><b>Maximum Stack:</b> Top=9 Bytes (<a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S18"></a>?PR?ISCANCHANGE?MAINFLOW (809F22H - 809F5EH)</h2>
+<p><br><b>Maximum Stack:</b> Top=9 Bytes (<a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S71">?PR?CHECKCHANGEPERMIT?MAINFLOW</a></li>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+<li><a href="#S57">?PR?GOODSWAYERR?MAINFLOW</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S61">?PR?REBUY?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S19"></a>?PR?COLNUMISCANSERVER?MAINFLOW (809F5FH - 809FA5H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=9 Bytes (<a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S61">?PR?REBUY?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S20"></a>?PR?SCANISSENDALARM?MAINFLOW (809FA6H - 80A8F5H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S474">?PR?_SENDSMS?COMMUNICATION</a>) Top=15 Bytes (<a href="#S37">?PR?CYCLESENDSMS?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S474">?PR?_SENDSMS?COMMUNICATION</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+<li><a href="#S473">?PR?SMSCOMMSTATUS?COMMUNICATION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S37">?PR?CYCLESENDSMS?MAINFLOW</a></li>
+<li><a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a></li>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S22"></a>?PR?SCANDEVICESTATUS?MAINFLOW (80AF25H - 80B6D8H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S474">?PR?_SENDSMS?COMMUNICATION</a>) Top=15 Bytes (<a href="#S37">?PR?CYCLESENDSMS?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S474">?PR?_SENDSMS?COMMUNICATION</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+<li><a href="#S473">?PR?SMSCOMMSTATUS?COMMUNICATION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S37">?PR?CYCLESENDSMS?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S24"></a>?PR?TRADEPACK?MAINFLOW (80A9EEH - 80AE9EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S474">?PR?_SENDSMS?COMMUNICATION</a>) Top=15 Bytes (<a href="#S37">?PR?CYCLESENDSMS?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S474">?PR?_SENDSMS?COMMUNICATION</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+<li><a href="#S473">?PR?SMSCOMMSTATUS?COMMUNICATION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S37">?PR?CYCLESENDSMS?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S26"></a>?PR?SYSTEMINIT?MAINFLOW (801F56H - 801FBDH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=48 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S28"></a>?PR?DEVICEDEFAULTSETTING?MAINFLOW (80B6D9H - 80B6FAH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=45 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S30"></a>?PR?DISPLAYOUTSERVER?MAINFLOW (80B6FBH - 80B70AH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=51 Bytes (<a href="#S7">?PR?SETOFFFLAG?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S369">?PR?KEYLOCK?KEY</a></li>
+<li><a href="#S7">?PR?SETOFFFLAG?MAINFLOW</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S31"></a>?PR?SYSINITPARAM?MAINFLOW (80B70BH - 80BA46H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=69 Bytes (<a href="#S15">?PR?GETHOPPERLIST?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S15">?PR?GETHOPPERLIST?MAINFLOW</a></li>
+<li><a href="#S150">?PR?LOADGLOBALPARAM?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S33"></a>?PR?CHECKOPERSTATUS?MAINFLOW (80BFFAH - 80C01CH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=45 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S318">?PR?_CASHERGETMACHINESTATE?SCHEDULER</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S354">?PR?ISMODEOFF?IOINPUT</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S34"></a>?PR?CHECKHARDWARESTATE?MAINFLOW (80C694H - 80C6B7H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S319">?PR?CASHERREALTIMESTATE?SCHEDULER</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S319">?PR?CASHERREALTIMESTATE?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S35"></a>?PR?CHECKQUREYCMD?MAINFLOW (80C6BFH - 80C815H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S486">?PR?_GETSHORTMSG?MOBILE</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S486">?PR?_GETSHORTMSG?MOBILE</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S37"></a>?PR?CYCLESENDSMS?MAINFLOW (80AEB6H - 80AF24H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S20">?PR?SCANISSENDALARM?MAINFLOW</a>) Top=12 Bytes (<a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S22">?PR?SCANDEVICESTATUS?MAINFLOW</a></li>
+<li><a href="#S20">?PR?SCANISSENDALARM?MAINFLOW</a></li>
+<li><a href="#S24">?PR?TRADEPACK?MAINFLOW</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a></li>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S39"></a>?PR?CHECKGOODSSUMANDLOAD?MAINFLOW (809824H - 8098DAH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=27 Bytes (<a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S8">?PR?LOGICOPEN?MAINFLOW</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S41"></a>?PR?ISINSERTBILL?MAINFLOW (809450H - 80952CH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=51 Bytes (<a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a>) Top=6 Bytes (<a href="#S48">?PR?DISPWELOROUTSERV?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S314">?PR?CASHERISCASHIN?SCHEDULER</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S364">?PR?GETCOIN?IOINPUT</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S48">?PR?DISPWELOROUTSERV?MAINFLOW</a></li>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S43"></a>?PR?CHECKKEYPRESS?MAINFLOW (80C816H - 80C89FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=51 Bytes (<a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S44"></a>?PR?QUERYDISPLAYINPUTCODE?MAINFLOW (801FBEH - 802114H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S46"></a>?PR?QUERYISGOODSWAY?MAINFLOW (80C8A0H - 80CB3CH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S48"></a>?PR?DISPWELOROUTSERV?MAINFLOW (802115H - 802314H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S300">?PR?GETDISPLAYSTATE?SCHEDULER</a></li>
+<li><a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S50"></a>?PR?GETBILL?MAINFLOW (801CB0H - 801F55H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=57 Bytes (<a href="#S13">?PR?_DISPLAYCURRENTMONEY?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S318">?PR?_CASHERGETMACHINESTATE?SCHEDULER</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S13">?PR?_DISPLAYCURRENTMONEY?MAINFLOW</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S310">?PR?CASHERACCEPT?SCHEDULER</a></li>
+<li><a href="#S315">?PR?CASHERISACCEPTOK?SCHEDULER</a></li>
+<li><a href="#S314">?PR?CASHERISCASHIN?SCHEDULER</a></li>
+<li><a href="#S5">?PR?DISABLEBILLDEV?MAINFLOW</a></li>
+<li><a href="#S364">?PR?GETCOIN?IOINPUT</a></li>
+<li><a href="#S316">?PR?GETCOMINGCASH?SCHEDULER</a></li>
+<li><a href="#S370">?PR?KEYUNLOCK?KEY</a></li>
+<li><a href="#S3">?PR?REJECTBILL?MAINFLOW</a></li>
+<li><a href="#S153">?PR?SAVEGLOBALPARAM?COMMONFUNCTION</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S52"></a>?PR?ISINPUTGOODSNO?MAINFLOW (80CB3DH - 80CB85H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=45 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S53"></a>?PR?DISPLAYINPUTCODE?MAINFLOW (802315H - 802641H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S5">?PR?DISABLEBILLDEV?MAINFLOW</a></li>
+<li><a href="#S364">?PR?GETCOIN?IOINPUT</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S3">?PR?REJECTBILL?MAINFLOW</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S55"></a>?PR?ISGOODSWAY?MAINFLOW (802642H - 8026AAH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=48 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S56"></a>?PR?ISMONEYENOUGH?MAINFLOW (80CB86H - 80CBB5H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S57"></a>?PR?GOODSWAYERR?MAINFLOW (8026ABH - 802881H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S18">?PR?ISCANCHANGE?MAINFLOW</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S59"></a>?PR?OUTGOODS?MAINFLOW (802882H - 802EA9H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=57 Bytes (<a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S13">?PR?_DISPLAYCURRENTMONEY?MAINFLOW</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S19">?PR?COLNUMISCANSERVER?MAINFLOW</a></li>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+<li><a href="#S18">?PR?ISCANCHANGE?MAINFLOW</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+<li><a href="#S152">?PR?SAVEGOODSSET?COMMONFUNCTION</a></li>
+<li><a href="#S156">?PR?SAVETRADECOUNTER?COMMONFUNCTION</a></li>
+<li><a href="#S155">?PR?SAVETRADEPARAM?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S61"></a>?PR?REBUY?MAINFLOW (802EAAH - 803647H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=57 Bytes (<a href="#S13">?PR?_DISPLAYCURRENTMONEY?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S13">?PR?_DISPLAYCURRENTMONEY?MAINFLOW</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S19">?PR?COLNUMISCANSERVER?MAINFLOW</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S18">?PR?ISCANCHANGE?MAINFLOW</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S63"></a>?PR?TESTHARDWARE?MAINFLOW (80CBB6H - 80CBDCH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=66 Bytes (<a href="#S1">?PR?_CHECKHARDWARE?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S1">?PR?_CHECKHARDWARE?MAINFLOW</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S64"></a>?PR?DISPENSECOIN?MAINFLOW (803648H - 803E91H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=6 Bytes (<a href="#S59">?PR?OUTGOODS?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S11">?PR?_CAL?MAINFLOW</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a></li>
+<li><a href="#S289">?PR?_HOPPERGETCOINOUT?SCHEDULER</a></li>
+<li><a href="#S140">?PR?_HOPPEROUTCOIN?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S19">?PR?COLNUMISCANSERVER?MAINFLOW</a></li>
+<li><a href="#S17">?PR?GETMINHOPPER?MAINFLOW</a></li>
+<li><a href="#S18">?PR?ISCANCHANGE?MAINFLOW</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+<li><a href="#S153">?PR?SAVEGLOBALPARAM?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S74">?PR?RETURNCHANGE?MAINFLOW</a></li>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S66"></a>?PR?DISPINPUTMONEY?MAINFLOW (801A5BH - 801AB0H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=57 Bytes (<a href="#S9">?PR?CHOOSERETURN?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S13">?PR?_DISPLAYCURRENTMONEY?MAINFLOW</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S9">?PR?CHOOSERETURN?MAINFLOW</a></li>
+<li><a href="#S6">?PR?ENABLEBILLDEV?MAINFLOW</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S68"></a>?PR?EXISTANYCHOOSE?MAINFLOW (80CBDDH - 80CC18H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S69"></a>?PR?CHEAPERONEPLZ?MAINFLOW (801A0DH - 801A5AH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=57 Bytes (<a href="#S9">?PR?CHOOSERETURN?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S9">?PR?CHOOSERETURN?MAINFLOW</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S71"></a>?PR?CHECKCHANGEPERMIT?MAINFLOW (803E92H - 803FDEH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=48 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S18">?PR?ISCANCHANGE?MAINFLOW</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S73"></a>?PR?DISPGETCOIN?MAINFLOW (807FF7H - 807FFAH)</h2>
+<p><br><b>Maximum Stack:</b> Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S74"></a>?PR?RETURNCHANGE?MAINFLOW (80CC19H - 80CC25H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=57 Bytes (<a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S75"></a>?PR?DISPTHX?MAINFLOW (803FDFH - 803FFDH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=51 Bytes (<a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S76"></a>?PR?SELLCODEOVER?MAINFLOW (80C024H - 80C049H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=66 Bytes (<a href="#S1">?PR?_CHECKHARDWARE?MAINFLOW</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S318">?PR?_CASHERGETMACHINESTATE?SCHEDULER</a></li>
+<li><a href="#S1">?PR?_CHECKHARDWARE?MAINFLOW</a></li>
+<li><a href="#S321">?PR?CASHERRESETOUTTIME?SCHEDULER</a></li>
+<li><a href="#S369">?PR?KEYLOCK?KEY</a></li>
+<li><a href="#S370">?PR?KEYUNLOCK?KEY</a></li>
+<li><a href="#S155">?PR?SAVETRADEPARAM?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S77"></a>?PR?ALLGOODSWAYERROR?MAINFLOW (803FFEH - 80402FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=60 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S155">?PR?SAVETRADEPARAM?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S78"></a>?PR?MAINTFUNCTION?MAINFLOW (804030H - 804192H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=222 Bytes (<a href="#S93">?PR?MAINMENU?MAINTMENU</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S472">?PR?CLEARALLSMSINSMSBUFFER?COMMUNICATION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S5">?PR?DISABLEBILLDEV?MAINFLOW</a></li>
+<li><a href="#S15">?PR?GETHOPPERLIST?MAINFLOW</a></li>
+<li><a href="#S354">?PR?ISMODEOFF?IOINPUT</a></li>
+<li><a href="#S369">?PR?KEYLOCK?KEY</a></li>
+<li><a href="#S370">?PR?KEYUNLOCK?KEY</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S80"></a>?PR?MISSION?MAINFLOW (80CC26H - 80CC34H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S484">?PR?ISSHORTMSGIN?MOBILE</a>) Top=39 Bytes (<a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S484">?PR?ISSHORTMSGIN?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S81"></a>?PR?OUTOFSERVICE?MAINFLOW (804193H - 80448FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=66 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=3 Bytes (<a href="#S83">?PR?RUNFLOW?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S37">?PR?CYCLESENDSMS?MAINFLOW</a></li>
+<li><a href="#S5">?PR?DISABLEBILLDEV?MAINFLOW</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+<li><a href="#S153">?PR?SAVEGLOBALPARAM?COMMONFUNCTION</a></li>
+<li><a href="#S152">?PR?SAVEGOODSSET?COMMONFUNCTION</a></li>
+<li><a href="#S20">?PR?SCANISSENDALARM?MAINFLOW</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S93"></a>?PR?MAINMENU?MAINTMENU (804490H - 804C52H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=219 Bytes (<a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a>) Top=6 Bytes (<a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S228">?PR?_DELAYMS?COMMON</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S243">?PR?_MOVFLASHTOSRAM?DATAEXCHANGE</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+<li><a href="#S290">?PR?DISPLAYCLEAR?SCHEDULER</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S172">?PR?GOODSPARAMMANAGE?GOODSWAYSET</a></li>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+<li><a href="#S153">?PR?SAVEGLOBALPARAM?COMMONFUNCTION</a></li>
+<li><a href="#S152">?PR?SAVEGOODSSET?COMMONFUNCTION</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+<li><a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S97"></a>?PR?_CHOOSERETURN?DEVICECHECK (8092D5H - 809343H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a>) Top=18 Bytes (<a href="#S101">?PR?COINERTEST?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S148">?PR?_DISPLAYINFO?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S101">?PR?COINERTEST?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S99"></a>?PR?GOODSWAYTEST?DEVICECHECK (80BB6CH - 80BF8FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=60 Bytes (<a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a>) Top=12 Bytes (<a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S101"></a>?PR?COINERTEST?DEVICECHECK (80905FH - 80926FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=57 Bytes (<a href="#S97">?PR?_CHOOSERETURN?DEVICECHECK</a>) Top=15 Bytes (<a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S97">?PR?_CHOOSERETURN?DEVICECHECK</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S360">?PR?COINERDISABLE?IOINPUT</a></li>
+<li><a href="#S359">?PR?COINERENABLE?IOINPUT</a></li>
+<li><a href="#S364">?PR?GETCOIN?IOINPUT</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S103"></a>?PR?_GETDEVICESTATUS?DEVICECHECK (807C60H - 807EAEH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=60 Bytes (<a href="#S101">?PR?COINERTEST?DEVICECHECK</a>) Top=12 Bytes (<a href="#S1">?PR?_CHECKHARDWARE?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a></li>
+<li><a href="#S140">?PR?_HOPPEROUTCOIN?COMMONFUNCTION</a></li>
+<li><a href="#S284">?PR?_TESTDEVICEEXCEPTION?SCHEDULER</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S101">?PR?COINERTEST?DEVICECHECK</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S1">?PR?_CHECKHARDWARE?MAINFLOW</a></li>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S105"></a>?PR?_DISPDEVICESTATUS?DEVICECHECK (804FBBH - 805149H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=48 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=15 Bytes (<a href="#S108">?PR?_DISPDEVICEMENU?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S108">?PR?_DISPDEVICEMENU?DEVICECHECK</a></li>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S108"></a>?PR?_DISPDEVICEMENU?DEVICECHECK (80514AH - 8051BDH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=51 Bytes (<a href="#S105">?PR?_DISPDEVICESTATUS?DEVICECHECK</a>) Top=12 Bytes (<a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S105">?PR?_DISPDEVICESTATUS?DEVICECHECK</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S110"></a>?PR?DISPGOODSWAYSSTATES?DEVICECHECK (8051BEH - 8055FEH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a>) Top=12 Bytes (<a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S228">?PR?_DELAYMS?COMMON</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S529">?PR?_STRLEN?STRLEN</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S112"></a>?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK (8055FFH - 8059A0H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=48 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=12 Bytes (<a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S461">?PR?_TESTSMSSEND?COMMMODULE</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S463">?PR?GETATCMDRESULT?COMMMODULE</a></li>
+<li><a href="#S462">?PR?GETTESTSMSSENDRESULT?COMMMODULE</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+<li><a href="#S473">?PR?SMSCOMMSTATUS?COMMUNICATION</a></li>
+<li><a href="#S336">?PR?TESTATCOMMAND?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S114"></a>?PR?DEVICECHECK?DEVICECHECK (80CC40H - 80CE27H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=63 Bytes (<a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a>) Top=9 Bytes (<a href="#S93">?PR?MAINMENU?MAINTMENU</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S228">?PR?_DELAYMS?COMMON</a></li>
+<li><a href="#S108">?PR?_DISPDEVICEMENU?DEVICECHECK</a></li>
+<li><a href="#S105">?PR?_DISPDEVICESTATUS?DEVICECHECK</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a></li>
+<li><a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S110">?PR?DISPGOODSWAYSSTATES?DEVICECHECK</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+</ul>
+
+<h2><a name="S119"></a>?PR?COREPROCESSCYCLE?COMMONFUNCTION (807AD7H - 807AEEH)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=24 Bytes (<a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a>) Top=36 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S457">?PR?DOCOMMUNICATION?COMMMODULE</a></li>
+<li><a href="#S80">?PR?MISSION?MAINFLOW</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S169">?PR?_GOODS_MENUSELECTED?GOODSWAYSET</a></li>
+<li><a href="#S220">?PR?_RACK_MENUSELECTED?RACKSET</a></li>
+<li><a href="#S185">?PR?_SP_MENUSELECTED?SYSPARAMSET</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S39">?PR?CHECKGOODSSUMANDLOAD?MAINFLOW</a></li>
+<li><a href="#S43">?PR?CHECKKEYPRESS?MAINFLOW</a></li>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+<li><a href="#S110">?PR?DISPGOODSWAYSSTATES?DEVICECHECK</a></li>
+<li><a href="#S136">?PR?GETONEKEY?COMMONFUNCTION</a></li>
+<li><a href="#S57">?PR?GOODSWAYERR?MAINFLOW</a></li>
+<li><a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S83">?PR?RUNFLOW?MAINFLOW</a></li>
+<li><a href="#S31">?PR?SYSINITPARAM?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S120"></a>?PR?_WAITFORWORK?COMMONFUNCTION (807AEFH - 807C5FH)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=33 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S285">?PR?_TESTDEVICECOMMOK?SCHEDULER</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a></li>
+<li><a href="#S97">?PR?_CHOOSERETURN?DEVICECHECK</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S13">?PR?_DISPLAYCURRENTMONEY?MAINFLOW</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a></li>
+<li><a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a></li>
+<li><a href="#S140">?PR?_HOPPEROUTCOIN?COMMONFUNCTION</a></li>
+<li><a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a></li>
+<li><a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a></li>
+<li><a href="#S69">?PR?CHEAPERONEPLZ?MAINFLOW</a></li>
+<li><a href="#S33">?PR?CHECKOPERSTATUS?MAINFLOW</a></li>
+<li><a href="#S0">?PR?CHECKTIMERORMONEY?MAINFLOW</a></li>
+<li><a href="#S101">?PR?COINERTEST?DEVICECHECK</a></li>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S205">?PR?CURRENCYCOUNTMENU?COUNTERMAINT</a></li>
+<li><a href="#S28">?PR?DEVICEDEFAULTSETTING?MAINFLOW</a></li>
+<li><a href="#S5">?PR?DISABLEBILLDEV?MAINFLOW</a></li>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+<li><a href="#S66">?PR?DISPINPUTMONEY?MAINFLOW</a></li>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S75">?PR?DISPTHX?MAINFLOW</a></li>
+<li><a href="#S48">?PR?DISPWELOROUTSERV?MAINFLOW</a></li>
+<li><a href="#S6">?PR?ENABLEBILLDEV?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S136">?PR?GETONEKEY?COMMONFUNCTION</a></li>
+<li><a href="#S128">?PR?GETONEMONEYKEY?COMMONFUNCTION</a></li>
+<li><a href="#S200">?PR?GOODSMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S172">?PR?GOODSPARAMMANAGE?GOODSWAYSET</a></li>
+<li><a href="#S57">?PR?GOODSWAYERR?MAINFLOW</a></li>
+<li><a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a></li>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+<li><a href="#S193">?PR?INITALLCOUNTER?COUNTERMAINT</a></li>
+<li><a href="#S55">?PR?ISGOODSWAY?MAINFLOW</a></li>
+<li><a href="#S52">?PR?ISINPUTGOODSNO?MAINFLOW</a></li>
+<li><a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a></li>
+<li><a href="#S44">?PR?QUERYDISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S46">?PR?QUERYISGOODSWAY?MAINFLOW</a></li>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+<li><a href="#S61">?PR?REBUY?MAINFLOW</a></li>
+<li><a href="#S3">?PR?REJECTBILL?MAINFLOW</a></li>
+<li><a href="#S26">?PR?SYSTEMINIT?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S122"></a>?PR?CLEARKEY?COMMONFUNCTION (808791H - 8087B1H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=63 Bytes (<a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a>) Top=24 Bytes (<a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S369">?PR?KEYLOCK?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S97">?PR?_CHOOSERETURN?DEVICECHECK</a></li>
+<li><a href="#S167">?PR?_EDITGOODSPARAM?GOODSWAYSET</a></li>
+<li><a href="#S182">?PR?_EDITPARAM?SYSPARAMSET</a></li>
+<li><a href="#S218">?PR?_EDITRACKPARAM?RACKSET</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a></li>
+<li><a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a></li>
+<li><a href="#S69">?PR?CHEAPERONEPLZ?MAINFLOW</a></li>
+<li><a href="#S9">?PR?CHOOSERETURN?MAINFLOW</a></li>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+<li><a href="#S110">?PR?DISPGOODSWAYSSTATES?DEVICECHECK</a></li>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S200">?PR?GOODSMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S172">?PR?GOODSPARAMMANAGE?GOODSWAYSET</a></li>
+<li><a href="#S57">?PR?GOODSWAYERR?MAINFLOW</a></li>
+<li><a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a></li>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+<li><a href="#S44">?PR?QUERYDISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S46">?PR?QUERYISGOODSWAY?MAINFLOW</a></li>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+<li><a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a></li>
+</ul>
+
+<h2><a name="S123"></a>?PR?_DISPLAYSTR?COMMONFUNCTION (808019H - 808161H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=57 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>) Top=36 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S294">?PR?_DISPLAYPOSSTRING?SCHEDULER</a></li>
+<li><a href="#S292">?PR?_DISPLAYSTRING?SCHEDULER</a></li>
+<li><a href="#S285">?PR?_TESTDEVICECOMMOK?SCHEDULER</a></li>
+<li><a href="#S283">?PR?_TESTDEVICETIMEOUT?SCHEDULER</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S97">?PR?_CHOOSERETURN?DEVICECHECK</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S108">?PR?_DISPDEVICEMENU?DEVICECHECK</a></li>
+<li><a href="#S105">?PR?_DISPDEVICESTATUS?DEVICECHECK</a></li>
+<li><a href="#S13">?PR?_DISPLAYCURRENTMONEY?MAINFLOW</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S164">?PR?_DISPLAYGOODSMENUANDVAL?GOODSWAYSET</a></li>
+<li><a href="#S148">?PR?_DISPLAYINFO?COMMONFUNCTION</a></li>
+<li><a href="#S179">?PR?_DISPLAYMENUANDVAL?SYSPARAMSET</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a></li>
+<li><a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a></li>
+<li><a href="#S185">?PR?_SP_MENUSELECTED?SYSPARAMSET</a></li>
+<li><a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S77">?PR?ALLGOODSWAYERROR?MAINFLOW</a></li>
+<li><a href="#S69">?PR?CHEAPERONEPLZ?MAINFLOW</a></li>
+<li><a href="#S71">?PR?CHECKCHANGEPERMIT?MAINFLOW</a></li>
+<li><a href="#S0">?PR?CHECKTIMERORMONEY?MAINFLOW</a></li>
+<li><a href="#S9">?PR?CHOOSERETURN?MAINFLOW</a></li>
+<li><a href="#S101">?PR?COINERTEST?DEVICECHECK</a></li>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+<li><a href="#S110">?PR?DISPGOODSWAYSSTATES?DEVICECHECK</a></li>
+<li><a href="#S66">?PR?DISPINPUTMONEY?MAINFLOW</a></li>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S75">?PR?DISPTHX?MAINFLOW</a></li>
+<li><a href="#S48">?PR?DISPWELOROUTSERV?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S136">?PR?GETONEKEY?COMMONFUNCTION</a></li>
+<li><a href="#S128">?PR?GETONEMONEYKEY?COMMONFUNCTION</a></li>
+<li><a href="#S57">?PR?GOODSWAYERR?MAINFLOW</a></li>
+<li><a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a></li>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+<li><a href="#S193">?PR?INITALLCOUNTER?COUNTERMAINT</a></li>
+<li><a href="#S55">?PR?ISGOODSWAY?MAINFLOW</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a></li>
+<li><a href="#S44">?PR?QUERYDISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S46">?PR?QUERYISGOODSWAY?MAINFLOW</a></li>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+<li><a href="#S61">?PR?REBUY?MAINFLOW</a></li>
+<li><a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a></li>
+<li><a href="#S26">?PR?SYSTEMINIT?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S126"></a>?PR?_GETLINE?COMMONFUNCTION (808C2CH - 808E91H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=66 Bytes (<a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a>) Top=21 Bytes (<a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S294">?PR?_DISPLAYPOSSTRING?SCHEDULER</a></li>
+<li><a href="#S298">?PR?_DISPLAYSETCURSORPOS?SCHEDULER</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S136">?PR?GETONEKEY?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S167">?PR?_EDITGOODSPARAM?GOODSWAYSET</a></li>
+<li><a href="#S182">?PR?_EDITPARAM?SYSPARAMSET</a></li>
+<li><a href="#S218">?PR?_EDITRACKPARAM?RACKSET</a></li>
+<li><a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a></li>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+</ul>
+
+<h2><a name="S128"></a>?PR?GETONEMONEYKEY?COMMONFUNCTION (809621H - 8096C1H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=48 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=18 Bytes (<a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S229">?PR?_NUMBERTOSTRING?COMMON</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S130"></a>?PR?_GETLINEMONEY?COMMONFUNCTION (8089C7H - 808C2BH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=54 Bytes (<a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a>) Top=15 Bytes (<a href="#S167">?PR?_EDITGOODSPARAM?GOODSWAYSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S294">?PR?_DISPLAYPOSSTRING?SCHEDULER</a></li>
+<li><a href="#S298">?PR?_DISPLAYSETCURSORPOS?SCHEDULER</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S128">?PR?GETONEMONEYKEY?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S167">?PR?_EDITGOODSPARAM?GOODSWAYSET</a></li>
+<li><a href="#S182">?PR?_EDITPARAM?SYSPARAMSET</a></li>
+</ul>
+
+<h2><a name="S132"></a>?PR?_CLEARDISPLAYLINE?COMMONFUNCTION (8087B2H - 8087F0H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=48 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=21 Bytes (<a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a></li>
+<li><a href="#S69">?PR?CHEAPERONEPLZ?MAINFLOW</a></li>
+<li><a href="#S0">?PR?CHECKTIMERORMONEY?MAINFLOW</a></li>
+<li><a href="#S205">?PR?CURRENCYCOUNTMENU?COUNTERMAINT</a></li>
+<li><a href="#S66">?PR?DISPINPUTMONEY?MAINFLOW</a></li>
+<li><a href="#S75">?PR?DISPTHX?MAINFLOW</a></li>
+<li><a href="#S48">?PR?DISPWELOROUTSERV?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S57">?PR?GOODSWAYERR?MAINFLOW</a></li>
+<li><a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a></li>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S44">?PR?QUERYDISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+<li><a href="#S61">?PR?REBUY?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S133"></a>?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION (808162H - 8081E5H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=60 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=33 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S298">?PR?_DISPLAYSETCURSORPOS?SCHEDULER</a></li>
+<li><a href="#S296">?PR?_DISPLAYSETCURSORSTYLE?SCHEDULER</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S285">?PR?_TESTDEVICECOMMOK?SCHEDULER</a></li>
+<li><a href="#S283">?PR?_TESTDEVICETIMEOUT?SCHEDULER</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S167">?PR?_EDITGOODSPARAM?GOODSWAYSET</a></li>
+<li><a href="#S182">?PR?_EDITPARAM?SYSPARAMSET</a></li>
+<li><a href="#S218">?PR?_EDITRACKPARAM?RACKSET</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a></li>
+<li><a href="#S169">?PR?_GOODS_MENUSELECTED?GOODSWAYSET</a></li>
+<li><a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a></li>
+<li><a href="#S220">?PR?_RACK_MENUSELECTED?RACKSET</a></li>
+<li><a href="#S185">?PR?_SP_MENUSELECTED?SYSPARAMSET</a></li>
+<li><a href="#S43">?PR?CHECKKEYPRESS?MAINFLOW</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S205">?PR?CURRENCYCOUNTMENU?COUNTERMAINT</a></li>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+<li><a href="#S110">?PR?DISPGOODSWAYSSTATES?DEVICECHECK</a></li>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S200">?PR?GOODSMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S172">?PR?GOODSPARAMMANAGE?GOODSWAYSET</a></li>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+<li><a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S44">?PR?QUERYDISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+<li><a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a></li>
+</ul>
+
+<h2><a name="S136"></a>?PR?GETONEKEY?COMMONFUNCTION (80CE28H - 80CEC8H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=60 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=24 Bytes (<a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S229">?PR?_NUMBERTOSTRING?COMMON</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S138"></a>?PR?_LENOFNUM?COMMONFUNCTION (80CEC9H - 80CFCCH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=21 Bytes (<a href="#S196">?PR?_DISPGOODSWAYLIST?COUNTERMAINT</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S196">?PR?_DISPGOODSWAYLIST?COUNTERMAINT</a></li>
+</ul>
+
+<h2><a name="S140"></a>?PR?_HOPPEROUTCOIN?COMMONFUNCTION (807F74H - 807FD0H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=45 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>) Top=15 Bytes (<a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S287">?PR?_HOPPEROUTPUT?SCHEDULER</a></li>
+<li><a href="#S285">?PR?_TESTDEVICECOMMOK?SCHEDULER</a></li>
+<li><a href="#S283">?PR?_TESTDEVICETIMEOUT?SCHEDULER</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a></li>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S142"></a>?PR?_INPUTGOODSWAYNO?COMMONFUNCTION (80CFCDH - 80D14EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=69 Bytes (<a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a>) Top=18 Bytes (<a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S172">?PR?GOODSPARAMMANAGE?GOODSWAYSET</a></li>
+<li><a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a></li>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+</ul>
+
+<h2><a name="S144"></a>?PR?_CHANNELTASK?COMMONFUNCTION (80BA47H - 80BB6BH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=45 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>) Top=15 Bytes (<a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S285">?PR?_TESTDEVICECOMMOK?SCHEDULER</a></li>
+<li><a href="#S283">?PR?_TESTDEVICETIMEOUT?SCHEDULER</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S330">?PR?_ZHKCHANNELEXEC?SCHEDULER</a></li>
+<li><a href="#S334">?PR?_ZHKCHANNELTEST?SCHEDULER</a></li>
+<li><a href="#S332">?PR?ZHKCHANNELCLEAR?SCHEDULER</a></li>
+<li><a href="#S328">?PR?ZHKCHANNELQUERY?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S31">?PR?SYSINITPARAM?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S146"></a>?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION (807EAFH - 807F73H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=45 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>) Top=15 Bytes (<a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S286">?PR?_HOPPERQUERY?SCHEDULER</a></li>
+<li><a href="#S285">?PR?_TESTDEVICECOMMOK?SCHEDULER</a></li>
+<li><a href="#S284">?PR?_TESTDEVICEEXCEPTION?SCHEDULER</a></li>
+<li><a href="#S283">?PR?_TESTDEVICETIMEOUT?SCHEDULER</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S309">?PR?CASHERQUERY?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a></li>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S148"></a>?PR?_DISPLAYINFO?COMMONFUNCTION (80D14FH - 80D18DH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=48 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=21 Bytes (<a href="#S97">?PR?_CHOOSERETURN?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S529">?PR?_STRLEN?STRLEN</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S97">?PR?_CHOOSERETURN?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S150"></a>?PR?LOADGLOBALPARAM?COMMONFUNCTION (80C22CH - 80C324H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S243">?PR?_MOVFLASHTOSRAM?DATAEXCHANGE</a>) Top=6 Bytes (<a href="#S31">?PR?SYSINITPARAM?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S243">?PR?_MOVFLASHTOSRAM?DATAEXCHANGE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S31">?PR?SYSINITPARAM?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S152"></a>?PR?SAVEGOODSSET?COMMONFUNCTION (80C34CH - 80C377H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=12 Bytes (<a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a></li>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+</ul>
+
+<h2><a name="S153"></a>?PR?SAVEGLOBALPARAM?COMMONFUNCTION (80C54CH - 80C5ABH)</h2>
+<p><br><b>Maximum Stack:</b> Top=12 Bytes (<a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S155"></a>?PR?SAVETRADEPARAM?COMMONFUNCTION (80C04AH - 80C062H)</h2>
+<p><br><b>Maximum Stack:</b> Top=15 Bytes (<a href="#S193">?PR?INITALLCOUNTER?COUNTERMAINT</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S77">?PR?ALLGOODSWAYERROR?MAINFLOW</a></li>
+<li><a href="#S193">?PR?INITALLCOUNTER?COUNTERMAINT</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S76">?PR?SELLCODEOVER?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S156"></a>?PR?SAVETRADECOUNTER?COMMONFUNCTION (80C325H - 80C34BH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=15 Bytes (<a href="#S193">?PR?INITALLCOUNTER?COUNTERMAINT</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S193">?PR?INITALLCOUNTER?COUNTERMAINT</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S157"></a>?PR?SAVERACKSET?COMMONFUNCTION (80C42BH - 80C443H)</h2>
+<p><br><b>Maximum Stack:</b> Top=12 Bytes (<a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+</ul>
+
+<h2><a name="S158"></a>?PR?SAVERACKCOLUMNSET?COMMONFUNCTION (80C444H - 80C45CH)</h2>
+<p><br><b>Maximum Stack:</b> Top=12 Bytes (<a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+</ul>
+
+<h2><a name="S161"></a>?PR?_READWRITEGOODSPARAM?GOODSWAYSET (80D18EH - 80D6BAH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=18 Bytes (<a href="#S164">?PR?_DISPLAYGOODSMENUANDVAL?GOODSWAYSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S164">?PR?_DISPLAYGOODSMENUANDVAL?GOODSWAYSET</a></li>
+<li><a href="#S167">?PR?_EDITGOODSPARAM?GOODSWAYSET</a></li>
+</ul>
+
+<h2><a name="S164"></a>?PR?_DISPLAYGOODSMENUANDVAL?GOODSWAYSET (8059A1H - 805B02H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=48 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=15 Bytes (<a href="#S169">?PR?_GOODS_MENUSELECTED?GOODSWAYSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S161">?PR?_READWRITEGOODSPARAM?GOODSWAYSET</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S169">?PR?_GOODS_MENUSELECTED?GOODSWAYSET</a></li>
+<li><a href="#S172">?PR?GOODSPARAMMANAGE?GOODSWAYSET</a></li>
+</ul>
+
+<h2><a name="S167"></a>?PR?_EDITGOODSPARAM?GOODSWAYSET (805B03H - 805C23H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=57 Bytes (<a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a>) Top=12 Bytes (<a href="#S172">?PR?GOODSPARAMMANAGE?GOODSWAYSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a></li>
+<li><a href="#S161">?PR?_READWRITEGOODSPARAM?GOODSWAYSET</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S172">?PR?GOODSPARAMMANAGE?GOODSWAYSET</a></li>
+</ul>
+
+<h2><a name="S169"></a>?PR?_GOODS_MENUSELECTED?GOODSWAYSET (80D6BBH - 80D817H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=51 Bytes (<a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a>) Top=12 Bytes (<a href="#S172">?PR?GOODSPARAMMANAGE?GOODSWAYSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S228">?PR?_DELAYMS?COMMON</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S164">?PR?_DISPLAYGOODSMENUANDVAL?GOODSWAYSET</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S172">?PR?GOODSPARAMMANAGE?GOODSWAYSET</a></li>
+</ul>
+
+<h2><a name="S172"></a>?PR?GOODSPARAMMANAGE?GOODSWAYSET (80D818H - 80D91DH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=60 Bytes (<a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a>) Top=9 Bytes (<a href="#S93">?PR?MAINMENU?MAINTMENU</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S164">?PR?_DISPLAYGOODSMENUANDVAL?GOODSWAYSET</a></li>
+<li><a href="#S167">?PR?_EDITGOODSPARAM?GOODSWAYSET</a></li>
+<li><a href="#S169">?PR?_GOODS_MENUSELECTED?GOODSWAYSET</a></li>
+<li><a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+</ul>
+
+<h2><a name="S176"></a>?PR?_READWRITESYSPARAM?SYSPARAMSET (80D91EH - 80FDF7H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=207 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=18 Bytes (<a href="#S179">?PR?_DISPLAYMENUANDVAL?SYSPARAMSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S179">?PR?_DISPLAYMENUANDVAL?SYSPARAMSET</a></li>
+<li><a href="#S182">?PR?_EDITPARAM?SYSPARAMSET</a></li>
+</ul>
+
+<h2><a name="S179"></a>?PR?_DISPLAYMENUANDVAL?SYSPARAMSET (805C24H - 805D82H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=210 Bytes (<a href="#S176">?PR?_READWRITESYSPARAM?SYSPARAMSET</a>) Top=15 Bytes (<a href="#S185">?PR?_SP_MENUSELECTED?SYSPARAMSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S176">?PR?_READWRITESYSPARAM?SYSPARAMSET</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S185">?PR?_SP_MENUSELECTED?SYSPARAMSET</a></li>
+<li><a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a></li>
+</ul>
+
+<h2><a name="S182"></a>?PR?_EDITPARAM?SYSPARAMSET (805D83H - 805EC0H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=210 Bytes (<a href="#S176">?PR?_READWRITESYSPARAM?SYSPARAMSET</a>) Top=12 Bytes (<a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a></li>
+<li><a href="#S176">?PR?_READWRITESYSPARAM?SYSPARAMSET</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a></li>
+</ul>
+
+<h2><a name="S185"></a>?PR?_SP_MENUSELECTED?SYSPARAMSET (808526H - 808790H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=213 Bytes (<a href="#S179">?PR?_DISPLAYMENUANDVAL?SYSPARAMSET</a>) Top=12 Bytes (<a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S228">?PR?_DELAYMS?COMMON</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S179">?PR?_DISPLAYMENUANDVAL?SYSPARAMSET</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a></li>
+</ul>
+
+<h2><a name="S188"></a>?PR?SYSPARAMMANAGE?SYSPARAMSET (810000H - 810154H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=216 Bytes (<a href="#S185">?PR?_SP_MENUSELECTED?SYSPARAMSET</a>) Top=9 Bytes (<a href="#S93">?PR?MAINMENU?MAINTMENU</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S179">?PR?_DISPLAYMENUANDVAL?SYSPARAMSET</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S182">?PR?_EDITPARAM?SYSPARAMSET</a></li>
+<li><a href="#S185">?PR?_SP_MENUSELECTED?SYSPARAMSET</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+</ul>
+
+<h2><a name="S193"></a>?PR?INITALLCOUNTER?COUNTERMAINT (805EC1H - 805F98H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=60 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>) Top=12 Bytes (<a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S156">?PR?SAVETRADECOUNTER?COMMONFUNCTION</a></li>
+<li><a href="#S155">?PR?SAVETRADEPARAM?COMMONFUNCTION</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+</ul>
+
+<h2><a name="S194"></a>?PR?_DISPLAYTRACESUM?COUNTERMAINT (805F99H - 8060ABH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=15 Bytes (<a href="#S200">?PR?GOODSMAINMENU?COUNTERMAINT</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S200">?PR?GOODSMAINMENU?COUNTERMAINT</a></li>
+</ul>
+
+<h2><a name="S196"></a>?PR?_DISPGOODSWAYLIST?COUNTERMAINT (8060ACH - 80628FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=18 Bytes (<a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S138">?PR?_LENOFNUM?COMMONFUNCTION</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+</ul>
+
+<h2><a name="S198"></a>?PR?GOODSWAYTRACELIST?COUNTERMAINT (808383H - 808525H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=72 Bytes (<a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a>) Top=15 Bytes (<a href="#S200">?PR?GOODSMAINMENU?COUNTERMAINT</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S196">?PR?_DISPGOODSWAYLIST?COUNTERMAINT</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S200">?PR?GOODSMAINMENU?COUNTERMAINT</a></li>
+</ul>
+
+<h2><a name="S200"></a>?PR?GOODSMAINMENU?COUNTERMAINT (8081E6H - 808382H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=75 Bytes (<a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a>) Top=12 Bytes (<a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S194">?PR?_DISPLAYTRACESUM?COUNTERMAINT</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+</ul>
+
+<h2><a name="S203"></a>?PR?_DISPCURRENCYLIST?COUNTERMAINT (806290H - 806D45H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=84 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=15 Bytes (<a href="#S205">?PR?CURRENCYCOUNTMENU?COUNTERMAINT</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S205">?PR?CURRENCYCOUNTMENU?COUNTERMAINT</a></li>
+</ul>
+
+<h2><a name="S205"></a>?PR?CURRENCYCOUNTMENU?COUNTERMAINT (810155H - 810292H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=87 Bytes (<a href="#S203">?PR?_DISPCURRENCYLIST?COUNTERMAINT</a>) Top=12 Bytes (<a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S203">?PR?_DISPCURRENCYLIST?COUNTERMAINT</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+</ul>
+
+<h2><a name="S208"></a>?PR?COUNTERMAINMENU?COUNTERMAINT (804C53H - 804FBAH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=90 Bytes (<a href="#S205">?PR?CURRENCYCOUNTMENU?COUNTERMAINT</a>) Top=9 Bytes (<a href="#S93">?PR?MAINMENU?MAINTMENU</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S205">?PR?CURRENCYCOUNTMENU?COUNTERMAINT</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+<li><a href="#S200">?PR?GOODSMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S193">?PR?INITALLCOUNTER?COUNTERMAINT</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+</ul>
+
+<h2><a name="S212"></a>?PR?_READWRITERACTPARAM?RACKSET (810293H - 810A3CH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=33 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=18 Bytes (<a href="#S215">?PR?_DISPLAYRACKMENUANDVAL?RACKSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S215">?PR?_DISPLAYRACKMENUANDVAL?RACKSET</a></li>
+<li><a href="#S218">?PR?_EDITRACKPARAM?RACKSET</a></li>
+</ul>
+
+<h2><a name="S215"></a>?PR?_DISPLAYRACKMENUANDVAL?RACKSET (806D46H - 806E14H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=36 Bytes (<a href="#S212">?PR?_READWRITERACTPARAM?RACKSET</a>) Top=15 Bytes (<a href="#S220">?PR?_RACK_MENUSELECTED?RACKSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S212">?PR?_READWRITERACTPARAM?RACKSET</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S220">?PR?_RACK_MENUSELECTED?RACKSET</a></li>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+</ul>
+
+<h2><a name="S218"></a>?PR?_EDITRACKPARAM?RACKSET (806E15H - 806EEDH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=69 Bytes (<a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a>) Top=12 Bytes (<a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S212">?PR?_READWRITERACTPARAM?RACKSET</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+</ul>
+
+<h2><a name="S220"></a>?PR?_RACK_MENUSELECTED?RACKSET (810A3DH - 810B99H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=63 Bytes (<a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a>) Top=12 Bytes (<a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S228">?PR?_DELAYMS?COMMON</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S215">?PR?_DISPLAYRACKMENUANDVAL?RACKSET</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+</ul>
+
+<h2><a name="S223"></a>?PR?RACKPARAMMANAGE?RACKSET (810B9AH - 810F95H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=72 Bytes (<a href="#S218">?PR?_EDITRACKPARAM?RACKSET</a>) Top=9 Bytes (<a href="#S93">?PR?MAINMENU?MAINTMENU</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S215">?PR?_DISPLAYRACKMENUANDVAL?RACKSET</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S218">?PR?_EDITRACKPARAM?RACKSET</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S220">?PR?_RACK_MENUSELECTED?RACKSET</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S152">?PR?SAVEGOODSSET?COMMONFUNCTION</a></li>
+<li><a href="#S158">?PR?SAVERACKCOLUMNSET?COMMONFUNCTION</a></li>
+<li><a href="#S157">?PR?SAVERACKSET?COMMONFUNCTION</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+</ul>
+
+<h2><a name="S227"></a>?PR?_DELAY?COMMON (80FDF8H - 80FE01H)</h2>
+<p><br><b>Maximum Stack:</b> Top=54 Bytes (<a href="#S410">?PR?_ZHKSERIAL1PUTCH?SERIAL1</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S410">?PR?_ZHKSERIAL1PUTCH?SERIAL1</a></li>
+</ul>
+
+<h2><a name="S228"></a>?PR?_DELAYMS?COMMON (80977DH - 80979BH)</h2>
+<p><br><b>Maximum Stack:</b> Top=54 Bytes (<a href="#S409">?PR?ZHKSERIAL1INIT?SERIAL1</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S169">?PR?_GOODS_MENUSELECTED?GOODSWAYSET</a></li>
+<li><a href="#S220">?PR?_RACK_MENUSELECTED?RACKSET</a></li>
+<li><a href="#S185">?PR?_SP_MENUSELECTED?SYSPARAMSET</a></li>
+<li><a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a></li>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+<li><a href="#S110">?PR?DISPGOODSWAYSSTATES?DEVICECHECK</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S361">?PR?ZHKIOINIT?IOINPUT</a></li>
+<li><a href="#S409">?PR?ZHKSERIAL1INIT?SERIAL1</a></li>
+</ul>
+
+<h2><a name="S229"></a>?PR?_NUMBERTOSTRING?COMMON (811130H - 81133BH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=27 Bytes (<a href="#S136">?PR?GETONEKEY?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S136">?PR?GETONEKEY?COMMONFUNCTION</a></li>
+<li><a href="#S128">?PR?GETONEMONEYKEY?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S233"></a>?PR?_MOVDATAFROMSRAM?DATAEXCHANGE (80C45DH - 80C487H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=6 Bytes (<a href="#S239">?PR?_POGRAMFLASH?DATAEXCHANGE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S239">?PR?_POGRAMFLASH?DATAEXCHANGE</a></li>
+</ul>
+
+<h2><a name="S235"></a>?PR?_MOVDATATOSRAM?DATAEXCHANGE (80C488H - 80C4B4H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=12 Bytes (<a href="#S243">?PR?_MOVFLASHTOSRAM?DATAEXCHANGE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S243">?PR?_MOVFLASHTOSRAM?DATAEXCHANGE</a></li>
+</ul>
+
+<h2><a name="S237"></a>?PR?_MOVSRAMTOSRAM?DATAEXCHANGE (80C4B5H - 80C4F7H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=51 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S241">?PR?_MOVSRAMTOFLASH?DATAEXCHANGE</a></li>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S239"></a>?PR?_POGRAMFLASH?DATAEXCHANGE (80C378H - 80C415H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S233">?PR?_MOVDATAFROMSRAM?DATAEXCHANGE</a>) Top=3 Bytes (<a href="#S241">?PR?_MOVSRAMTOFLASH?DATAEXCHANGE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S233">?PR?_MOVDATAFROMSRAM?DATAEXCHANGE</a></li>
+<li><a href="#S249">?PR?_SSTFLASHSTRINGPROGAM?SSTFLASH</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S241">?PR?_MOVSRAMTOFLASH?DATAEXCHANGE</a></li>
+</ul>
+
+<h2><a name="S243"></a>?PR?_MOVFLASHTOSRAM?DATAEXCHANGE (80C17BH - 80C22BH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S235">?PR?_MOVDATATOSRAM?DATAEXCHANGE</a>) Top=9 Bytes (<a href="#S150">?PR?LOADGLOBALPARAM?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S235">?PR?_MOVDATATOSRAM?DATAEXCHANGE</a></li>
+<li><a href="#S251">?PR?_SSTFLASHREADSTRING?SSTFLASH</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S241">?PR?_MOVSRAMTOFLASH?DATAEXCHANGE</a></li>
+<li><a href="#S150">?PR?LOADGLOBALPARAM?COMMONFUNCTION</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+</ul>
+
+<h2><a name="S0"></a>?PR?SSTFLASHCHIPERASE?SSTFLASH (000000H - 000033H)</h2>
+<p><br><b>Maximum Stack:</b> Top=3 Bytes (<a href="#S0">?PR?FLASHINIT?COMMONFUNCTION</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S0">?PR?FLASHINIT?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S247"></a>?PR?_SSTFLASHSECTORERASE?SSTFLASH (80C5ACH - 80C619H)</h2>
+<p><br><b>Maximum Stack:</b> Top=3 Bytes (<a href="#S241">?PR?_MOVSRAMTOFLASH?DATAEXCHANGE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S241">?PR?_MOVSRAMTOFLASH?DATAEXCHANGE</a></li>
+</ul>
+
+<h2><a name="S249"></a>?PR?_SSTFLASHSTRINGPROGAM?SSTFLASH (80C61AH - 80C693H)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S239">?PR?_POGRAMFLASH?DATAEXCHANGE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S239">?PR?_POGRAMFLASH?DATAEXCHANGE</a></li>
+</ul>
+
+<h2><a name="S251"></a>?PR?_SSTFLASHREADSTRING?SSTFLASH (80C4F8H - 80C54BH)</h2>
+<p><br><b>Maximum Stack:</b> Top=12 Bytes (<a href="#S243">?PR?_MOVFLASHTOSRAM?DATAEXCHANGE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S243">?PR?_MOVFLASHTOSRAM?DATAEXCHANGE</a></li>
+</ul>
+
+<h2><a name="S253"></a>?PR?ZHKTIMERINIT?TIMER (80FEC2H - 80FEFAH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S439">?PR?ZHKINIT?INITIALIZATION</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S439">?PR?ZHKINIT?INITIALIZATION</a></li>
+</ul>
+
+<h2><a name="S258"></a>?PR?CLOCKINIT?CLOCK (8077BCH - 8077CCH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S397">?PR?DS12887INIT?DS12887</a>) Top=6 Bytes (<a href="#S439">?PR?ZHKINIT?INITIALIZATION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S397">?PR?DS12887INIT?DS12887</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S439">?PR?ZHKINIT?INITIALIZATION</a></li>
+</ul>
+
+<h2><a name="S260"></a>?PR?SCHEDULERINIT?SCHEDULER (81142FH - 81152FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S482">?PR?ZHKMOBILEINIT?MOBILE</a>) Top=6 Bytes (<a href="#S439">?PR?ZHKINIT?INITIALIZATION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S482">?PR?ZHKMOBILEINIT?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S439">?PR?ZHKINIT?INITIALIZATION</a></li>
+</ul>
+
+<h2><a name="S261"></a>?PR?SCHEDULERPROCESS?SCHEDULER (80952DH - 809620H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=21 Bytes (<a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a>) Top=39 Bytes (<a href="#S285">?PR?_TESTDEVICECOMMOK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S301">?PR?_ZHKCASHERTASK?SCHEDULER</a></li>
+<li><a href="#S322">?PR?_ZHKCHANNELTASK?SCHEDULER</a></li>
+<li><a href="#S449">?PR?_ZHKCHKADDR?PROCOTOL</a></li>
+<li><a href="#S267">?PR?_ZHKHOPPERTASK?SCHEDULER</a></li>
+<li><a href="#S269">?PR?_ZHKLCDTASK?SCHEDULER</a></li>
+<li><a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a></li>
+<li><a href="#S266">?PR?ZHKNULLTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S285">?PR?_TESTDEVICECOMMOK?SCHEDULER</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S9">?PR?CHOOSERETURN?MAINFLOW</a></li>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S205">?PR?CURRENCYCOUNTMENU?COUNTERMAINT</a></li>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S128">?PR?GETONEMONEYKEY?COMMONFUNCTION</a></li>
+<li><a href="#S200">?PR?GOODSMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+<li><a href="#S193">?PR?INITALLCOUNTER?COUNTERMAINT</a></li>
+<li><a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S336">?PR?TESTATCOMMAND?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S262"></a>?PR?_ZHKSCHEDULERADDTASK?SCHEDULER (8088B4H - 808948H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S264">?PR?_ZHKSCHEDULERISTASKNULL?SCHEDULER</a>) Top=48 Bytes (<a href="#S307">?PR?ZHKCASHERQUERY?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S237">?PR?_MOVSRAMTOSRAM?DATAEXCHANGE</a></li>
+<li><a href="#S264">?PR?_ZHKSCHEDULERISTASKNULL?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S0">?PR?_DISPLAYCHARACTERSET?SCHEDULER</a></li>
+<li><a href="#S294">?PR?_DISPLAYPOSSTRING?SCHEDULER</a></li>
+<li><a href="#S298">?PR?_DISPLAYSETCURSORPOS?SCHEDULER</a></li>
+<li><a href="#S296">?PR?_DISPLAYSETCURSORSTYLE?SCHEDULER</a></li>
+<li><a href="#S292">?PR?_DISPLAYSTRING?SCHEDULER</a></li>
+<li><a href="#S287">?PR?_HOPPEROUTPUT?SCHEDULER</a></li>
+<li><a href="#S330">?PR?_ZHKCHANNELEXEC?SCHEDULER</a></li>
+<li><a href="#S334">?PR?_ZHKCHANNELTEST?SCHEDULER</a></li>
+<li><a href="#S310">?PR?CASHERACCEPT?SCHEDULER</a></li>
+<li><a href="#S312">?PR?CASHERREJECT?SCHEDULER</a></li>
+<li><a href="#S0">?PR?DISPLAYBKLIGHTOFF?SCHEDULER</a></li>
+<li><a href="#S0">?PR?DISPLAYBKLIGHTON?SCHEDULER</a></li>
+<li><a href="#S290">?PR?DISPLAYCLEAR?SCHEDULER</a></li>
+<li><a href="#S307">?PR?ZHKCASHERQUERY?SCHEDULER</a></li>
+<li><a href="#S332">?PR?ZHKCHANNELCLEAR?SCHEDULER</a></li>
+<li><a href="#S328">?PR?ZHKCHANNELQUERY?SCHEDULER</a></li>
+<li><a href="#S273">?PR?ZHKHOPPER1QUERY?SCHEDULER</a></li>
+<li><a href="#S275">?PR?ZHKHOPPER2QUERY?SCHEDULER</a></li>
+<li><a href="#S277">?PR?ZHKHOPPER3QUERY?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S264"></a>?PR?_ZHKSCHEDULERISTASKNULL?SCHEDULER (808F4FH - 808F6CH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=51 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+<li><a href="#S266">?PR?ZHKNULLTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S265"></a>?PR?ZHKGETSCHEDULERCLOCK?SCHEDULER (80FFC6H - 80FFD3H)</h2>
+<p><br><b>Maximum Stack:</b> Top=45 Bytes (<a href="#S266">?PR?ZHKNULLTASK?SCHEDULER</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S266">?PR?ZHKNULLTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S266"></a>?PR?ZHKNULLTASK?SCHEDULER (806EEEH - 80702FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S307">?PR?ZHKCASHERQUERY?SCHEDULER</a>) Top=42 Bytes (<a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S264">?PR?_ZHKSCHEDULERISTASKNULL?SCHEDULER</a></li>
+<li><a href="#S307">?PR?ZHKCASHERQUERY?SCHEDULER</a></li>
+<li><a href="#S265">?PR?ZHKGETSCHEDULERCLOCK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S267"></a>?PR?_ZHKHOPPERTASK?SCHEDULER (8115BFH - 811712H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a>) Top=42 Bytes (<a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a></li>
+<li><a href="#S271">?PR?_ZHKHOPPERTXMSG?SCHEDULER</a></li>
+<li><a href="#S279">?PR?ZHKHOPPERMSGPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S269"></a>?PR?_ZHKLCDTASK?SCHEDULER (8117A3H - 811877H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a>) Top=42 Bytes (<a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a></li>
+<li><a href="#S272">?PR?_ZHKLCDTXMSG?SCHEDULER</a></li>
+<li><a href="#S281">?PR?ZHKLCDMSGPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S271"></a>?PR?_ZHKHOPPERTXMSG?SCHEDULER (811713H - 81174FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S441">?PR?_ZHKBUSTXMSG?PROCOTOL</a>) Top=45 Bytes (<a href="#S267">?PR?_ZHKHOPPERTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S441">?PR?_ZHKBUSTXMSG?PROCOTOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S267">?PR?_ZHKHOPPERTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S272"></a>?PR?_ZHKLCDTXMSG?SCHEDULER (80FFD4H - 80FFFBH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S441">?PR?_ZHKBUSTXMSG?PROCOTOL</a>) Top=45 Bytes (<a href="#S269">?PR?_ZHKLCDTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S441">?PR?_ZHKBUSTXMSG?PROCOTOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S269">?PR?_ZHKLCDTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S273"></a>?PR?ZHKHOPPER1QUERY?SCHEDULER (808EE7H - 808EFCH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=21 Bytes (<a href="#S286">?PR?_HOPPERQUERY?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S286">?PR?_HOPPERQUERY?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S275"></a>?PR?ZHKHOPPER2QUERY?SCHEDULER (808F21H - 808F37H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=21 Bytes (<a href="#S286">?PR?_HOPPERQUERY?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S286">?PR?_HOPPERQUERY?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S277"></a>?PR?ZHKHOPPER3QUERY?SCHEDULER (808F38H - 808F4EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=21 Bytes (<a href="#S286">?PR?_HOPPERQUERY?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S286">?PR?_HOPPERQUERY?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S279"></a>?PR?ZHKHOPPERMSGPROCESS?SCHEDULER (811878H - 811937H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S443">?PR?_ZHKBUSFRAMEUNPACK?PROCOTOL</a>) Top=45 Bytes (<a href="#S267">?PR?_ZHKHOPPERTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S443">?PR?_ZHKBUSFRAMEUNPACK?PROCOTOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S267">?PR?_ZHKHOPPERTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S281"></a>?PR?ZHKLCDMSGPROCESS?SCHEDULER (811938H - 811997H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S443">?PR?_ZHKBUSFRAMEUNPACK?PROCOTOL</a>) Top=45 Bytes (<a href="#S269">?PR?_ZHKLCDTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S443">?PR?_ZHKBUSFRAMEUNPACK?PROCOTOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S269">?PR?_ZHKLCDTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S283"></a>?PR?_TESTDEVICETIMEOUT?SCHEDULER (807FFBH - 808018H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Top=33 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a></li>
+<li><a href="#S140">?PR?_HOPPEROUTCOIN?COMMONFUNCTION</a></li>
+<li><a href="#S3">?PR?REJECTBILL?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S284"></a>?PR?_TESTDEVICEEXCEPTION?SCHEDULER (811FD6H - 812018H)</h2>
+<p><br><b>Maximum Stack:</b> Top=18 Bytes (<a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S103">?PR?_GETDEVICESTATUS?DEVICECHECK</a></li>
+<li><a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S285"></a>?PR?_TESTDEVICECOMMOK?SCHEDULER (807FD1H - 807FF6H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=24 Bytes (<a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a>) Top=36 Bytes (<a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a></li>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a></li>
+<li><a href="#S140">?PR?_HOPPEROUTCOIN?COMMONFUNCTION</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S3">?PR?REJECTBILL?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S286"></a>?PR?_HOPPERQUERY?SCHEDULER (808EFDH - 808F20H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S273">?PR?ZHKHOPPER1QUERY?SCHEDULER</a>) Top=18 Bytes (<a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S273">?PR?ZHKHOPPER1QUERY?SCHEDULER</a></li>
+<li><a href="#S275">?PR?ZHKHOPPER2QUERY?SCHEDULER</a></li>
+<li><a href="#S277">?PR?ZHKHOPPER3QUERY?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S287"></a>?PR?_HOPPEROUTPUT?SCHEDULER (812019H - 812106H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=18 Bytes (<a href="#S140">?PR?_HOPPEROUTCOIN?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S140">?PR?_HOPPEROUTCOIN?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S289"></a>?PR?_HOPPERGETCOINOUT?SCHEDULER (812107H - 81213FH)</h2>
+<p><br><b>Maximum Stack:</b> Top=9 Bytes (<a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S290"></a>?PR?DISPLAYCLEAR?SCHEDULER (812140H - 81217BH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=9 Bytes (<a href="#S93">?PR?MAINMENU?MAINTMENU</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+</ul>
+
+<h2><a name="S292"></a>?PR?_DISPLAYSTRING?SCHEDULER (81217CH - 8121DDH)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=33 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S294"></a>?PR?_DISPLAYPOSSTRING?SCHEDULER (808949H - 8089C6H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=33 Bytes (<a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S296"></a>?PR?_DISPLAYSETCURSORSTYLE?SCHEDULER (8121DEH - 812227H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=30 Bytes (<a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S298"></a>?PR?_DISPLAYSETCURSORPOS?SCHEDULER (808E92H - 808EE6H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=30 Bytes (<a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S133">?PR?_DISPLAYCURSORSTATE?COMMONFUNCTION</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S300"></a>?PR?GETDISPLAYSTATE?SCHEDULER (812228H - 81222EH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S48">?PR?DISPWELOROUTSERV?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S48">?PR?DISPWELOROUTSERV?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S301"></a>?PR?_ZHKCASHERTASK?SCHEDULER (81222FH - 81238CH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a>) Top=42 Bytes (<a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S303">?PR?_ZHKCASHERTXMSG?SCHEDULER</a></li>
+<li><a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a></li>
+<li><a href="#S388">?PR?CASHERDISABLECASHER?CASHER</a></li>
+<li><a href="#S305">?PR?ZHKCASHERMSGPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S303"></a>?PR?_ZHKCASHERTXMSG?SCHEDULER (80FF1DH - 80FF62H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S385">?PR?ZHKCASHERACCEPTCASH?CASHER</a>) Top=45 Bytes (<a href="#S301">?PR?_ZHKCASHERTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S387">?PR?_ZHKCASHERGETSTATE?CASHER</a></li>
+<li><a href="#S388">?PR?CASHERDISABLECASHER?CASHER</a></li>
+<li><a href="#S385">?PR?ZHKCASHERACCEPTCASH?CASHER</a></li>
+<li><a href="#S386">?PR?ZHKCASHERREJECTCASH?CASHER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S301">?PR?_ZHKCASHERTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S305"></a>?PR?ZHKCASHERMSGPROCESS?SCHEDULER (81238DH - 8123B7H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S445">?PR?_ZHKCASHERFRAMEUNPACK?PROCOTOL</a>) Top=45 Bytes (<a href="#S301">?PR?_ZHKCASHERTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S445">?PR?_ZHKCASHERFRAMEUNPACK?PROCOTOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S301">?PR?_ZHKCASHERTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S307"></a>?PR?ZHKCASHERQUERY?SCHEDULER (808F6DH - 808F9DH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=45 Bytes (<a href="#S266">?PR?ZHKNULLTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S309">?PR?CASHERQUERY?SCHEDULER</a></li>
+<li><a href="#S266">?PR?ZHKNULLTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S309"></a>?PR?CASHERQUERY?SCHEDULER (808F9EH - 808FA5H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S307">?PR?ZHKCASHERQUERY?SCHEDULER</a>) Top=18 Bytes (<a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S307">?PR?ZHKCASHERQUERY?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S146">?PR?_GETHARDWAREDEVICESTATE?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S310"></a>?PR?CASHERACCEPT?SCHEDULER (808FA6H - 808FD6H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=6 Bytes (<a href="#S50">?PR?GETBILL?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S312"></a>?PR?CASHERREJECT?SCHEDULER (808883H - 8088B3H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=9 Bytes (<a href="#S3">?PR?REJECTBILL?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S3">?PR?REJECTBILL?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S314"></a>?PR?CASHERISCASHIN?SCHEDULER (8096F1H - 8096F9H)</h2>
+<p><br><b>Maximum Stack:</b> Top=9 Bytes (<a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S315"></a>?PR?CASHERISACCEPTOK?SCHEDULER (812587H - 81258FH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S50">?PR?GETBILL?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S316"></a>?PR?GETCOMINGCASH?SCHEDULER (812590H - 8125B8H)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S50">?PR?GETBILL?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S317"></a>?PR?CASHERQUERYENABLE?SCHEDULER (8125B9H - 8125D2H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=9 Bytes (<a href="#S6">?PR?ENABLEBILLDEV?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S6">?PR?ENABLEBILLDEV?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S318"></a>?PR?_CASHERGETMACHINESTATE?SCHEDULER (80C01DH - 80C023H)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S33">?PR?CHECKOPERSTATUS?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S33">?PR?CHECKOPERSTATUS?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S76">?PR?SELLCODEOVER?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S319"></a>?PR?CASHERREALTIMESTATE?SCHEDULER (80C6B8H - 80C6BEH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S34">?PR?CHECKHARDWARESTATE?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S34">?PR?CHECKHARDWARESTATE?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S320"></a>?PR?CASHERQUERYDISABLE?SCHEDULER (8125D3H - 8125DAH)</h2>
+<p><br><b>Maximum Stack:</b> Top=12 Bytes (<a href="#S5">?PR?DISABLEBILLDEV?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S5">?PR?DISABLEBILLDEV?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S321"></a>?PR?CASHERRESETOUTTIME?SCHEDULER (80C420H - 80C42AH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S76">?PR?SELLCODEOVER?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S76">?PR?SELLCODEOVER?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S322"></a>?PR?_ZHKCHANNELTASK?SCHEDULER (811DDFH - 811F42H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a>) Top=42 Bytes (<a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a></li>
+<li><a href="#S324">?PR?_ZHKCHANNELTXMSG?SCHEDULER</a></li>
+<li><a href="#S326">?PR?ZHKCHANNELMSGPROCESS?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S324"></a>?PR?_ZHKCHANNELTXMSG?SCHEDULER (810F96H - 81112FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S410">?PR?_ZHKSERIAL1PUTCH?SERIAL1</a>) Top=45 Bytes (<a href="#S322">?PR?_ZHKCHANNELTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S410">?PR?_ZHKSERIAL1PUTCH?SERIAL1</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S322">?PR?_ZHKCHANNELTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S326"></a>?PR?ZHKCHANNELMSGPROCESS?SCHEDULER (811D6FH - 811DDEH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S447">?PR?_ZHKCHANNELFRAMEUNPACK?PROCOTOL</a>) Top=45 Bytes (<a href="#S322">?PR?_ZHKCHANNELTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S447">?PR?_ZHKCHANNELFRAMEUNPACK?PROCOTOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S322">?PR?_ZHKCHANNELTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S328"></a>?PR?ZHKCHANNELQUERY?SCHEDULER (80BF90H - 80BFC4H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=18 Bytes (<a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S330"></a>?PR?_ZHKCHANNELEXEC?SCHEDULER (8125DBH - 812635H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=18 Bytes (<a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S332"></a>?PR?ZHKCHANNELCLEAR?SCHEDULER (80BFC5H - 80BFF9H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=18 Bytes (<a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S334"></a>?PR?_ZHKCHANNELTEST?SCHEDULER (812636H - 81266AH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a>) Top=18 Bytes (<a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S144">?PR?_CHANNELTASK?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S336"></a>?PR?TESTATCOMMAND?SCHEDULER (81266BH - 8126C0H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=24 Bytes (<a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a>) Top=15 Bytes (<a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+<li><a href="#S483">?PR?SENDATCOMMANDTOMOBILE?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S338"></a>?PR?_ZHKCHANNELSWITCH?SCHEDULER (811F43H - 811FB6H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S440">?PR?ZHKBUSSERIALINIT?PROCOTOL</a>) Top=45 Bytes (<a href="#S267">?PR?_ZHKHOPPERTASK?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S228">?PR?_DELAYMS?COMMON</a></li>
+<li><a href="#S398">?PR?_ZHKHARDSERIALSWITCH?DEVICE</a></li>
+<li><a href="#S440">?PR?ZHKBUSSERIALINIT?PROCOTOL</a></li>
+<li><a href="#S384">?PR?ZHKCASHERSERIALINIT?CASHER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S301">?PR?_ZHKCASHERTASK?SCHEDULER</a></li>
+<li><a href="#S322">?PR?_ZHKCHANNELTASK?SCHEDULER</a></li>
+<li><a href="#S267">?PR?_ZHKHOPPERTASK?SCHEDULER</a></li>
+<li><a href="#S269">?PR?_ZHKLCDTASK?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S354"></a>?PR?ISMODEOFF?IOINPUT (80C416H - 80C41FH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S33">?PR?CHECKOPERSTATUS?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S33">?PR?CHECKOPERSTATUS?MAINFLOW</a></li>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S355"></a>?PR?BEEP?IOINPUT (8096C2H - 8096C9H)</h2>
+<p><br><b>Maximum Stack:</b> Top=30 Bytes (<a href="#S371">?PR?GETKEY?KEY</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S371">?PR?GETKEY?KEY</a></li>
+</ul>
+
+<h2><a name="S356"></a>?PR?ZHKIOINPUTISR?IOINPUT (80FF89H - 80FFC1H)</h2>
+<p><br><b>Maximum Stack:</b> Top=12 Bytes (<a href="#S254">?PR?ZHKTMR0?TIMER</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S254">?PR?ZHKTMR0?TIMER</a></li>
+</ul>
+
+<h2><a name="S359"></a>?PR?COINERENABLE?IOINPUT (809029H - 80905EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S401">?PR?ZHKHARDCOINERDISABLE?DEVICE</a>) Top=18 Bytes (<a href="#S101">?PR?COINERTEST?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S401">?PR?ZHKHARDCOINERDISABLE?DEVICE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S101">?PR?COINERTEST?DEVICECHECK</a></li>
+<li><a href="#S6">?PR?ENABLEBILLDEV?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S360"></a>?PR?COINERDISABLE?IOINPUT (8096E2H - 8096F0H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S402">?PR?ZHKHARDCOINERENABLE?DEVICE</a>) Top=18 Bytes (<a href="#S101">?PR?COINERTEST?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S402">?PR?ZHKHARDCOINERENABLE?DEVICE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S101">?PR?COINERTEST?DEVICECHECK</a></li>
+<li><a href="#S5">?PR?DISABLEBILLDEV?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S361"></a>?PR?ZHKIOINIT?IOINPUT (80972AH - 80977CH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S405">?PR?ZHKHARDPOWEROFF?DEVICE</a>) Top=6 Bytes (<a href="#S439">?PR?ZHKINIT?INITIALIZATION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S228">?PR?_DELAYMS?COMMON</a></li>
+<li><a href="#S400">?PR?ZHKHARDBUZZEROFF?DEVICE</a></li>
+<li><a href="#S402">?PR?ZHKHARDCOINERENABLE?DEVICE</a></li>
+<li><a href="#S405">?PR?ZHKHARDPOWEROFF?DEVICE</a></li>
+<li><a href="#S404">?PR?ZHKHARDPOWERON?DEVICE</a></li>
+<li><a href="#S403">?PR?ZHKHARDSTATUSON?DEVICE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S439">?PR?ZHKINIT?INITIALIZATION</a></li>
+</ul>
+
+<h2><a name="S362"></a>?PR?SCANSPCOIN?IOINPUT (8127F7H - 812858H)</h2>
+<p><br><b>Maximum Stack:</b> Top=16 Bytes (<a href="#S363">?PR?ZYZCHKCOINCHNSTA?IOINPUT</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S363">?PR?ZYZCHKCOINCHNSTA?IOINPUT</a></li>
+</ul>
+
+<h2><a name="S363"></a>?PR?ZYZCHKCOINCHNSTA?IOINPUT (812859H - 812B80H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=4 Bytes (<a href="#S362">?PR?SCANSPCOIN?IOINPUT</a>) Top=12 Bytes (<a href="#S254">?PR?ZHKTMR0?TIMER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S362">?PR?SCANSPCOIN?IOINPUT</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S254">?PR?ZHKTMR0?TIMER</a></li>
+</ul>
+
+<h2><a name="S364"></a>?PR?GETCOIN?IOINPUT (809344H - 80944FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=18 Bytes (<a href="#S101">?PR?COINERTEST?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S101">?PR?COINERTEST?DEVICECHECK</a></li>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S368"></a>?PR?KEYBOARDINIT?KEY (8077CDH - 8077E8H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=12 Bytes (<a href="#S370">?PR?KEYUNLOCK?KEY</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S370">?PR?KEYUNLOCK?KEY</a></li>
+<li><a href="#S439">?PR?ZHKINIT?INITIALIZATION</a></li>
+</ul>
+
+<h2><a name="S369"></a>?PR?KEYLOCK?KEY (8087F1H - 8087F8H)</h2>
+<p><br><b>Maximum Stack:</b> Top=27 Bytes (<a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S122">?PR?CLEARKEY?COMMONFUNCTION</a></li>
+<li><a href="#S30">?PR?DISPLAYOUTSERVER?MAINFLOW</a></li>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+<li><a href="#S76">?PR?SELLCODEOVER?MAINFLOW</a></li>
+<li><a href="#S7">?PR?SETOFFFLAG?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S370"></a>?PR?KEYUNLOCK?KEY (8077AEH - 8077BBH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S368">?PR?KEYBOARDINIT?KEY</a>) Top=9 Bytes (<a href="#S8">?PR?LOGICOPEN?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S368">?PR?KEYBOARDINIT?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S8">?PR?LOGICOPEN?MAINFLOW</a></li>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+<li><a href="#S76">?PR?SELLCODEOVER?MAINFLOW</a></li>
+<li><a href="#S439">?PR?ZHKINIT?INITIALIZATION</a></li>
+</ul>
+
+<h2><a name="S371"></a>?PR?GETKEY?KEY (809270H - 8092D4H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S355">?PR?BEEP?IOINPUT</a>) Top=27 Bytes (<a href="#S136">?PR?GETONEKEY?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S355">?PR?BEEP?IOINPUT</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S97">?PR?_CHOOSERETURN?DEVICECHECK</a></li>
+<li><a href="#S169">?PR?_GOODS_MENUSELECTED?GOODSWAYSET</a></li>
+<li><a href="#S220">?PR?_RACK_MENUSELECTED?RACKSET</a></li>
+<li><a href="#S185">?PR?_SP_MENUSELECTED?SYSPARAMSET</a></li>
+<li><a href="#S43">?PR?CHECKKEYPRESS?MAINFLOW</a></li>
+<li><a href="#S9">?PR?CHOOSERETURN?MAINFLOW</a></li>
+<li><a href="#S101">?PR?COINERTEST?DEVICECHECK</a></li>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S205">?PR?CURRENCYCOUNTMENU?COUNTERMAINT</a></li>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+<li><a href="#S110">?PR?DISPGOODSWAYSSTATES?DEVICECHECK</a></li>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S136">?PR?GETONEKEY?COMMONFUNCTION</a></li>
+<li><a href="#S128">?PR?GETONEMONEYKEY?COMMONFUNCTION</a></li>
+<li><a href="#S200">?PR?GOODSMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S57">?PR?GOODSWAYERR?MAINFLOW</a></li>
+<li><a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a></li>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+<li><a href="#S193">?PR?INITALLCOUNTER?COUNTERMAINT</a></li>
+<li><a href="#S52">?PR?ISINPUTGOODSNO?MAINFLOW</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S61">?PR?REBUY?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S372"></a>?PR?SCANFKEYFUN?KEY (807030H - 80709BH)</h2>
+<p><br><b>Maximum Stack:</b> Top=16 Bytes (<a href="#S373">?PR?ZHKKEYSCANISR?KEY</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S373">?PR?ZHKKEYSCANISR?KEY</a></li>
+</ul>
+
+<h2><a name="S373"></a>?PR?ZHKKEYSCANISR?KEY (811750H - 8117A2H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=5 Bytes (<a href="#S372">?PR?SCANFKEYFUN?KEY</a>) Top=12 Bytes (<a href="#S254">?PR?ZHKTMR0?TIMER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S372">?PR?SCANFKEYFUN?KEY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S254">?PR?ZHKTMR0?TIMER</a></li>
+</ul>
+
+<h2><a name="S384"></a>?PR?ZHKCASHERSERIALINIT?CASHER (80709CH - 807120H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S409">?PR?ZHKSERIAL1INIT?SERIAL1</a>) Top=48 Bytes (<a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S409">?PR?ZHKSERIAL1INIT?SERIAL1</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S385"></a>?PR?ZHKCASHERACCEPTCASH?CASHER (80FF63H - 80FF74H)</h2>
+<p><br><b>Maximum Stack:</b> Top=48 Bytes (<a href="#S303">?PR?_ZHKCASHERTXMSG?SCHEDULER</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S303">?PR?_ZHKCASHERTXMSG?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S386"></a>?PR?ZHKCASHERREJECTCASH?CASHER (80FEFBH - 80FF0BH)</h2>
+<p><br><b>Maximum Stack:</b> Top=48 Bytes (<a href="#S303">?PR?_ZHKCASHERTXMSG?SCHEDULER</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S303">?PR?_ZHKCASHERTXMSG?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S387"></a>?PR?_ZHKCASHERGETSTATE?CASHER (80FF75H - 80FF88H)</h2>
+<p><br><b>Maximum Stack:</b> Top=48 Bytes (<a href="#S303">?PR?_ZHKCASHERTXMSG?SCHEDULER</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S303">?PR?_ZHKCASHERTXMSG?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S388"></a>?PR?CASHERDISABLECASHER?CASHER (80FF0CH - 80FF1CH)</h2>
+<p><br><b>Maximum Stack:</b> Top=48 Bytes (<a href="#S303">?PR?_ZHKCASHERTXMSG?SCHEDULER</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S301">?PR?_ZHKCASHERTASK?SCHEDULER</a></li>
+<li><a href="#S303">?PR?_ZHKCASHERTXMSG?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S397"></a>?PR?DS12887INIT?DS12887 (812B81H - 812BB4H)</h2>
+<p><br><b>Maximum Stack:</b> Top=9 Bytes (<a href="#S258">?PR?CLOCKINIT?CLOCK</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S258">?PR?CLOCKINIT?CLOCK</a></li>
+</ul>
+
+<h2><a name="S398"></a>?PR?_ZHKHARDSERIALSWITCH?DEVICE (811FB7H - 811FD5H)</h2>
+<p><br><b>Maximum Stack:</b> Top=48 Bytes (<a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S400"></a>?PR?ZHKHARDBUZZEROFF?DEVICE (80979CH - 8097B3H)</h2>
+<p><br><b>Maximum Stack:</b> Top=12 Bytes (<a href="#S254">?PR?ZHKTMR0?TIMER</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S361">?PR?ZHKIOINIT?IOINPUT</a></li>
+<li><a href="#S254">?PR?ZHKTMR0?TIMER</a></li>
+</ul>
+
+<h2><a name="S401"></a>?PR?ZHKHARDCOINERDISABLE?DEVICE (8096FAH - 809711H)</h2>
+<p><br><b>Maximum Stack:</b> Top=21 Bytes (<a href="#S359">?PR?COINERENABLE?IOINPUT</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S359">?PR?COINERENABLE?IOINPUT</a></li>
+</ul>
+
+<h2><a name="S402"></a>?PR?ZHKHARDCOINERENABLE?DEVICE (809712H - 809729H)</h2>
+<p><br><b>Maximum Stack:</b> Top=21 Bytes (<a href="#S360">?PR?COINERDISABLE?IOINPUT</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S360">?PR?COINERDISABLE?IOINPUT</a></li>
+<li><a href="#S361">?PR?ZHKIOINIT?IOINPUT</a></li>
+</ul>
+
+<h2><a name="S403"></a>?PR?ZHKHARDSTATUSON?DEVICE (8097B4H - 8097CBH)</h2>
+<p><br><b>Maximum Stack:</b> Top=9 Bytes (<a href="#S361">?PR?ZHKIOINIT?IOINPUT</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S361">?PR?ZHKIOINIT?IOINPUT</a></li>
+</ul>
+
+<h2><a name="S404"></a>?PR?ZHKHARDPOWERON?DEVICE (8097CCH - 8097E3H)</h2>
+<p><br><b>Maximum Stack:</b> Top=9 Bytes (<a href="#S361">?PR?ZHKIOINIT?IOINPUT</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S361">?PR?ZHKIOINIT?IOINPUT</a></li>
+</ul>
+
+<h2><a name="S405"></a>?PR?ZHKHARDPOWEROFF?DEVICE (8097E4H - 8097FBH)</h2>
+<p><br><b>Maximum Stack:</b> Top=9 Bytes (<a href="#S361">?PR?ZHKIOINIT?IOINPUT</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S361">?PR?ZHKIOINIT?IOINPUT</a></li>
+</ul>
+
+<h2><a name="S406"></a>?PR?WATERKEYENABLE?DEVICE (80FFC2H - 80FFC5H)</h2>
+<p><br><b>Maximum Stack:</b> Top=48 Bytes (<a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a></li>
+<li><a href="#S482">?PR?ZHKMOBILEINIT?MOBILE</a></li>
+</ul>
+
+<h2><a name="S407"></a>?PR?WATERKEYDISABLE?DEVICE (812BB5H - 812BB8H)</h2>
+<p><br><b>Maximum Stack:</b> Top=48 Bytes (<a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S409"></a>?PR?ZHKSERIAL1INIT?SERIAL1 (812F0EH - 812FCCH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=51 Bytes (<a href="#S440">?PR?ZHKBUSSERIALINIT?PROCOTOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S522">?C?LDIV</a></li>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S228">?PR?_DELAYMS?COMMON</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S440">?PR?ZHKBUSSERIALINIT?PROCOTOL</a></li>
+<li><a href="#S384">?PR?ZHKCASHERSERIALINIT?CASHER</a></li>
+<li><a href="#S439">?PR?ZHKINIT?INITIALIZATION</a></li>
+</ul>
+
+<h2><a name="S410"></a>?PR?_ZHKSERIAL1PUTCH?SERIAL1 (80FE02H - 80FE57H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S227">?PR?_DELAY?COMMON</a>) Top=51 Bytes (<a href="#S441">?PR?_ZHKBUSTXMSG?PROCOTOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S227">?PR?_DELAY?COMMON</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S441">?PR?_ZHKBUSTXMSG?PROCOTOL</a></li>
+<li><a href="#S324">?PR?_ZHKCHANNELTXMSG?SCHEDULER</a></li>
+<li><a href="#S0">?PR?_ZHKSERIAL1PRINTF?DEBUG</a></li>
+<li><a href="#S381">?PR?_ZHKVTISENDCMD?CASHER</a></li>
+</ul>
+
+<h2><a name="S413"></a>?PR?ZHKSERIAL1GETCH?SERIAL1 (811D43H - 811D6EH)</h2>
+<p><br><b>Maximum Stack:</b> Top=51 Bytes (<a href="#S443">?PR?_ZHKBUSFRAMEUNPACK?PROCOTOL</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S443">?PR?_ZHKBUSFRAMEUNPACK?PROCOTOL</a></li>
+<li><a href="#S445">?PR?_ZHKCASHERFRAMEUNPACK?PROCOTOL</a></li>
+<li><a href="#S447">?PR?_ZHKCHANNELFRAMEUNPACK?PROCOTOL</a></li>
+</ul>
+
+<h2><a name="S414"></a>?PR?ZHKSERIAL1ISRXBUFNULL?SERIAL1 (811BB4H - 811BC0H)</h2>
+<p><br><b>Maximum Stack:</b> Top=51 Bytes (<a href="#S443">?PR?_ZHKBUSFRAMEUNPACK?PROCOTOL</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S443">?PR?_ZHKBUSFRAMEUNPACK?PROCOTOL</a></li>
+<li><a href="#S445">?PR?_ZHKCASHERFRAMEUNPACK?PROCOTOL</a></li>
+<li><a href="#S447">?PR?_ZHKCHANNELFRAMEUNPACK?PROCOTOL</a></li>
+</ul>
+
+<h2><a name="S422"></a>?PR?ZHKSERIALINIT?SERIAL (807121H - 807203H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=48 Bytes (<a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S522">?C?LDIV</a></li>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a></li>
+<li><a href="#S439">?PR?ZHKINIT?INITIALIZATION</a></li>
+</ul>
+
+<h2><a name="S423"></a>?PR?_ZHKSERIALPUTCH?SERIAL (807204H - 807240H)</h2>
+<p><br><b>Maximum Stack:</b> Top=54 Bytes (<a href="#S426">?PR?_ZHKSERIALTXMSG?SERIAL</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S426">?PR?_ZHKSERIALTXMSG?SERIAL</a></li>
+<li><a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S425"></a>?PR?ZHKSERIALGETCH?SERIAL (813007H - 81303EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=57 Bytes (<a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a></li>
+</ul>
+
+<h2><a name="S426"></a>?PR?_ZHKSERIALTXMSG?SERIAL (812793H - 8127F6H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=51 Bytes (<a href="#S505">?PR?_ZHKATCMD?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S423">?PR?_ZHKSERIALPUTCH?SERIAL</a></li>
+<li><a href="#S429">?PR?ZHKSERIALISTXBUFNULL?SERIAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S505">?PR?_ZHKATCMD?MOBILE</a></li>
+</ul>
+
+<h2><a name="S428"></a>?PR?ZHKSERIALISRXBUFNULL?SERIAL (8137DDH - 8137FCH)</h2>
+<p><br><b>Maximum Stack:</b> Top=57 Bytes (<a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a></li>
+</ul>
+
+<h2><a name="S429"></a>?PR?ZHKSERIALISTXBUFNULL?SERIAL (8137FDH - 813819H)</h2>
+<p><br><b>Maximum Stack:</b> Top=54 Bytes (<a href="#S426">?PR?_ZHKSERIALTXMSG?SERIAL</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S426">?PR?_ZHKSERIALTXMSG?SERIAL</a></li>
+<li><a href="#S430">?PR?ZHKSERIAL_ISR?SERIAL</a></li>
+</ul>
+
+<h2><a name="S439"></a>?PR?ZHKINIT?INITIALIZATION (80777AH - 8077ADH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S260">?PR?SCHEDULERINIT?SCHEDULER</a>) Top=3 Bytes (<a href="#S84">?PR?MAIN?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S258">?PR?CLOCKINIT?CLOCK</a></li>
+<li><a href="#S368">?PR?KEYBOARDINIT?KEY</a></li>
+<li><a href="#S370">?PR?KEYUNLOCK?KEY</a></li>
+<li><a href="#S260">?PR?SCHEDULERINIT?SCHEDULER</a></li>
+<li><a href="#S361">?PR?ZHKIOINIT?IOINPUT</a></li>
+<li><a href="#S409">?PR?ZHKSERIAL1INIT?SERIAL1</a></li>
+<li><a href="#S422">?PR?ZHKSERIALINIT?SERIAL</a></li>
+<li><a href="#S253">?PR?ZHKTIMERINIT?TIMER</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S84">?PR?MAIN?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S440"></a>?PR?ZHKBUSSERIALINIT?PROCOTOL (8072D7H - 80730AH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S409">?PR?ZHKSERIAL1INIT?SERIAL1</a>) Top=48 Bytes (<a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S409">?PR?ZHKSERIAL1INIT?SERIAL1</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S338">?PR?_ZHKCHANNELSWITCH?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S441"></a>?PR?_ZHKBUSTXMSG?PROCOTOL (81381AH - 8138DCH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S410">?PR?_ZHKSERIAL1PUTCH?SERIAL1</a>) Top=48 Bytes (<a href="#S271">?PR?_ZHKHOPPERTXMSG?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S410">?PR?_ZHKSERIAL1PUTCH?SERIAL1</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S271">?PR?_ZHKHOPPERTXMSG?SCHEDULER</a></li>
+<li><a href="#S272">?PR?_ZHKLCDTXMSG?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S443"></a>?PR?_ZHKBUSFRAMEUNPACK?PROCOTOL (811998H - 811BB3H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S414">?PR?ZHKSERIAL1ISRXBUFNULL?SERIAL1</a>) Top=48 Bytes (<a href="#S279">?PR?ZHKHOPPERMSGPROCESS?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S413">?PR?ZHKSERIAL1GETCH?SERIAL1</a></li>
+<li><a href="#S414">?PR?ZHKSERIAL1ISRXBUFNULL?SERIAL1</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S279">?PR?ZHKHOPPERMSGPROCESS?SCHEDULER</a></li>
+<li><a href="#S281">?PR?ZHKLCDMSGPROCESS?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S445"></a>?PR?_ZHKCASHERFRAMEUNPACK?PROCOTOL (8123B8H - 812586H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S414">?PR?ZHKSERIAL1ISRXBUFNULL?SERIAL1</a>) Top=48 Bytes (<a href="#S305">?PR?ZHKCASHERMSGPROCESS?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S413">?PR?ZHKSERIAL1GETCH?SERIAL1</a></li>
+<li><a href="#S414">?PR?ZHKSERIAL1ISRXBUFNULL?SERIAL1</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S305">?PR?ZHKCASHERMSGPROCESS?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S447"></a>?PR?_ZHKCHANNELFRAMEUNPACK?PROCOTOL (811BC1H - 811D42H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S414">?PR?ZHKSERIAL1ISRXBUFNULL?SERIAL1</a>) Top=48 Bytes (<a href="#S326">?PR?ZHKCHANNELMSGPROCESS?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S413">?PR?ZHKSERIAL1GETCH?SERIAL1</a></li>
+<li><a href="#S414">?PR?ZHKSERIAL1ISRXBUFNULL?SERIAL1</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S326">?PR?ZHKCHANNELMSGPROCESS?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S449"></a>?PR?_ZHKCHKADDR?PROCOTOL (8138DDH - 81394EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=42 Bytes (<a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S457"></a>?PR?DOCOMMUNICATION?COMMMODULE (81394FH - 813979H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S460">?PR?STACHECKCOMMSTATUS?COMMMODULE</a>) Top=39 Bytes (<a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S460">?PR?STACHECKCOMMSTATUS?COMMMODULE</a></li>
+<li><a href="#S464">?PR?STACHECKSMSSENDRESULT?COMMMODULE</a></li>
+<li><a href="#S458">?PR?STACOMMMODULEINIT?COMMMODULE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S119">?PR?COREPROCESSCYCLE?COMMONFUNCTION</a></li>
+</ul>
+
+<h2><a name="S458"></a>?PR?STACOMMMODULEINIT?COMMMODULE (813B85H - 813BA4H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=42 Bytes (<a href="#S457">?PR?DOCOMMUNICATION?COMMMODULE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S457">?PR?DOCOMMUNICATION?COMMMODULE</a></li>
+</ul>
+
+<h2><a name="S459"></a>?PR?COMMINITGPRS?COMMMODULE (813A3EH - 813A60H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S480">?PR?GPRSINIT?MOBILE</a>) Top=45 Bytes (<a href="#S460">?PR?STACHECKCOMMSTATUS?COMMMODULE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S480">?PR?GPRSINIT?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S460">?PR?STACHECKCOMMSTATUS?COMMMODULE</a></li>
+<li><a href="#S464">?PR?STACHECKSMSSENDRESULT?COMMMODULE</a></li>
+</ul>
+
+<h2><a name="S460"></a>?PR?STACHECKCOMMSTATUS?COMMMODULE (813A0FH - 813A3DH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S459">?PR?COMMINITGPRS?COMMMODULE</a>) Top=42 Bytes (<a href="#S457">?PR?DOCOMMUNICATION?COMMMODULE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S459">?PR?COMMINITGPRS?COMMMODULE</a></li>
+<li><a href="#S489">?PR?SMSGETLASTERR?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S457">?PR?DOCOMMUNICATION?COMMMODULE</a></li>
+</ul>
+
+<h2><a name="S461"></a>?PR?_TESTSMSSEND?COMMMODULE (813BEBH - 813C16H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S488">?PR?_PUTSHORTMSG?MOBILE</a>) Top=15 Bytes (<a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S488">?PR?_PUTSHORTMSG?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S462"></a>?PR?GETTESTSMSSENDRESULT?COMMMODULE (813C17H - 813C39H)</h2>
+<p><br><b>Maximum Stack:</b> Top=15 Bytes (<a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S463"></a>?PR?GETATCMDRESULT?COMMMODULE (813C3AH - 813C43H)</h2>
+<p><br><b>Maximum Stack:</b> Top=15 Bytes (<a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a></li>
+</ul>
+
+<h2><a name="S464"></a>?PR?STACHECKSMSSENDRESULT?COMMMODULE (813A61H - 813B49H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S459">?PR?COMMINITGPRS?COMMMODULE</a>) Top=42 Bytes (<a href="#S457">?PR?DOCOMMUNICATION?COMMMODULE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S459">?PR?COMMINITGPRS?COMMMODULE</a></li>
+<li><a href="#S489">?PR?SMSGETLASTERR?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S457">?PR?DOCOMMUNICATION?COMMMODULE</a></li>
+</ul>
+
+<h2><a name="S465"></a>?PR?_COMMADD2SMSSENDBUFFER?COMMMODULE (80A96CH - 80A9EDH)</h2>
+<p><br><b>Maximum Stack:</b> Top=21 Bytes (<a href="#S474">?PR?_SENDSMS?COMMUNICATION</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S474">?PR?_SENDSMS?COMMUNICATION</a></li>
+</ul>
+
+<h2><a name="S472"></a>?PR?CLEARALLSMSINSMSBUFFER?COMMUNICATION (813C44H - 813C54H)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S473"></a>?PR?SMSCOMMSTATUS?COMMUNICATION (80AE9FH - 80AEB5H)</h2>
+<p><br><b>Maximum Stack:</b> Top=18 Bytes (<a href="#S20">?PR?SCANISSENDALARM?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a></li>
+<li><a href="#S22">?PR?SCANDEVICESTATUS?MAINFLOW</a></li>
+<li><a href="#S20">?PR?SCANISSENDALARM?MAINFLOW</a></li>
+<li><a href="#S24">?PR?TRADEPACK?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S474"></a>?PR?_SENDSMS?COMMUNICATION (80A8F6H - 80A96BH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S465">?PR?_COMMADD2SMSSENDBUFFER?COMMMODULE</a>) Top=18 Bytes (<a href="#S20">?PR?SCANISSENDALARM?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S465">?PR?_COMMADD2SMSSENDBUFFER?COMMMODULE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S22">?PR?SCANDEVICESTATUS?MAINFLOW</a></li>
+<li><a href="#S20">?PR?SCANISSENDALARM?MAINFLOW</a></li>
+<li><a href="#S24">?PR?TRADEPACK?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S476"></a>?PR?ZHKMOBILENULLPROCESS?MOBILE (813C55H - 813C97H)</h2>
+<p><br><b>Maximum Stack:</b> Top=45 Bytes (<a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S477"></a>?PR?MOBILEINITPROCESS?MOBILE (812BB9H - 812E7FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=15 Bytes (<a href="#S505">?PR?_ZHKATCMD?MOBILE</a>) Top=45 Bytes (<a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S505">?PR?_ZHKATCMD?MOBILE</a></li>
+<li><a href="#S407">?PR?WATERKEYDISABLE?DEVICE</a></li>
+<li><a href="#S406">?PR?WATERKEYENABLE?DEVICE</a></li>
+<li><a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a></li>
+<li><a href="#S422">?PR?ZHKSERIALINIT?SERIAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S479"></a>?PR?ZHKMOBILEPROCESS?MOBILE (813218H - 81331DH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=18 Bytes (<a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a>) Top=42 Bytes (<a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S423">?PR?_ZHKSERIALPUTCH?SERIAL</a></li>
+<li><a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a></li>
+<li><a href="#S476">?PR?ZHKMOBILENULLPROCESS?MOBILE</a></li>
+<li><a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a></li>
+<li><a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a></li>
+<li><a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S480"></a>?PR?GPRSINIT?MOBILE (813B6FH - 813B84H)</h2>
+<p><br><b>Maximum Stack:</b> Top=48 Bytes (<a href="#S459">?PR?COMMINITGPRS?COMMMODULE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S459">?PR?COMMINITGPRS?COMMMODULE</a></li>
+</ul>
+
+<h2><a name="S481"></a>?PR?ZHKMOBILESIGNALIN?MOBILE (81303FH - 813217H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S425">?PR?ZHKSERIALGETCH?SERIAL</a>) Top=54 Bytes (<a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S527">?PR?_ISDIGIT?ISDIGIT</a></li>
+<li><a href="#S529">?PR?_STRLEN?STRLEN</a></li>
+<li><a href="#S425">?PR?ZHKSERIALGETCH?SERIAL</a></li>
+<li><a href="#S428">?PR?ZHKSERIALISRXBUFNULL?SERIAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a></li>
+<li><a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a></li>
+<li><a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a></li>
+<li><a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S482"></a>?PR?ZHKMOBILEINIT?MOBILE (811530H - 8115BEH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=9 Bytes (<a href="#S260">?PR?SCHEDULERINIT?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S406">?PR?WATERKEYENABLE?DEVICE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S260">?PR?SCHEDULERINIT?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S483"></a>?PR?SENDATCOMMANDTOMOBILE?MOBILE (8126C1H - 81270EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=15 Bytes (<a href="#S505">?PR?_ZHKATCMD?MOBILE</a>) Top=18 Bytes (<a href="#S336">?PR?TESTATCOMMAND?SCHEDULER</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S505">?PR?_ZHKATCMD?MOBILE</a></li>
+<li><a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S336">?PR?TESTATCOMMAND?SCHEDULER</a></li>
+</ul>
+
+<h2><a name="S484"></a>?PR?ISSHORTMSGIN?MOBILE (80CC35H - 80CC3FH)</h2>
+<p><br><b>Maximum Stack:</b> Top=42 Bytes (<a href="#S80">?PR?MISSION?MAINFLOW</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S80">?PR?MISSION?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S485"></a>?PR?ISMESSAGERBUZY?MOBILE (813B67H - 813B6EH)</h2>
+<p><br><b>Maximum Stack:</b> Top=3 Bytes (<a href="#S467">?PR?COMMDOSENDSMS?COMMMODULE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S467">?PR?COMMDOSENDSMS?COMMMODULE</a></li>
+</ul>
+
+<h2><a name="S486"></a>?PR?_GETSHORTMSG?MOBILE (813C98H - 813D35H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=6 Bytes (<a href="#S35">?PR?CHECKQUREYCMD?MAINFLOW</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S35">?PR?CHECKQUREYCMD?MAINFLOW</a></li>
+</ul>
+
+<h2><a name="S488"></a>?PR?_PUTSHORTMSG?MOBILE (813BA5H - 813BEAH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=18 Bytes (<a href="#S461">?PR?_TESTSMSSEND?COMMMODULE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S461">?PR?_TESTSMSSEND?COMMMODULE</a></li>
+<li><a href="#S467">?PR?COMMDOSENDSMS?COMMMODULE</a></li>
+</ul>
+
+<h2><a name="S489"></a>?PR?SMSGETLASTERR?MOBILE (813B4AH - 813B66H)</h2>
+<p><br><b>Maximum Stack:</b> Top=45 Bytes (<a href="#S460">?PR?STACHECKCOMMSTATUS?COMMMODULE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S460">?PR?STACHECKCOMMSTATUS?COMMMODULE</a></li>
+<li><a href="#S464">?PR?STACHECKSMSSENDRESULT?COMMMODULE</a></li>
+</ul>
+
+<h2><a name="S490"></a>?PR?ZHKMOBILESMSTXPROCESS?MOBILE (81331EH - 8134F0H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=15 Bytes (<a href="#S505">?PR?_ZHKATCMD?MOBILE</a>) Top=45 Bytes (<a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S530">?PR?_STRSTR?STRSTR</a></li>
+<li><a href="#S505">?PR?_ZHKATCMD?MOBILE</a></li>
+<li><a href="#S495">?PR?_ZHKMOBILESMSGETTXMSG?MOBILE</a></li>
+<li><a href="#S501">?PR?_ZHKMOBILESMSPACK?MOBILE</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+<li><a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a></li>
+<li><a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S492"></a>?PR?_ASCTOINT?MOBILE (813D36H - 813D74H)</h2>
+<p><br><b>Maximum Stack:</b> Top=51 Bytes (<a href="#S503">?PR?_ZHKMOBILESMSUNPACK?MOBILE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S503">?PR?_ZHKMOBILESMSUNPACK?MOBILE</a></li>
+</ul>
+
+<h2><a name="S493"></a>?PR?ZHKMOBILESMSRXPROCESS?MOBILE (8134F1H - 8137DCH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=15 Bytes (<a href="#S505">?PR?_ZHKATCMD?MOBILE</a>) Top=45 Bytes (<a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S529">?PR?_STRLEN?STRLEN</a></li>
+<li><a href="#S530">?PR?_STRSTR?STRSTR</a></li>
+<li><a href="#S528">?PR?_TOUPPER?TOUPPER</a></li>
+<li><a href="#S505">?PR?_ZHKATCMD?MOBILE</a></li>
+<li><a href="#S503">?PR?_ZHKMOBILESMSUNPACK?MOBILE</a></li>
+<li><a href="#S523">?PR?PRINTF?PRINTF</a></li>
+<li><a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a></li>
+<li><a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S479">?PR?ZHKMOBILEPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S495"></a>?PR?_ZHKMOBILESMSGETTXMSG?MOBILE (813D75H - 813DA7H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=48 Bytes (<a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S497"></a>?PR?_ZHKGSMTOASC?MOBILE (813DA8H - 81406EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=51 Bytes (<a href="#S503">?PR?_ZHKMOBILESMSUNPACK?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S503">?PR?_ZHKMOBILESMSUNPACK?MOBILE</a></li>
+</ul>
+
+<h2><a name="S499"></a>?PR?_ZHKMESSAGETOGSM?MOBILE (81406FH - 814204H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S521">?C?LIB_CODE</a>) Top=51 Bytes (<a href="#S501">?PR?_ZHKMOBILESMSPACK?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S501">?PR?_ZHKMOBILESMSPACK?MOBILE</a></li>
+</ul>
+
+<h2><a name="S501"></a>?PR?_ZHKMOBILESMSPACK?MOBILE (80730BH - 8075BBH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S499">?PR?_ZHKMESSAGETOGSM?MOBILE</a>) Top=48 Bytes (<a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S499">?PR?_ZHKMESSAGETOGSM?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S503"></a>?PR?_ZHKMOBILESMSUNPACK?MOBILE (814205H - 8145B7H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S497">?PR?_ZHKGSMTOASC?MOBILE</a>) Top=48 Bytes (<a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S492">?PR?_ASCTOINT?MOBILE</a></li>
+<li><a href="#S497">?PR?_ZHKGSMTOASC?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S505"></a>?PR?_ZHKATCMD?MOBILE (81270FH - 812792H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=12 Bytes (<a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a>) Top=48 Bytes (<a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S529">?PR?_STRLEN?STRLEN</a></li>
+<li><a href="#S426">?PR?_ZHKSERIALTXMSG?SERIAL</a></li>
+<li><a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a></li>
+<li><a href="#S483">?PR?SENDATCOMMANDTOMOBILE?MOBILE</a></li>
+<li><a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a></li>
+<li><a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S507"></a>?PR?ZHKATCMDGETERR?MOBILE (812E80H - 812F0DH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=9 Bytes (<a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a>) Top=51 Bytes (<a href="#S505">?PR?_ZHKATCMD?MOBILE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S521">?C?LIB_CODE</a></li>
+<li><a href="#S530">?PR?_STRSTR?STRSTR</a></li>
+<li><a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S505">?PR?_ZHKATCMD?MOBILE</a></li>
+<li><a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a></li>
+<li><a href="#S483">?PR?SENDATCOMMANDTOMOBILE?MOBILE</a></li>
+<li><a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a></li>
+<li><a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S521"></a>?C?LIB_CODE (80052DH - 8008DCH)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Top=225 Bytes (<a href="#S176">?PR?_READWRITESYSPARAM?SYSPARAMSET</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S11">?PR?_CAL?MAINFLOW</a></li>
+<li><a href="#S97">?PR?_CHOOSERETURN?DEVICECHECK</a></li>
+<li><a href="#S132">?PR?_CLEARDISPLAYLINE?COMMONFUNCTION</a></li>
+<li><a href="#S465">?PR?_COMMADD2SMSSENDBUFFER?COMMMODULE</a></li>
+<li><a href="#S203">?PR?_DISPCURRENCYLIST?COUNTERMAINT</a></li>
+<li><a href="#S108">?PR?_DISPDEVICEMENU?DEVICECHECK</a></li>
+<li><a href="#S105">?PR?_DISPDEVICESTATUS?DEVICECHECK</a></li>
+<li><a href="#S196">?PR?_DISPGOODSWAYLIST?COUNTERMAINT</a></li>
+<li><a href="#S0">?PR?_DISPLAYCHARACTERSET?SCHEDULER</a></li>
+<li><a href="#S13">?PR?_DISPLAYCURRENTMONEY?MAINFLOW</a></li>
+<li><a href="#S164">?PR?_DISPLAYGOODSMENUANDVAL?GOODSWAYSET</a></li>
+<li><a href="#S148">?PR?_DISPLAYINFO?COMMONFUNCTION</a></li>
+<li><a href="#S179">?PR?_DISPLAYMENUANDVAL?SYSPARAMSET</a></li>
+<li><a href="#S294">?PR?_DISPLAYPOSSTRING?SCHEDULER</a></li>
+<li><a href="#S215">?PR?_DISPLAYRACKMENUANDVAL?RACKSET</a></li>
+<li><a href="#S298">?PR?_DISPLAYSETCURSORPOS?SCHEDULER</a></li>
+<li><a href="#S296">?PR?_DISPLAYSETCURSORSTYLE?SCHEDULER</a></li>
+<li><a href="#S123">?PR?_DISPLAYSTR?COMMONFUNCTION</a></li>
+<li><a href="#S292">?PR?_DISPLAYSTRING?SCHEDULER</a></li>
+<li><a href="#S194">?PR?_DISPLAYTRACESUM?COUNTERMAINT</a></li>
+<li><a href="#S167">?PR?_EDITGOODSPARAM?GOODSWAYSET</a></li>
+<li><a href="#S182">?PR?_EDITPARAM?SYSPARAMSET</a></li>
+<li><a href="#S218">?PR?_EDITRACKPARAM?RACKSET</a></li>
+<li><a href="#S126">?PR?_GETLINE?COMMONFUNCTION</a></li>
+<li><a href="#S130">?PR?_GETLINEMONEY?COMMONFUNCTION</a></li>
+<li><a href="#S486">?PR?_GETSHORTMSG?MOBILE</a></li>
+<li><a href="#S142">?PR?_INPUTGOODSWAYNO?COMMONFUNCTION</a></li>
+<li><a href="#S138">?PR?_LENOFNUM?COMMONFUNCTION</a></li>
+<li><a href="#S233">?PR?_MOVDATAFROMSRAM?DATAEXCHANGE</a></li>
+<li><a href="#S235">?PR?_MOVDATATOSRAM?DATAEXCHANGE</a></li>
+<li><a href="#S243">?PR?_MOVFLASHTOSRAM?DATAEXCHANGE</a></li>
+<li><a href="#S237">?PR?_MOVSRAMTOSRAM?DATAEXCHANGE</a></li>
+<li><a href="#S229">?PR?_NUMBERTOSTRING?COMMON</a></li>
+<li><a href="#S239">?PR?_POGRAMFLASH?DATAEXCHANGE</a></li>
+<li><a href="#S488">?PR?_PUTSHORTMSG?MOBILE</a></li>
+<li><a href="#S161">?PR?_READWRITEGOODSPARAM?GOODSWAYSET</a></li>
+<li><a href="#S212">?PR?_READWRITERACTPARAM?RACKSET</a></li>
+<li><a href="#S176">?PR?_READWRITESYSPARAM?SYSPARAMSET</a></li>
+<li><a href="#S474">?PR?_SENDSMS?COMMUNICATION</a></li>
+<li><a href="#S185">?PR?_SP_MENUSELECTED?SYSPARAMSET</a></li>
+<li><a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a></li>
+<li><a href="#S120">?PR?_WAITFORWORK?COMMONFUNCTION</a></li>
+<li><a href="#S505">?PR?_ZHKATCMD?MOBILE</a></li>
+<li><a href="#S443">?PR?_ZHKBUSFRAMEUNPACK?PROCOTOL</a></li>
+<li><a href="#S301">?PR?_ZHKCASHERTASK?SCHEDULER</a></li>
+<li><a href="#S330">?PR?_ZHKCHANNELEXEC?SCHEDULER</a></li>
+<li><a href="#S447">?PR?_ZHKCHANNELFRAMEUNPACK?PROCOTOL</a></li>
+<li><a href="#S322">?PR?_ZHKCHANNELTASK?SCHEDULER</a></li>
+<li><a href="#S449">?PR?_ZHKCHKADDR?PROCOTOL</a></li>
+<li><a href="#S497">?PR?_ZHKGSMTOASC?MOBILE</a></li>
+<li><a href="#S499">?PR?_ZHKMESSAGETOGSM?MOBILE</a></li>
+<li><a href="#S495">?PR?_ZHKMOBILESMSGETTXMSG?MOBILE</a></li>
+<li><a href="#S501">?PR?_ZHKMOBILESMSPACK?MOBILE</a></li>
+<li><a href="#S503">?PR?_ZHKMOBILESMSUNPACK?MOBILE</a></li>
+<li><a href="#S262">?PR?_ZHKSCHEDULERADDTASK?SCHEDULER</a></li>
+<li><a href="#S264">?PR?_ZHKSCHEDULERISTASKNULL?SCHEDULER</a></li>
+<li><a href="#S0">?PR?_ZHKSERIAL1PRINTF?DEBUG</a></li>
+<li><a href="#S426">?PR?_ZHKSERIALTXMSG?SERIAL</a></li>
+<li><a href="#S77">?PR?ALLGOODSWAYERROR?MAINFLOW</a></li>
+<li><a href="#S317">?PR?CASHERQUERYENABLE?SCHEDULER</a></li>
+<li><a href="#S71">?PR?CHECKCHANGEPERMIT?MAINFLOW</a></li>
+<li><a href="#S39">?PR?CHECKGOODSSUMANDLOAD?MAINFLOW</a></li>
+<li><a href="#S35">?PR?CHECKQUREYCMD?MAINFLOW</a></li>
+<li><a href="#S9">?PR?CHOOSERETURN?MAINFLOW</a></li>
+<li><a href="#S101">?PR?COINERTEST?DEVICECHECK</a></li>
+<li><a href="#S19">?PR?COLNUMISCANSERVER?MAINFLOW</a></li>
+<li><a href="#S467">?PR?COMMDOSENDSMS?COMMMODULE</a></li>
+<li><a href="#S208">?PR?COUNTERMAINMENU?COUNTERMAINT</a></li>
+<li><a href="#S114">?PR?DEVICECHECK?DEVICECHECK</a></li>
+<li><a href="#S28">?PR?DEVICEDEFAULTSETTING?MAINFLOW</a></li>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+<li><a href="#S110">?PR?DISPGOODSWAYSSTATES?DEVICECHECK</a></li>
+<li><a href="#S66">?PR?DISPINPUTMONEY?MAINFLOW</a></li>
+<li><a href="#S290">?PR?DISPLAYCLEAR?SCHEDULER</a></li>
+<li><a href="#S53">?PR?DISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S48">?PR?DISPWELOROUTSERV?MAINFLOW</a></li>
+<li><a href="#S68">?PR?EXISTANYCHOOSE?MAINFLOW</a></li>
+<li><a href="#S50">?PR?GETBILL?MAINFLOW</a></li>
+<li><a href="#S364">?PR?GETCOIN?IOINPUT</a></li>
+<li><a href="#S15">?PR?GETHOPPERLIST?MAINFLOW</a></li>
+<li><a href="#S136">?PR?GETONEKEY?COMMONFUNCTION</a></li>
+<li><a href="#S128">?PR?GETONEMONEYKEY?COMMONFUNCTION</a></li>
+<li><a href="#S57">?PR?GOODSWAYERR?MAINFLOW</a></li>
+<li><a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a></li>
+<li><a href="#S198">?PR?GOODSWAYTRACELIST?COUNTERMAINT</a></li>
+<li><a href="#S193">?PR?INITALLCOUNTER?COUNTERMAINT</a></li>
+<li><a href="#S55">?PR?ISGOODSWAY?MAINFLOW</a></li>
+<li><a href="#S41">?PR?ISINSERTBILL?MAINFLOW</a></li>
+<li><a href="#S56">?PR?ISMONEYENOUGH?MAINFLOW</a></li>
+<li><a href="#S368">?PR?KEYBOARDINIT?KEY</a></li>
+<li><a href="#S150">?PR?LOADGLOBALPARAM?COMMONFUNCTION</a></li>
+<li><a href="#S93">?PR?MAINMENU?MAINTMENU</a></li>
+<li><a href="#S78">?PR?MAINTFUNCTION?MAINFLOW</a></li>
+<li><a href="#S477">?PR?MOBILEINITPROCESS?MOBILE</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a></li>
+<li><a href="#S44">?PR?QUERYDISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S46">?PR?QUERYISGOODSWAY?MAINFLOW</a></li>
+<li><a href="#S223">?PR?RACKPARAMMANAGE?RACKSET</a></li>
+<li><a href="#S61">?PR?REBUY?MAINFLOW</a></li>
+<li><a href="#S152">?PR?SAVEGOODSSET?COMMONFUNCTION</a></li>
+<li><a href="#S156">?PR?SAVETRADECOUNTER?COMMONFUNCTION</a></li>
+<li><a href="#S22">?PR?SCANDEVICESTATUS?MAINFLOW</a></li>
+<li><a href="#S20">?PR?SCANISSENDALARM?MAINFLOW</a></li>
+<li><a href="#S260">?PR?SCHEDULERINIT?SCHEDULER</a></li>
+<li><a href="#S261">?PR?SCHEDULERPROCESS?SCHEDULER</a></li>
+<li><a href="#S458">?PR?STACOMMMODULEINIT?COMMMODULE</a></li>
+<li><a href="#S31">?PR?SYSINITPARAM?MAINFLOW</a></li>
+<li><a href="#S188">?PR?SYSPARAMMANAGE?SYSPARAMSET</a></li>
+<li><a href="#S26">?PR?SYSTEMINIT?MAINFLOW</a></li>
+<li><a href="#S24">?PR?TRADEPACK?MAINFLOW</a></li>
+<li><a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a></li>
+<li><a href="#S326">?PR?ZHKCHANNELMSGPROCESS?SCHEDULER</a></li>
+<li><a href="#S279">?PR?ZHKHOPPERMSGPROCESS?SCHEDULER</a></li>
+<li><a href="#S361">?PR?ZHKIOINIT?IOINPUT</a></li>
+<li><a href="#S281">?PR?ZHKLCDMSGPROCESS?SCHEDULER</a></li>
+<li><a href="#S482">?PR?ZHKMOBILEINIT?MOBILE</a></li>
+<li><a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a></li>
+<li><a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a></li>
+<li><a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a></li>
+<li><a href="#S266">?PR?ZHKNULLTASK?SCHEDULER</a></li>
+<li><a href="#S409">?PR?ZHKSERIAL1INIT?SERIAL1</a></li>
+<li><a href="#S430">?PR?ZHKSERIAL_ISR?SERIAL</a></li>
+<li><a href="#S425">?PR?ZHKSERIALGETCH?SERIAL</a></li>
+<li><a href="#S422">?PR?ZHKSERIALINIT?SERIAL</a></li>
+<li><a href="#S254">?PR?ZHKTMR0?TIMER</a></li>
+</ul>
+
+<h2><a name="S522"></a>?C?LDIV (8017C6H - 801810H)</h2>
+<p><br><b>Maximum Stack:</b> Top=54 Bytes (<a href="#S409">?PR?ZHKSERIAL1INIT?SERIAL1</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S409">?PR?ZHKSERIAL1INIT?SERIAL1</a></li>
+<li><a href="#S422">?PR?ZHKSERIALINIT?SERIAL</a></li>
+</ul>
+
+<h2><a name="S523"></a>?PR?PRINTF?PRINTF (8008DDH - 800C52H)</h2>
+<p><br><b>Maximum Stack:</b> Top=222 Bytes (<a href="#S176">?PR?_READWRITESYSPARAM?SYSPARAMSET</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S203">?PR?_DISPCURRENCYLIST?COUNTERMAINT</a></li>
+<li><a href="#S196">?PR?_DISPGOODSWAYLIST?COUNTERMAINT</a></li>
+<li><a href="#S13">?PR?_DISPLAYCURRENTMONEY?MAINFLOW</a></li>
+<li><a href="#S194">?PR?_DISPLAYTRACESUM?COUNTERMAINT</a></li>
+<li><a href="#S161">?PR?_READWRITEGOODSPARAM?GOODSWAYSET</a></li>
+<li><a href="#S212">?PR?_READWRITERACTPARAM?RACKSET</a></li>
+<li><a href="#S176">?PR?_READWRITESYSPARAM?SYSPARAMSET</a></li>
+<li><a href="#S112">?PR?_TESTANDDISPMOBILESTATES?DEVICECHECK</a></li>
+<li><a href="#S71">?PR?CHECKCHANGEPERMIT?MAINFLOW</a></li>
+<li><a href="#S35">?PR?CHECKQUREYCMD?MAINFLOW</a></li>
+<li><a href="#S101">?PR?COINERTEST?DEVICECHECK</a></li>
+<li><a href="#S64">?PR?DISPENSECOIN?MAINFLOW</a></li>
+<li><a href="#S110">?PR?DISPGOODSWAYSSTATES?DEVICECHECK</a></li>
+<li><a href="#S57">?PR?GOODSWAYERR?MAINFLOW</a></li>
+<li><a href="#S99">?PR?GOODSWAYTEST?DEVICECHECK</a></li>
+<li><a href="#S59">?PR?OUTGOODS?MAINFLOW</a></li>
+<li><a href="#S81">?PR?OUTOFSERVICE?MAINFLOW</a></li>
+<li><a href="#S44">?PR?QUERYDISPLAYINPUTCODE?MAINFLOW</a></li>
+<li><a href="#S46">?PR?QUERYISGOODSWAY?MAINFLOW</a></li>
+<li><a href="#S61">?PR?REBUY?MAINFLOW</a></li>
+<li><a href="#S22">?PR?SCANDEVICESTATUS?MAINFLOW</a></li>
+<li><a href="#S20">?PR?SCANISSENDALARM?MAINFLOW</a></li>
+<li><a href="#S24">?PR?TRADEPACK?MAINFLOW</a></li>
+<li><a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a></li>
+<li><a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S527"></a>?PR?_ISDIGIT?ISDIGIT (80197FH - 80198EH)</h2>
+<p><br><b>Maximum Stack:</b> Top=57 Bytes (<a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a></li>
+</ul>
+
+<h2><a name="S528"></a>?PR?_TOUPPER?TOUPPER (80196CH - 80197EH)</h2>
+<p><br><b>Maximum Stack:</b> Top=48 Bytes (<a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S529"></a>?PR?_STRLEN?STRLEN (800010H - 800021H)</h2>
+<p><br><b>Maximum Stack:</b> Top=57 Bytes (<a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S148">?PR?_DISPLAYINFO?COMMONFUNCTION</a></li>
+<li><a href="#S505">?PR?_ZHKATCMD?MOBILE</a></li>
+<li><a href="#S110">?PR?DISPGOODSWAYSSTATES?DEVICECHECK</a></li>
+<li><a href="#S481">?PR?ZHKMOBILESIGNALIN?MOBILE</a></li>
+<li><a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S530"></a>?PR?_STRSTR?STRSTR (8018AEH - 80196BH)</h2>
+<p><br><b>Maximum Stack:</b> Top=54 Bytes (<a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S507">?PR?ZHKATCMDGETERR?MOBILE</a></li>
+<li><a href="#S493">?PR?ZHKMOBILESMSRXPROCESS?MOBILE</a></li>
+<li><a href="#S490">?PR?ZHKMOBILESMSTXPROCESS?MOBILE</a></li>
+</ul>
+
+<h2><a name="S0"></a>?PR?_VSPRINTF?VSPRINTF (000000H - 000047H)</h2>
+<p><br><b>Maximum Stack:</b> Top=3 Bytes (<a href="#S0">?PR?_ZHKSERIAL1PRINTF?DEBUG</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S0">?PR?_ZHKSERIAL1PRINTF?DEBUG</a></li>
+</ul>
+
+</body>
+</html>

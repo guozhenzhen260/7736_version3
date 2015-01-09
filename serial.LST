@@ -1,0 +1,219 @@
+CX51 COMPILER V7.50   SERIAL                                                               09/30/2014 13:53:09 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE SERIAL
+OBJECT MODULE PLACED IN serial.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE serial.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define SERIAL_C
+   2           #define ZHKSERIAL_C
+   3          #ifndef ZHKSTORAGETYPE 
+   4          #define ZHKSTORAGETYPE xdata 
+   5          #endif
+   6          #ifndef ZHK_INTERRUPT
+   7          #define ZHK_INTERRUPT
+   8          #endif 
+   9          #include "device.h"
+  10          #include "Serial.h"
+  11          #include "Serial1.h"
+  12          #include "string.h"
+  13          #include "debug.h"
+  14          #define ZHKSERIALRXBUFLEN       384
+  15          #define ZHKSERIALTXBUFLEN       384
+  16          #ifndef ZHKLINEMAX
+  17                  #define ZHKLINEMAX 128
+  18          #endif
+  19          
+  20          //typedef uchar SERAILPARAM[6];
+  21          
+  22          ZhkSerialSourse SERAILPARAM code ZhkSerialParam = 
+  23          { 
+  24            //8 , VERIFY_NULL , 1 , 0x03 , 0x84 , 0x00
+  25                  8 , VERIFY_NULL , 1 , 0x00 , 0x96 , 0x00
+  26          };
+  27          
+  28          #define ZhkBaudRate     ZhkSerialParam[ 4 ] + ZhkSerialParam[ 3 ] * 256
+  29          #define ZhkDataBit      ZhkSerialParam[ 0 ]
+  30          #define ZhkVerifyBit    ZhkSerialParam[ 1 ]
+  31          #define ZhkStopBit      ZhkSerialParam[ 2 ]
+  32          
+  33          uchar ZHKSTORAGETYPE ZhkSerialRxBuf[ ZHKSERIALRXBUFLEN ];
+  34          uint ZHKSTORAGETYPE ZhkSerialRxBufWr;
+  35          uint ZHKSTORAGETYPE ZhkSerialRxBufRd;
+  36          
+  37          uchar ZHKSTORAGETYPE ZhkSerialTxBuf[ ZHKSERIALTXBUFLEN ];
+  38          uint  ZHKSTORAGETYPE ZhkSerialTxBufWr;
+  39          uint  ZHKSTORAGETYPE ZhkSerialTxBufRd;
+  40          
+  41          bit ZhkSerialTxdEmpty;
+  42          
+  43          uchar ZhkSerialIsRxBufNull( void );
+  44          //uchar ZhkSerialIsRxFullIsr( void );
+  45          uchar ZhkSerialIsTxBufNull( void );
+  46          //uchar ZhkSerialIsTxBufNullIsr( void );
+  47          
+  48          uchar ZhkSerialInit( void )
+  49          {
+  50   1              uint  data dat;
+  51   1              uchar data ch;
+  52   1      
+  53   1              T2CON   = 0x34;
+  54   1              SCON    = 0xD0;
+  55   1              
+CX51 COMPILER V7.50   SERIAL                                                               09/30/2014 13:53:09 PAGE 2   
+
+  56   1              ch = ZhkDataBit + ZhkStopBit;
+  57   1              if ( ZhkVerifyBit != VERIFY_NULL ) ch ++;
+  58   1              if ( ch != 9 && ch != 10 ) return 0;
+  59   1              if ( ZhkVerifyBit == VERIFY_NULL || ZhkDataBit < 8 )
+  60   1              {
+  61   2                      SM0 = 0;
+  62   2              }
+  63   1              
+  64   1              /* ZhkBaudRate 是波特率/100 用BCD码表示 */
+  65   1              dat      = ZhkBaudRate;
+  66   1              dat     -= dat / 4096 * 6 * 256;
+  67   1              dat     -= dat /  256 * 6 *  16;
+  68   1              dat     -= dat /   16 * 6;
+  69   1              dat      = ( OSCRATE / 32 / 100  * 12 / MACHINECYCLE ) / dat;
+  70   1              dat      = - dat;
+  71   1              RCAP2H   = dat / 256;
+  72   1              RCAP2L   = dat % 256;
+  73   1      
+  74   1      //      S0STAT   = 0x20;
+  75   1              ES       = 1;
+  76   1              #ifdef _DEBUG_TRACE
+                      ES = 0;
+                      #endif
+  79   1              TI       = 1;
+  80   1      
+  81   1              ZhkSerialTxdEmpty = 1;
+  82   1              ZhkSerialTxBufWr  = 0;
+  83   1              ZhkSerialTxBufRd  = 0;
+  84   1              ZhkSerialRxBufWr  = 0;
+  85   1              ZhkSerialRxBufRd  = 0;
+  86   1              return 1;
+  87   1              
+  88   1      }
+  89          
+  90          uchar ZhkSerialPutCh( uchar ch )
+  91          {
+  92   1      
+  93   1              uint data i;
+  94   1              bit data veri;
+  95   1              for( i = 0 ; i < 2000 ; i ++ )  if( ZhkSerialTxdEmpty )
+  96   1              { 
+  97   2                      ZhkSerialTxdEmpty = 0;
+  98   2                      ACC   = ch;
+  99   2                      veri  = P;
+ 100   2                      if ( ZhkVerifyBit == VERIFY_ODD  ) veri = ! veri;
+ 101   2                      if ( ZhkVerifyBit == VERIFY_NULL ) veri = 1;
+ 102   2                      TB8 = veri;
+ 103   2                      SBUF = ch;
+ 104   2                      return 0;
+ 105   2              }
+ 106   1              return 1 ;
+ 107   1      
+ 108   1      }
+ 109          uchar ZhkSerialGetCh( void )
+ 110          {
+ 111   1              uchar data ch;
+ 112   1              ch = ZhkSerialRxBuf[ ZhkSerialRxBufRd ];
+ 113   1              ZhkSerialRxBufRd ++;
+ 114   1              if ( ZhkSerialRxBufRd >= ZHKSERIALRXBUFLEN ) ZhkSerialRxBufRd = 0;
+ 115   1              ZhkHardSetRTS();
+ 116   1              return ch;
+ 117   1              
+CX51 COMPILER V7.50   SERIAL                                                               09/30/2014 13:53:09 PAGE 3   
+
+ 118   1      }
+ 119          uchar ZhkSerialTxMsg( uchar* TxBuf , uint len )
+ 120          {
+ 121   1              uchar i;
+ 122   1              if ( len > ZHKSERIALTXBUFLEN ) 
+ 123   1                      return 1;
+ 124   1              while ( ! ZhkSerialIsTxBufNull() )
+ 125   1                              ;
+ 126   1      
+ 127   1      //      Trace("\n ZhkSerialTxMsg len = %u", len );
+ 128   1              memcpy( ZhkSerialTxBuf , TxBuf , len );
+ 129   1              ZhkSerialPutCh( ZhkSerialTxBuf[ 0 ] );
+ 130   1              ZhkSerialTxBufRd = 1;
+ 131   1              ZhkSerialTxBufWr = len;
+ 132   1              #ifdef _DEBUG_MOBILE_TRACE
+                              for( i = 0 ; i < len ; i ++ )
+                                      ZhkSerial1PutCh( TxBuf[ i ] );
+                      #endif
+ 136   1              return 0;
+ 137   1      }
+*** WARNING C280 IN LINE 121 OF SERIAL.C: 'i': unreferenced local variable
+ 138          /////////////////////////////////////////////////////////////////////////////////////
+ 139          uchar ZhkSerialIsRxBufNull( void )
+ 140          {
+ 141   1              if ( ZhkSerialRxBufRd - ZhkSerialRxBufWr == 0 ) 
+ 142   1                      return 1;
+ 143   1              _nop_();
+ 144   1              return 0;
+ 145   1      }
+ 146          uchar ZhkSerialIsTxBufNull( void )
+ 147          {
+ 148   1              if  ( ZhkSerialTxBufRd - ZhkSerialTxBufWr == 0 ) 
+ 149   1                      return 1;
+ 150   1              return 0;
+ 151   1      }
+ 152          
+ 153          void ZhkSerial_Isr( void ) interrupt 4 using 1 
+ 154          {
+ 155   1              bit data veri;
+ 156   1              ZhkSaveChipSelect();
+ 157   1              ZhkHardSramSelect();
+ 158   1              if ( TI )
+ 159   1              {
+ 160   2                      TI = 0;
+ 161   2                      if ( /*! ZhkHardIsCTS() || */ZhkSerialIsTxBufNull() )
+ 162   2                      {
+ 163   3                              ZhkSerialTxdEmpty = 1;
+ 164   3                      }
+ 165   2                      else
+ 166   2                      {
+ 167   3                              SBUF = ZhkSerialTxBuf[ ZhkSerialTxBufRd ++ ];
+ 168   3                              if ( ZhkVerifyBit == VERIFY_ODD  ) veri = ! veri;
+ 169   3                              if ( ZhkVerifyBit == VERIFY_NULL ) veri = 1;
+ 170   3                              TB8  = veri;    
+ 171   3                      }
+ 172   2              }
+ 173   1              if ( RI )
+ 174   1              {
+ 175   2                      RI = 0;
+ 176   2                      ZhkSerialRxBuf[ ZhkSerialRxBufWr ] = SBUF;
+ 177   2                      
+ 178   2                      ZhkSerialRxBufWr ++;
+CX51 COMPILER V7.50   SERIAL                                                               09/30/2014 13:53:09 PAGE 4   
+
+ 179   2                      if ( ZhkSerialRxBufWr >= ZHKSERIALRXBUFLEN )
+ 180   2                              ZhkSerialRxBufWr = 0;
+ 181   2              }
+ 182   1              ZhkLoadChipSelect();
+ 183   1      }
+ 184          
+ 185          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    709    ----
+   CONSTANT SIZE    =      6    ----
+   XDATA SIZE       =    776       6
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1       2
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

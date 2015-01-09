@@ -1,0 +1,4 @@
+#define SHORTMSG_C
+
+
+

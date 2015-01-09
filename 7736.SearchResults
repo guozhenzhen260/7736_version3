@@ -1,0 +1,11 @@
+---- sysVPMission.sel2ErrLed Æ¥Åä (10 ÔÚ 3 ÎÄ¼þ ) ----
+D:\VMCSourceCode\7736\7736_MDB\test\7736_V1_7\devicecheck.c:1481:    sysVPMission.sel2ErrLed   = 0xff;
+D:\VMCSourceCode\7736\7736_MDB\test\7736_V1_7\devicecheck.c:1518:    sysVPMission.sel2ErrLed   = 0x00;
+D:\VMCSourceCode\7736\7736_MDB\test\7736_V1_7\scheduler.c:995:		TaskTemp.Param[1] = sysVPMission.sel2ErrLed;
+D:\VMCSourceCode\7736\7736_MDB\test\7736_V1_7\VMC_PC.c:915:	sysVPMission.sel2ErrLed = 0;
+D:\VMCSourceCode\7736\7736_MDB\test\7736_V1_7\VMC_PC.c:941:			sysVPMission.sel2ErrLed |= 1<<(i-KEYEXTRAVAL);
+D:\VMCSourceCode\7736\7736_MDB\test\7736_V1_7\VMC_PC.c:945:        	sysVPMission.sel2ErrLed |= 1<<(i-KEYEXTRAVAL);
+D:\VMCSourceCode\7736\7736_MDB\test\7736_V1_7\VMC_PC.c:1054:			sysVPMission.sel2ErrLed |= 1<<(i-KEYEXTRAVAL);
+D:\VMCSourceCode\7736\7736_MDB\test\7736_V1_7\VMC_PC.c:1065:	        	sysVPMission.sel2ErrLed |= 1<<(i-KEYEXTRAVAL);
+D:\VMCSourceCode\7736\7736_MDB\test\7736_V1_7\VMC_PC.c:1077:	        	sysVPMission.sel2ErrLed |= 1<<(i-KEYEXTRAVAL);
+D:\VMCSourceCode\7736\7736_MDB\test\7736_V1_7\VMC_PC.c:2486:    sysVPMission.sel2ErrLed   = 0xff;

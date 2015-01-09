@@ -1,0 +1,123 @@
+CX51 COMPILER V7.50   COMMON                                                               09/30/2014 13:53:00 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE COMMON
+OBJECT MODULE PLACED IN common.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE common.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define COMMON_C
+   2          #include "device.h"
+   3          #include "common.h"
+   4          
+   5          /////////////////////////////////////////////////////////////////////////////////
+   6          void delay( uchar Cycle )
+   7          {
+   8   1              while( Cycle ) 
+   9   1                      Cycle --;
+  10   1      }
+  11          /////////////////////////////////////////////////////////////////////////////////
+  12          
+  13          //void DelayMs( uchar MicroSecond )
+  14          void DelayMs( uint MicroSecond )
+  15          {
+  16   1              uchar xdata iCycle;
+  17   1      
+  18   1              MicroSecond ++;
+  19   1              while( -- MicroSecond )
+  20   1              {
+  21   2                      iCycle = 224;
+  22   2                      while( iCycle ) 
+  23   2                              iCycle --;
+  24   2      
+  25   2                      iCycle = 224;
+  26   2                      while( iCycle ) 
+  27   2                              iCycle --;               
+  28   2              }
+  29   1      }
+  30          
+  31          void NumberToString( unsigned long dat , uchar * str , uchar len  )
+  32          {
+  33   1              unsigned long code divisor[]=
+  34   1              {
+  35   1                      1,
+  36   1                      10,
+  37   1                      100,
+  38   1                      1000,
+  39   1                      10000,
+  40   1                      100000,
+  41   1                      1000000,
+  42   1                      10000000,
+  43   1                      100000000
+  44   1              };
+  45   1              uchar data i,ch;
+  46   1              unsigned long data temp1;
+  47   1              unsigned  int data temp2;
+  48   1              uchar data temp3;
+  49   1              unsigned long data divisor1;
+  50   1              unsigned  int data divisor2;
+  51   1              
+  52   1              if ( len > 8 ) len = 8;
+  53   1              temp1    = dat;
+  54   1              temp1   %= divisor[ len ];
+  55   1              for( i = 8 ; i > 4 ; i -- )
+CX51 COMPILER V7.50   COMMON                                                               09/30/2014 13:53:00 PAGE 2   
+
+  56   1              {
+  57   2                      divisor1 = divisor[ i - 1 ];
+  58   2                      for( ch = 0 ; ch < 9 ; ch ++ )
+  59   2                      {
+  60   3                              if ( temp1 < divisor1 ) break;
+  61   3                              temp1 -= divisor1;
+  62   3                      }
+  63   2                      if ( i <= len )
+  64   2                              str[ len - i ] = ch;
+  65   2              }
+  66   1              temp2    = temp1;
+  67   1              for( i = 4 ; i > 2 ; i -- )
+  68   1              {
+  69   2                      divisor2 = divisor[ i - 1 ];
+  70   2                      for( ch = 0 ; ch < 9 ; ch ++ )
+  71   2                      {
+  72   3                              if ( temp2 < divisor2 ) break;
+  73   3                              temp2 -= divisor2;
+  74   3                      }
+  75   2                      if ( i <= len )
+  76   2                              str[ len - i ] = ch;
+  77   2              }
+  78   1              temp3 = temp2;
+  79   1              ch    = temp3 / 10;
+  80   1              if ( 2 <= len )
+  81   1                      str[ len - 2 ] = ch;
+  82   1              ch    = temp3 % 10;
+  83   1              if ( 1 <= len )
+  84   1                      str[ len - 1 ] = ch;
+  85   1              for( i = 0 ; i < len - 1 ; i ++ )
+  86   1              {
+  87   2                      if ( str[ i ] != 0 ) break;
+  88   2                      str[ i ] = 0x20;
+  89   2              }
+  90   1              for( ; i < len ; i ++ )
+  91   1              {
+  92   2                      str[ i ] += '0';
+  93   2              }
+  94   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    585    ----
+   CONSTANT SIZE    =     36    ----
+   XDATA SIZE       =   ----       8
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      15
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

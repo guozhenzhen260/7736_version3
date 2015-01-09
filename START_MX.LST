@@ -1,0 +1,332 @@
+AX51 MACRO ASSEMBLER  START_MX                                                              09/30/14 13:43:34 PAGE     1
+
+
+MACRO ASSEMBLER AX51 V3.10
+OBJECT MODULE PLACED IN START_MX.OBJ
+ASSEMBLER INVOKED BY: C:\Keil\C51\BIN\AX51.EXE START_MX.A51 MOD_MX51 SET(LARGE) DEBUG EP
+
+LOC    OBJ             LINE     SOURCE
+
+                          1     $mod_mx51 
+                          2     ;------------------------------------------------------------------------------
+                          3     ;  This file is part of the PK51 Professional Developers Kit
+                          4     ;  Startup Code for the Philips 80C51MX architecture
+                          5     ;  Copyright (c) 2000-2002 Keil Elektronik GmbH and Keil Software, Inc.
+                          6     ;  Version 1.03
+                          7     ;------------------------------------------------------------------------------
+                          8     ;  START_MX.A51:  This code is executed after processor reset.
+                          9     ;  You may add this file to a uVision2 project.
+                         10     ;
+                         11     ;  To translate this file manually use AX51 with the following invocation:
+                         12     ;
+                         13     ;     AX51 START_MX.A51  
+                         14     ;
+                         15     ;  To link the modified START_MX.OBJ file to your application use the
+                         16     ;  following LX51 invocation:
+                         17     ;
+                         18     ;     LX51 START_MX.OBJ, <your object file list> <controls>
+                         19     ;
+                         20     ;------------------------------------------------------------------------------
+                         21     ;
+                         22     ;  Setup 80C51MX Configuration Register (MXCON)
+                         23     ;
+                         24     ; Extended Call Return Mode (intermixed subroutine call with ECALL/LCALL/ACALL)
+                         25     ; ECRM       Val  Description
+                         26     ; ---        ---  -----------
+ 0000                    27     ECRM EQU 0  ; 0 = classic CALL/RET instructions with 2-byte stack frame
+                         28     ;           ; 1 = CALL/RET save and restore the full 3-byte program counter
+                         29     ; NOTE: ECRM is only available on some devices, check your chip specification
+                         30     ;
+                         31     ; Extended Addressing Mode (enable upper address multiplex on Port 2)
+                         32     ; EAM        Val  Description
+                         33     ; ---        ---  -----------
+ 0001                    34     EAM EQU  1  ; 0 = do not change configuration state of the CPU
+                         35     ;           ; 1 = enable extended addressing mode (multiplex A16..A22 on Port 2)
+                         36     ;
+                         37     ; Extended Stack Memory Mode (16-bit Stack Pointer)
+                         38     ; ESMM       Val  Description
+                         39     ; ----       ---  -----------
+ 0001                    40     ESMM EQU 1  ; 0 = classic 8051 stack pointer (8-bit) addressing IDATA space
+                         41     ;           ; 1 = extended 16-bit stack pointer addressing EDATA space
+                         42     ;
+                         43     ; Extended Interrupt Frame
+                         44     ; EIFM       Val  Description
+                         45     ; --         ---  -----------
+ 0001                    46     EIFM EQU 1  ; 0 = classic 8051 interrupt frame (16-bit address pushed)
+                         47     ;           ; 1 = extended 24-bit interrupt frame (3 bytes pushed on interrupt)
+                         48     ;
+                         49     ;
+                         50     ;
+                         51     ;  Setup Additional Features (AUXR, AUXR1)
+                         52     ;
+                         53     ; XDATA access (External XDATA space)
+                         54     ; EXTRAM     Val  Description
+                         55     ; ---        ---  -----------
+ 0001                    56     EXTRAM EQU 1; 0 = access on-chip XDATA RAM 
+                         57     ;           ; 1 = disable on-chip XDATA and access off-chip XDATA space
+                         58     ;
+AX51 MACRO ASSEMBLER  START_MX                                                              09/30/14 13:43:34 PAGE     2
+
+                         59     ; ALE (Address Latch Enable) Output Signal 
+                         60     ; AO         Val  Description
+                         61     ; --         ---  -----------
+ 0001                    62     AO   EQU 1  ; 0 = ALE signal is generate at a constant rate 
+                         63     ;           ; 1 = ALE signal is active only during a MOVX or MOVC instruction
+                         64     ;
+                         65     ; Low Volatage (Vcc) configuration
+                         66     ; LPEP       Val  Description
+                         67     ; ----       ---  -----------
+ 0000                    68     LPEP EQU 0  ; 0 = chip supply volatage (Vcc) is above 4V
+                         69     ;           ; 1 = chip supply volatage (Vcc) is below 4V
+                         70     ;------------------------------------------------------------------------------
+                         71     ;
+                         72     ;  CPU Stack Size Definition 
+                         73     ;
+                         74     ;  The following EQU statement defines the stack space available in extended
+                         75     ;  stack mode (ESMM set to 1) for the application program.  It should be noted
+                         76     ;  that the stack space must be adjusted according the actual requirements of 
+                         77     ;  the application.
+                         78     ;
+ 0100                    79     STACKSIZE       EQU     100H    ; set to 100H Bytes.
+                         80     ;
+                         81     ;------------------------------------------------------------------------------
+                         82     ;
+                         83     ;  User-defined Power-On Initialization of Memory
+                         84     ;
+                         85     ;  With the following EQU statements the initialization of memory
+                         86     ;  at processor reset can be defined:
+                         87     ;
+                         88     ;               ; the absolute start-address of IDATA memory is always 0
+ 00FF                    89     IDATALEN        EQU     0FFH    ; the length of IDATA memory in bytes.
+                         90     ;
+ 0000                    91     XDATASTART      EQU     0H      ; the absolute start-address of XDATA memory
+ 0000                    92     XDATALEN        EQU     0H      ; the length of XDATA memory in bytes.
+                         93     ;
+ 0000                    94     PDATASTART      EQU     0H      ; the absolute start-address of PDATA memory
+ 0000                    95     PDATALEN        EQU     0H      ; the length of PDATA memory in bytes.
+                         96     ;
+                         97     ;  Notes:  The IDATA space overlaps physically the DATA and BIT areas of the
+                         98     ;          80C51MX CPU.
+                         99     ;------------------------------------------------------------------------------
+                        100     ;
+                        101     ;  Reentrant Stack Initilization
+                        102     ;
+                        103     ;  The following EQU statements define the stack pointer for reentrant
+                        104     ;  functions and initialized it:
+                        105     ;
+                        106     ;  Stack Space for reentrant functions in the SMALL model.
+ 0000                   107     IBPSTACK        EQU     0       ; set to 1 if small reentrant is used.
+ 0100                   108     IBPSTACKTOP     EQU     0FFH+1  ; set top of stack to highest location+1.
+                        109     ;
+                        110     ;  Stack Space for reentrant functions in the LARGE model.      
+ 0000                   111     XBPSTACK        EQU     0       ; set to 1 if large reentrant is used.
+ 00010000               112     XBPSTACKTOP     EQU     0FFFFH+1; set top of stack to highest location+1.
+                        113     ;
+                        114     ;  Stack Space for reentrant functions in the COMPACT model.    
+ 0000                   115     PBPSTACK        EQU     0       ; set to 1 if compact reentrant is used.
+ 00010000               116     PBPSTACKTOP     EQU     0FFFFH+1; set top of stack to highest location+1.
+                        117     ;
+                        118     ;------------------------------------------------------------------------------
+                        119     ;
+                        120     ;  Page Definition for Using the Compact Model with 64 KByte xdata RAM
+                        121     ;
+                        122     ;  The following EQU statements define the xdata page used for pdata
+                        123     ;  variables. The EQU PPAGE must conform with the PPAGE control used
+                        124     ;  in the linker invocation.
+AX51 MACRO ASSEMBLER  START_MX                                                              09/30/14 13:43:34 PAGE     3
+
+                        125     ;
+ 0000                   126     PPAGEENABLE     EQU     0       ; set to 1 if pdata object are used.
+ 0000                   127     PPAGE           EQU     0       ; define PPAGE number.
+                        128     ;
+                        129     ;------------------------------------------------------------------------------
+                        130     
+                        131     ; Define CPU Symbols
+  0081                  132     sfr SP     = 0x81;
+  01FB                  133     sfr SPE    = 0x1FB;
+  008E                  134     sfr AUXR   = 0x8E;
+  00A2                  135     sfr AUXR1  = 0xA2;
+  01FF                  136     sfr MXCON  = 0x1FF;
+                        137     
+                        138                     NAME    ?C_STARTUP
+                        139     
+------                  140     ?C_C51STARTUP   SEGMENT   CODE
+                        141     
+                        142     IF ESMM == 1
+                        143     
+------                  144     ?STACK          SEGMENT   EDATA
+------                  145                     RSEG    ?STACK
+000000                  146                     DS      STACKSIZE       ; Stack Space 100H Bytes
+                        147     
+                        148     ELSE
+                                
+                                ?STACK          SEGMENT   IDATA
+                                                RSEG    ?STACK
+                                                DS      1
+                                
+                                ENDIF
+                        155     
+                        156     
+                        157                     EXTRN CODE (?C_START)
+                        158                     PUBLIC  ?C_STARTUP
+                        159     
+000000                  160                     CSEG    AT      0
+000000 020000     F     161     ?C_STARTUP:     LJMP    STARTUP1
+                        162     
+------                  163                     RSEG    ?C_C51STARTUP
+                        164     
+000000                  165     STARTUP1:
+                        166     
+                        167     
+                        168     IF ECRM               ; Define Symbols for LX51 Linker/Locater
+                                PUBLIC ?L?_CALL3_
+                                ?L?_CALL3_  EQU  1    ; 3 bytes stack frame for CALL/RET
+                                ENDIF
+                        172     
+                        173     ; Init MXCON
+ 0007                   174     _VMXCON EQU (ECRM SHL 4) OR (EAM SHL 2) OR (ESMM SHL 1) OR (EIFM)
+                        175     IF _VMXCON
+000000 A575FF07         176                     MOV     MXCON,#_VMXCON
+                        177     ENDIF
+                        178     
+                        179     ; Init AUXR
+ 0003                   180     _VAUXR  EQU (EXTRAM SHL 1) OR (AO)
+                        181     IF _VAUXR
+000004 758E03           182                     MOV     AUXR,#_VAUXR
+                        183     ENDIF
+                        184     
+                        185     ; Init AUXR1
+ 0000                   186     _VAUXR1 EQU (LPEP SHL 4)
+                        187     IF _VAUXR1
+                                               MOV     AUXR1,#_VAUXR1
+                                ENDIF
+                        190     
+AX51 MACRO ASSEMBLER  START_MX                                                              09/30/14 13:43:34 PAGE     4
+
+                        191     IF IDATALEN <> 0
+000007 78FE             192                     MOV     R0,#IDATALEN - 1
+000009 E4               193                     CLR     A
+00000A F6               194     IDATALOOP:      MOV     @R0,A
+00000B D8FD             195                     DJNZ    R0,IDATALOOP
+                        196     ENDIF
+                        197     
+                        198     IF XDATALEN <> 0
+                                                MOV     R1,#BYTE0 XDATASTART
+                                                MOV     R2,#BYTE1 XDATASTART
+                                                MOV     R3,#BYTE2 XDATASTART
+                                                MOV     R7,#BYTE0 (XDATALEN)
+                                  IF (BYTE0 (XDATALEN)) <> 0
+                                                MOV     R6,#(BYTE1 (XDATALEN)) +1
+                                  ELSE
+                                                MOV     R6,#BYTE1 (XDATALEN)
+                                  ENDIF
+                                  IF (WORD0 (XDATALEN)) <> 0
+                                                MOV     R5,#(BYTE2 (XDATALEN)) + 1
+                                  ELSE
+                                                MOV     R5,#BYTE2 (XDATALEN)
+                                  ENDIF
+                                                CLR     A
+                                XDATALOOP:      EMOV    @PR0,A
+                                                ADD     PR0,#1
+                                                DJNZ    R7,XDATALOOP
+                                                DJNZ    R6,XDATALOOP
+                                                DJNZ    R5,XDATALOOP
+                                ENDIF
+                        220     
+                        221     IF PPAGEENABLE <> 0
+                                                MOV     P2,#PPAGE
+                                ENDIF
+                        224     
+                        225     IF PDATALEN <> 0
+                                                MOV     R0,#PDATASTART
+                                                MOV     R7,#LOW (PDATALEN)
+                                                CLR     A
+                                PDATALOOP:      MOVX    @R0,A
+                                                INC     R0
+                                                DJNZ    R7,PDATALOOP
+                                ENDIF
+                        233     
+                        234     IF IBPSTACK <> 0
+                                EXTRN DATA (?C_IBP)
+                                
+                                                MOV     ?C_IBP,#LOW IBPSTACKTOP
+                                ENDIF
+                        239     
+                        240     IF XBPSTACK <> 0
+                                EXTRN DATA (?C_XBP)
+                                
+                                                MOV     ?C_XBP,#HIGH XBPSTACKTOP
+                                                MOV     ?C_XBP+1,#LOW XBPSTACKTOP
+                                ENDIF
+                        246     
+                        247     IF PBPSTACK <> 0
+                                EXTRN DATA (?C_PBP)
+                                                MOV     ?C_PBP,#LOW PBPSTACKTOP
+                                ENDIF
+                        251     
+                        252     IF (ESMM)
+00000D 758100     F     253                     MOV     SP,#BYTE0 (?STACK-1)    ; Initilize Extended Stack Pointer
+000010 A575FB00   F     254                     MOV     SPE,#BYTE1 (?STACK-1)
+                        255     ELSE
+                                                MOV     SP,#?STACK-1            ; Initilize Classic 8051 Stack
+AX51 MACRO ASSEMBLER  START_MX                                                              09/30/14 13:43:34 PAGE     5
+
+                                ENDIF
+000014 759008           258                     mov     90H,#08h
+                        259     IF (EIFM)
+000017 A502000000 E     260                     EJMP    ?C_START
+                        261     ELSE
+                                                LJMP    ?C_START
+                                ENDIF
+                        264     
+                        265     
+                        266                     END
+AX51 MACRO ASSEMBLER  START_MX                                                              09/30/14 13:43:34 PAGE     6
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E                         T Y P E  V A L U E     ATTRIBUTES
+
+?C_C51STARTUP. . . . . . . . .  C  SEG   00001CH       REL=UNIT, ALN=BYTE
+?C_START . . . . . . . . . . .  C  ADDR  -------       EXT
+?C_STARTUP . . . . . . . . . .  C  ADDR  0000H     R   SEG=?CO?START_MX?3
+?STACK . . . . . . . . . . . .  ED SEG   000100H       REL=UNIT, ALN=BYTE
+_VAUXR . . . . . . . . . . . .  N  NUMB  0003H     A   
+_VAUXR1. . . . . . . . . . . .  N  NUMB  0000H     A   
+_VMXCON. . . . . . . . . . . .  N  NUMB  0007H     A   
+AO . . . . . . . . . . . . . .  N  NUMB  0001H     A   
+AUXR . . . . . . . . . . . . .  D  ADDR  008EH     A   
+AUXR1. . . . . . . . . . . . .  D  ADDR  00A2H     A   
+EAM. . . . . . . . . . . . . .  N  NUMB  0001H     A   
+ECRM . . . . . . . . . . . . .  N  NUMB  0000H     A   
+EIFM . . . . . . . . . . . . .  N  NUMB  0001H     A   
+ESMM . . . . . . . . . . . . .  N  NUMB  0001H     A   
+EXTRAM . . . . . . . . . . . .  N  NUMB  0001H     A   
+IBPSTACK . . . . . . . . . . .  N  NUMB  0000H     A   
+IBPSTACKTOP. . . . . . . . . .  N  NUMB  0100H     A   
+IDATALEN . . . . . . . . . . .  N  NUMB  00FFH     A   
+IDATALOOP. . . . . . . . . . .  C  ADDR  000AH     R   SEG=?C_C51STARTUP
+LPEP . . . . . . . . . . . . .  N  NUMB  0000H     A   
+MXCON. . . . . . . . . . . . .  XF ADDR  01FFH     A   
+PBPSTACK . . . . . . . . . . .  N  NUMB  0000H     A   
+PBPSTACKTOP. . . . . . . . . .  N  NUMB  00010000H A   
+PDATALEN . . . . . . . . . . .  N  NUMB  0000H     A   
+PDATASTART . . . . . . . . . .  N  NUMB  0000H     A   
+PPAGE. . . . . . . . . . . . .  N  NUMB  0000H     A   
+PPAGEENABLE. . . . . . . . . .  N  NUMB  0000H     A   
+SP . . . . . . . . . . . . . .  D  ADDR  0081H     A   
+SPE. . . . . . . . . . . . . .  XF ADDR  01FBH     A   
+STACKSIZE. . . . . . . . . . .  N  NUMB  0100H     A   
+STARTUP1 . . . . . . . . . . .  C  ADDR  0000H     R   SEG=?C_C51STARTUP
+XBPSTACK . . . . . . . . . . .  N  NUMB  0000H     A   
+XBPSTACKTOP. . . . . . . . . .  N  NUMB  00010000H A   
+XDATALEN . . . . . . . . . . .  N  NUMB  0000H     A   
+XDATASTART . . . . . . . . . .  N  NUMB  0000H     A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S).

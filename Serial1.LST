@@ -1,0 +1,316 @@
+CX51 COMPILER V7.50   SERIAL1                                                              10/23/2014 09:48:30 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE SERIAL1
+OBJECT MODULE PLACED IN Serial1.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE Serial1.C LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          ////////////////////////////////////////////////////////////////////////////////////////////////
+   2          //
+   3          //                         串口2驱动程序     
+   4          //                  工作于华邦系列mcs51(w77e532)
+   5          //
+   6          //
+   7          ////////////////////////////////////////////////////////////////////////////////////////////////
+   8          //#undef _DEBUG_TRACE
+   9          #define ZHKSERIAL1_C
+  10          #ifndef ZHK_INTERRUPT
+  11          #define ZHK_INTERRUPT
+  12          #endif
+  13          #include "device.h"
+  14          #include "Serial1.h"
+  15          #include "debug.h"
+  16          #include "common.h"
+  17          #include "global.h"
+  18          
+  19          #define ZHKSERIAL1RXBUFLEN      128
+  20          #define ZHKSERIAL1TXBUFLEN      128
+  21          
+  22          
+  23          ZhkSerial1Sourse SERAIL1PARAM xdata ZhkSerial1Param = 
+  24          { 
+  25                  8 , VERIFY_NULL , 1 , 0x00 , 0x96 , 0x00        
+  26          };
+  27          
+  28          #define ZhkBaudRate     ZhkSerial1Param[ 4 ]
+  29          #define ZhkDataBit      ZhkSerial1Param[ 0 ]
+  30          #define ZhkVerifyBit    ZhkSerial1Param[ 1 ]
+  31          #define ZhkStopBit      ZhkSerial1Param[ 2 ]
+  32          
+  33          uchar xdata ZhkSerial1RxBuf[ ZHKSERIAL1RXBUFLEN ];
+  34          uchar data ZhkSerial1RxBufWd;
+  35          uchar data ZhkSerial1RxBufRd;
+  36          
+  37          bit ZhkSerial1TxdEmpty;
+  38          
+  39          uchar ZhkSerial1IsRxBufNull( void );
+  40          //uchar ZhkSerial1IsRxFullIsr( void );
+  41          uchar ZhkSerial1IsTxBufNull( void );
+  42          uchar ZhkSerial1IsTxBufNullIsr( void );
+  43          
+  44          
+  45          
+  46          
+  47          
+  48          uchar ZhkSerial1Init( void )
+  49          {
+  50   1              uint data dat;
+  51   1               data ch;
+  52   1              S1STAT = 0x20 ; // 区分接收和发送中断
+  53   1              S1CON = 0x00 ; //串口控制寄存器清零
+  54   1              REN_1 = 1 ; //允许接收中断
+  55   1              { //进入8 位UART 模式设置
+CX51 COMPILER V7.50   SERIAL1                                                              10/23/2014 09:48:30 PAGE 2   
+
+  56   2              SM0_1 = 0 ;
+  57   2              SM1_1 = 1 ; //设定串口通讯方式为模式1
+  58   2              }
+  59   1              if ( ZhkVerifyBit != VERIFY_NULL && ZhkDataBit == 8 )
+  60   1              {
+  61   2                      SM0_1 = 1;
+  62   2              }
+  63   1              // ZhkBaudRate 是波特率的 千位数和百位数组成的BCD码 
+  64   1              ch       = ZhkBaudRate;
+  65   1              if ( ch > 0x99 || ch % 16 > 9 ) return 0 ;
+  66   1              
+  67   1              dat      = ( ch - ch / 16 * 6 ) * 100;
+  68   1              dat      = OSCRATE / dat - 16;
+  69   1              BRGCON = 0X00 ; //关闭波特率发生器，从而设置波特率
+  70   1              BRGR1 = dat >> 8 ;
+  71   1              BRGR0 = dat & 0x0ff ;
+  72   1              BRGCON = 0X01 ; //开启波特率发生器
+  73   1              
+  74   1              ES1R = 1 ; // 开放UART1 接收中断
+  75   1              TI_1 = 1 ;
+  76   1              DelayMs( 3 );
+  77   1              ZhkSerial1RxBufWd = 0;
+  78   1              ZhkSerial1RxBufRd = 0;
+  79   1              return 1;
+  80   1      }
+  81          
+  82          uchar ZhkSerial1PutCh( uchar ch )
+  83          {
+  84   1      //      uint data i;
+  85   1              bit veri;
+  86   1      //      Trace( "ZhkSerial1PutCh(%bx)",ch );
+  87   1              while( ! TI_1 )
+  88   1              TI_1  = 0;
+  89   1              delay( 250 );
+  90   1              delay( 250 );
+  91   1              ACC   = ch;
+  92   1              veri  = P;
+  93   1              if ( ZhkVerifyBit == VERIFY_ODD  ) veri = ! veri;
+  94   1              if ( ZhkVerifyBit == VERIFY_NULL ) veri = 1;
+  95   1              if ( ZhkDataBit < 8 )
+  96   1              {
+  97   2                      if ( veri ) ch |= 1 << 7;
+  98   2              }
+  99   1              TB8_1 = veri;
+ 100   1              S1BUF = ch;
+ 101   1              return 0;
+ 102   1      }
+ 103          uchar ZhkSerial1GetCh( void )
+ 104          {
+ 105   1              uchar data ch;
+ 106   1              ch = ZhkSerial1RxBuf[ ZhkSerial1RxBufRd ];
+ 107   1              if ( ZhkDataBit < 8 )
+ 108   1              {
+ 109   2                      ch &= ~( 1 << 7 );
+ 110   2              }
+ 111   1              ZhkSerial1RxBufRd ++;
+ 112   1              if ( ZhkSerial1RxBufRd >= ZHKSERIAL1RXBUFLEN ) ZhkSerial1RxBufRd = 0;
+ 113   1              ZhkHardSetRTS();
+ 114   1      //      Trace( "ZhkSerial1GetCh=%bxH\n",ch );
+ 115   1              return ch;
+ 116   1              
+ 117   1      }
+CX51 COMPILER V7.50   SERIAL1                                                              10/23/2014 09:48:30 PAGE 3   
+
+ 118          /*
+ 119          uchar ZhkSerial1TxMsg( uchar xdata* TxBuf , uchar len )
+ 120          {
+ 121                  uchar data i;
+ 122                  
+ 123                  if ( len > ZHKSERIAL1TXBUFLEN ) return 1;
+ 124                  if ( ! ZhkSerial1IsTxBufNull() ) return 1;
+ 125                  
+ 126                  ZhkSerial1TxBufWd = 0;
+ 127                  ZhkSerial1TxBufRd = 0;
+ 128                  for( i = 0 ; i < ZHKSERIAL1TXBUFLEN ; i ++ )
+ 129                          ZhkSerial1TxBuf[ ZhkSerial1TxBufWd ++ ] = TxBuf[ i ];
+ 130                  ZhkSerial1PutCh( ZhkSerial1TxBuf[ ZhkSerial1TxBufRd ++ ] );
+ 131                  return 1;
+ 132          }
+ 133          */
+ 134          /////////////////////////////////////////////////////////////////////////////////////
+ 135          uchar ZhkSerial1IsRxBufNull( void )
+ 136          {
+ 137   1              if  ( ZhkSerial1RxBufRd - ZhkSerial1RxBufWd == 0 ) return 1;
+ 138   1              return 0;
+ 139   1      }
+ 140          
+ 141          ////ygp close //////////////
+ 142          /*
+ 143          uchar ZhkSerial1IsRxFullIsr( void ) using 1
+ 144          {
+ 145          
+ 146                  if ( ( ZhkSerial1RxBufRd - ZhkSerial1RxBufWd ) % ZHKSERIAL1RXBUFLEN == 1 )
+ 147                          return 1;
+ 148                  return 0;
+ 149          }
+ 150          */
+ 151          /////////////////////////////
+ 152          /*
+ 153          uchar ZhkSerial1IsTxBufNull( void )
+ 154          {
+ 155                  if ( ZhkSerial1TxBufRd - ZhkSerial1TxBufWd == 0 ) return 1;;
+ 156                  return  0;
+ 157          }
+ 158          
+ 159          uchar ZhkSerial1IsTxBufNullIsr( void ) using 1
+ 160          {
+ 161                  if ( ZhkSerial1TxBufRd - ZhkSerial1TxBufWd == 0 ) return 1;
+ 162                  return 0;
+ 163          }
+ 164          */
+ 165          void ZhkSerial1_Isr( void ) interrupt 10 using 1 
+ 166          {
+ 167   1              ZhkSaveChipSelect();
+ 168   1              ZhkHardSramSelect();
+ 169   1      /*
+ 170   1              if ( TI_1 )
+ 171   1              {
+ 172   1                      TI_1 = 0;
+ 173   1                      ZhkSerial1TxdEmpty = 1;
+ 174   1              }
+ 175   1      */
+ 176   1              if ( RI_1 )
+ 177   1              {
+ 178   2                      RI_1 = 0;
+ 179   2                      ZhkSerial1RxBuf[ ZhkSerial1RxBufWd ] = S1BUF;
+CX51 COMPILER V7.50   SERIAL1                                                              10/23/2014 09:48:30 PAGE 4   
+
+ 180   2                      ZhkSerial1RxBufWd ++;
+ 181   2                      if ( ZhkSerial1RxBufWd >= ZHKSERIAL1RXBUFLEN )
+ 182   2                              ZhkSerial1RxBufWd = 0;
+ 183   2                      //--------------------------------------------
+ 184   2                      if( RB8_1 == 1 )
+ 185   2                      {
+ 186   3                          sysMDBMission.modeBit = 1;
+ 187   3                      }
+ 188   2                      else
+ 189   2                      {
+ 190   3                          sysMDBMission.modeBit = 0;
+ 191   3                      }
+ 192   2                      //============================================
+ 193   2              }
+ 194   1              ZhkLoadChipSelect();
+ 195   1      
+ 196   1      }
+ 197          
+ 198          
+ 199          uchar ZhkSerial1_MDB_Init( void )
+ 200          {
+ 201   1              uint  data dat;
+ 202   1              //uchar 
+ 203   1          data ch;
+ 204   1      
+ 205   1              S1STAT = 0x20; // 区分接收和发送中断
+ 206   1              S1CON = 0x00;  //串口控制寄存器清零
+ 207   1              REN_1 = 1 ;    //允许接收中断
+ 208   1              {   //进入8 位UART 模式设置
+ 209   2                      SM0_1 = 1 ;
+ 210   2                      SM1_1 = 1 ; //设定串口通讯方式为模式3
+ 211   2              }
+ 212   1              // ZhkBaudRate 是波特率的 千位数和百位数组成的BCD码 
+ 213   1              ch = ZhkBaudRate;
+ 214   1              if ( ch > 0x99 || ch % 16 > 9 ) return 0 ;
+ 215   1              dat      = ( ch - ch / 16 * 6 ) * 100;
+ 216   1              dat      = OSCRATE / dat - 16;
+ 217   1              BRGCON = 0X00 ; //关闭波特率发生器，从而设置波特率
+ 218   1              BRGR1 = dat >> 8 ;
+ 219   1              BRGR0 = dat & 0x0ff ;
+ 220   1              BRGCON = 0X01 ; //开启波特率发生器
+ 221   1              
+ 222   1              ES1R = 1 ; // 开放UART1 接收中断
+ 223   1              TI_1 = 1 ;
+ 224   1              DelayMs( 3 );
+ 225   1              ZhkSerial1RxBufWd = 0;
+ 226   1              ZhkSerial1RxBufRd = 0;
+ 227   1              return 1;
+ 228   1      
+ 229   1      }
+ 230          
+ 231          uchar ZhkSerial1_MDB_PutCh( uchar ch,uchar mode)
+ 232          {
+ 233   1          
+ 234   1          //uint data i;
+ 235   1              //bit veri;
+ 236   1      
+ 237   1              while( !TI_1 )
+ 238   1              TI_1  = 0;
+ 239   1              delay( 250 );
+ 240   1              //delay( 250 );
+ 241   1              //ACC   = ch;
+CX51 COMPILER V7.50   SERIAL1                                                              10/23/2014 09:48:30 PAGE 5   
+
+ 242   1              if( mode == 0 )
+ 243   1          {
+ 244   2                      TB8_1 = 0;  
+ 245   2          }
+ 246   1          else
+ 247   1          {
+ 248   2              TB8_1 = 1;
+ 249   2          }   
+ 250   1              S1BUF = ch;
+ 251   1          delay( 250 );
+ 252   1              return 0;
+ 253   1      
+ 254   1      }
+ 255          uchar ZhkSerial1_MDB_GetCh( uchar *byte, uchar *bMode )
+ 256          {
+ 257   1              uchar data ch;
+ 258   1      
+ 259   1          sysMDBMission.MDBMSTimer = 3;
+ 260   1              while( (ZhkSerial1IsRxBufNull())&&(sysMDBMission.MDBMSTimer>0) );
+ 261   1          if( sysMDBMission.MDBMSTimer == 0 ) return 0;
+ 262   1          
+ 263   1              ch = ZhkSerial1RxBuf[ ZhkSerial1RxBufRd ];
+ 264   1              ZhkSerial1RxBufRd ++;  
+ 265   1              if ( ZhkSerial1RxBufRd >= ZHKSERIAL1RXBUFLEN ) ZhkSerial1RxBufRd = 0;
+ 266   1              ZhkHardSetRTS();
+ 267   1          //Trace( "ZhkSerial1GetCh=%bxH\n",ch );
+ 268   1          //if( RB8_1==1 )
+ 269   1              if( sysMDBMission.modeBit == 1 )
+ 270   1              {
+ 271   2              *bMode = 1;
+ 272   2              }
+ 273   1              else
+ 274   1              {
+ 275   2                  *bMode = 0;
+ 276   2              }
+ 277   1              *byte = ch;
+ 278   1              return 1;
+ 279   1      
+ 280   1                      
+ 281   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    817    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    134       9
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2      10
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1       1
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

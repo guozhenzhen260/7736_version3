@@ -1,0 +1,790 @@
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE COUNTERMAINT
+OBJECT MODULE PLACED IN countermaint.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE countermaint.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #include "device.h"
+   2          #include "CommonFunction.h"
+   3          #include "scheduler.h"
+   4          #include "string.h"     
+   5          #include "global.h"
+   6          #include "stdlib.h"
+   7          #include "stdio.h"
+   8          #include "key.h"
+   9          #include "common.h"
+  10          #include "mainflow.h"
+  11          #include "timer.h" 
+  12          #include "debug.h"
+  13          #include "VMC_PC.h"
+  14          
+  15          
+  16          #ifdef _CHINA_  
+  17                  const struct StrAndLen code InfoStr[] =
+  18                  {               
+  19                          { "  你确定吗?", 11 },      //全部计数值清零
+  20                          { "确定ENTER 取消CANCEL", 20 },         
+  21                          { "  没有交易记录", 14 },       
+  22                  };
+  23          #else
+                      const struct StrAndLen code InfoStr[] =
+                      {               
+                              { "   Are you sure ?", 17 }, //全部计数值清零
+                              { "   ENTER   CANCEL", 17 },            
+                              { " No note Of trade", 17 },    
+                      };
+              #endif
+  31          
+  32          #ifdef _CHINA_
+  33                  const struct StrAndLen code CurrencyMenuStr[] =
+  34                  {       
+  35                          { "纸收:",   6 },            
+  36                          { "现纸收:", 8 },                
+  37                          { "1Y收:",   6 },           
+  38                          { "现1Y收:", 8 },         
+  39                          { "5J收:",   6 },         
+  40                          { "现5J收:", 8 },       
+  41                          { "1Y找:",   6 },       
+  42                          { "现1Y找:", 8 },      
+  43                          { "5J找:",   6 },               
+  44                          { "现5J找:", 8 },               
+  45                          //{ "累计销售商品:", 15 },//120419 by cq TotalSell      
+  46                          //{ "累计销售金额:", 15 },//120419 by cq TotalSell      
+  47                  };
+  48          #else
+                      const struct StrAndLen code CurrencyMenuStr[] =
+                      {       
+                              { "Bill:", 5 },                 //总收入
+                              { "Now Bill:", 9 },                     //纸币总收入
+                              { "Coin1.0 In:", 11 },                  //硬币总收入
+                              { "Now Coin1.0:", 12 },                 //交易总金额
+                              { "Coin0.5 In:", 11 },          //找零总金额
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 2   
+
+                              { "Now Coin0.5:", 12 }, //1#出币总金额
+                              { "Coin1.0 Out:", 12 },                 //硬币总收入
+                              { "Now Coin1.0:", 12 },                 //交易总金额
+                              { "Coin0.5 Out:", 12 },                 //找零总金额
+                              { "Now Coin0.5:", 12 }, //1#出币总金额  
+                              //{ "TotalSellNum:", 13 },//120419 by cq TotalSell      
+                              //{ "TotalSellMoeny: ", 15 },//120419 by cq TotalSell   
+                                              
+                      };
+              #endif
+  66          
+  67          
+  68          
+  69          //120521 by cq SellAccumulate
+  70          #ifdef _CHINA_
+  71                  const struct StrAndLen code CurrencyMenuStr_1[] =
+  72                  {       
+  73                          { "全部量:",   7 },          
+  74                          { "全部额:", 7 },                
+  75                          { "现金量:",   7 },           
+  76                          { "现金额:", 7 },         
+  77                          { "游戏量:",   7 },         
+  78                          { "游戏额:", 7 },       
+  79                          { "刷卡量:",   7 },       
+  80                          { "刷卡额:", 7 },      
+  81                          { "在线量:",   7 },             
+  82                          { "在线额:", 7 }, 
+  83                          { "硬币投入:", 9 },      
+  84                          { "纸币投入:",   9 },                   
+  85                          { "硬币出币:", 9 },
+  86                          { "区间硬币投入:", 13 },      
+  87                          { "区间纸币投入:",   13 },              
+  88                          { "区间硬币出币:", 13 }
+  89                  };
+  90          #else
+                      const struct StrAndLen code CurrencyMenuStr_1[] =
+                      {       
+                              { "SuccessNum:", 11 },                  //总收入
+                              { "SuccessMoney:", 13 },                        //纸币总收入
+                              { "CashNum:", 8 },              //硬币总收入
+                              { "CashMoney:", 10 },                   //交易总金额
+                              { "GameNum:", 8 },              //找零总金额
+                              { "GameMoney:", 10 },   //1#出币总金额
+                              { "CardNum:", 8 },              //硬币总收入
+                              { "CardMoney:", 10 },                   //交易总金额
+                              { "OnlineNum:", 10 },           //找零总金额
+                              { "OnlineMoney:", 11 }  //1#出币总金额                                  
+                      };
+              #endif
+ 105          
+ 106          
+ 107          //void GoodsWayTraceList( u_char xdata  iIndex );
+ 108          
+ 109          //120419 by cq TotalSell
+ 110          void InitAllCounter_1()
+ 111          {
+ 112   1              //区间交易记录
+ 113   1              TradeCounter.CoinSum1yBack = 0;
+ 114   1              TradeCounter.CoinSum5jBack = 0;
+ 115   1              TradeCounter.CashSumBack = 0;
+ 116   1              TradeCounter.Hopper1SumBack = 0;
+ 117   1              TradeCounter.Hopper2SumBack = 0;
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 3   
+
+ 118   1              SaveTradeParam();//by gzz 20110610                      
+ 119   1              //SaveTradeCounter();
+ 120   1              SchedulerProcess();//让出时间片
+ 121   1              WaitForWork( 100, NULL );       
+ 122   1              return;
+ 123   1      }
+ 124          
+ 125          //清零
+ 126          void InitAllCounter()
+ 127          {       
+ 128   1              u_char xdata key;
+ 129   1          //struct time xdata Temptime;
+ 130   1      
+ 131   1              DisplayStr( 0, 0, 1, InfoStr[0].str, InfoStr[0].len );
+ 132   1              DisplayStr( 0, 1, 1, InfoStr[1].str, InfoStr[1].len);
+ 133   1              SgwSecTimer= 6;         
+ 134   1              while( SgwSecTimer )
+ 135   1              {
+ 136   2                      key = GetKey();
+ 137   2                      if( key == KEY_CANCEL )
+ 138   2                              break;
+ 139   2                      if (key == KEY_SUBMIT)
+ 140   2                      {
+ 141   3                              memset( &TradeCounter, 0, sizeof( struct TRADECOUNTER ) );                          
+ 142   3                          //memset( DoubtTradeLog, 0, sizeof( DoubtTradeLog ) );
+ 143   3                          /*
+ 144   3                              memset( TradeLog, 0, sizeof( TradeLog ) );      
+ 145   3                              for( key = 0; key < GOODSWAYNUM; key++ )                                        
+ 146   3                                      TradeLog[key].WayNo = InputGoodsWayList[key].GoodsWayNo;
+ 147   3                              */
+ 148   3                          /*  
+ 149   3                          memset( &Temptime, 0, sizeof( struct time ) );
+ 150   3                              GetCurrentTime( &Temptime );
+ 151   3                              TradeCounter.Date[0] = ( Temptime.year & 0xff00 ) >> 8;
+ 152   3                              TradeCounter.Date[1] = ( Temptime.year & 0x00ff );
+ 153   3                              TradeCounter.Date[2] = Temptime.mon;
+ 154   3                              TradeCounter.Date[3] = Temptime.date;                   
+ 155   3                              SgwSecTimer = 0;*/
+ 156   3                              SaveTradeParam();
+ 157   3                              SaveTradeCounter();
+ 158   3                              SchedulerProcess();//让出时间片
+ 159   3                              WaitForWork( 100, NULL );       
+ 160   3                              return;
+ 161   3                      }
+ 162   2                      SchedulerProcess();//让出时间片
+ 163   2                      WaitForWork( 100, &Lcd );       
+ 164   2              }
+ 165   1      }
+ 166          
+ 167          ////货币记录值
+ 168          void DispCurrencyList( u_char yPos, u_char iIndex )
+ 169          {
+ 170   1              u_char xdata len = 0; 
+ 171   1              u_char xdata line[26];  
+ 172   1              
+ 173   1              memset( line, 0, sizeof( line ) );              
+ 174   1              //memcpy( line, CurrencyMenuStr[iIndex].str, CurrencyMenuStr[iIndex].len );
+ 175   1              //len = CurrencyMenuStr[iIndex].len;
+ 176   1              switch( iIndex )
+ 177   1              {
+ 178   2                      case 0://上次纸币收币总金额                        
+ 179   2                          //len = sprintf( line, "%05u %s", TradeCounter.CashSumID,CurrencyMenuStr[iIndex].str );
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 4   
+
+ 180   2                              //len += sprintf( line + len, "%lu.%02lu", TradeCounter.CashSumBack/SystemParameter.curUnit, TradeCount
+             -er.CashSumBack%SystemParameter.curUnit );
+ 181   2                              len = sprintf( line, "%05u %s%lu.%02lu", 0,CurrencyMenuStr[iIndex].str, TradeCounter.CashSumBack/System
+             -Parameter.curUnit, TradeCounter.CashSumBack%SystemParameter.curUnit );
+ 182   2                              /*
+ 183   2                              switch( SystemParameter.curUnit )               
+ 184   2                              {
+ 185   2                                      case 1:
+ 186   2                                              len += sprintf( line + len, "%lu", TradeCounter.CashSumBack );
+ 187   2                                      break;
+ 188   2                                      case 10:
+ 189   2                                              len += sprintf( line + len, "%lu.%lu", TradeCounter.CashSumBack/SystemParameter.curUnit, TradeCounter
+             -.CashSumBack%SystemParameter.curUnit );
+ 190   2                                      break;
+ 191   2                                      case 100:
+ 192   2                                              len += sprintf( line + len, "%lu.%02lu", TradeCounter.CashSumBack/SystemParameter.curUnit, TradeCount
+             -er.CashSumBack%SystemParameter.curUnit );
+ 193   2                                      break;
+ 194   2                              }       
+ 195   2                              */
+ 196   2                      break;
+ 197   2                      case 1://本次纸币收币总金额     
+ 198   2                          memcpy( line, CurrencyMenuStr[iIndex].str, CurrencyMenuStr[iIndex].len );
+ 199   2                      len = CurrencyMenuStr[iIndex].len;
+ 200   2                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.CashSum/SystemParameter.c
+             -urUnit, TradeCounter.CashSum%SystemParameter.curUnit );
+ 201   2                              /*
+ 202   2                              switch( SystemParameter.curUnit )               
+ 203   2                              {
+ 204   2                                      case 1:
+ 205   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu", TradeCounter.CashSum );
+ 206   2                                      break;
+ 207   2                                      case 10:
+ 208   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%lu", TradeCounter.CashSum/SystemParameter.c
+             -urUnit, TradeCounter.CashSum%SystemParameter.curUnit );
+ 209   2                                      break;
+ 210   2                                      case 100:
+ 211   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.CashSum/SystemParameter
+             -.curUnit, TradeCounter.CashSum%SystemParameter.curUnit );
+ 212   2                                      break;
+ 213   2                              }
+ 214   2                              */
+ 215   2                      break;
+ 216   2              case 2://收入1元硬总金额 
+ 217   2                              //len = sprintf( line, "%05u %s", TradeCounter.CoinSum1yID,CurrencyMenuStr[iIndex].str );
+ 218   2                              //len += sprintf( line + len, "%lu.%02lu", TradeCounter.CoinSum1yBack/SystemParameter.curUnit, TradeCou
+             -nter.CoinSum1yBack%SystemParameter.curUnit );
+ 219   2                              len = sprintf( line, "%05u %s%lu.%02lu", 0,CurrencyMenuStr[iIndex].str, TradeCounter.CoinSum1yBack/Syst
+             -emParameter.curUnit, TradeCounter.CoinSum1yBack%SystemParameter.curUnit );
+ 220   2                              /*
+ 221   2                              switch( SystemParameter.curUnit )               
+ 222   2                              {
+ 223   2                                      case 1:
+ 224   2                                              len += sprintf( line + len, "%lu", TradeCounter.CoinSum1yBack );
+ 225   2                                      break;
+ 226   2                                      case 10:
+ 227   2                                              len += sprintf( line + len, "%lu.%lu", TradeCounter.CoinSum1yBack/SystemParameter.curUnit, TradeCount
+             -er.CoinSum1yBack%SystemParameter.curUnit );
+ 228   2                                      break;
+ 229   2                                      case 100:
+ 230   2                                              len += sprintf( line + len, "%lu.%02lu", TradeCounter.CoinSum1yBack/SystemParameter.curUnit, TradeCou
+             -nter.CoinSum1yBack%SystemParameter.curUnit );
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 5   
+
+ 231   2                                      break;
+ 232   2                              }
+ 233   2                              */
+ 234   2                      break;
+ 235   2                      case 3:         
+ 236   2                              memcpy( line, CurrencyMenuStr[iIndex].str, CurrencyMenuStr[iIndex].len );
+ 237   2                      len = CurrencyMenuStr[iIndex].len;
+ 238   2                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.CoinSum1y/SystemParameter
+             -.curUnit, TradeCounter.CoinSum1y%SystemParameter.curUnit );
+ 239   2                              /*
+ 240   2                              switch( SystemParameter.curUnit )               
+ 241   2                              {
+ 242   2                                      case 1:
+ 243   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu", TradeCounter.CoinSum1y );
+ 244   2                                      break;
+ 245   2                                      case 10:
+ 246   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%lu", TradeCounter.CoinSum1y/SystemParameter
+             -.curUnit, TradeCounter.CoinSum1y%SystemParameter.curUnit );
+ 247   2                                      break;
+ 248   2                                      case 100:
+ 249   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.CoinSum1y/SystemParamet
+             -er.curUnit, TradeCounter.CoinSum1y%SystemParameter.curUnit );
+ 250   2                                      break;
+ 251   2                              }       
+ 252   2                              */
+ 253   2                      break;
+ 254   2                      case 4://收入5角硬总金额        
+ 255   2                              //len = sprintf( line, "%05u %s", TradeCounter.CoinSum5jID,CurrencyMenuStr[iIndex].str );
+ 256   2                              //len += sprintf( line + len, "%lu.%02lu", TradeCounter.CoinSum5jBack/SystemParameter.curUnit, TradeCou
+             -nter.CoinSum5jBack%SystemParameter.curUnit );
+ 257   2                              len = sprintf( line, "%05u %s%lu.%02lu", 0,CurrencyMenuStr[iIndex].str, TradeCounter.CoinSum5jBack/Syst
+             -emParameter.curUnit, TradeCounter.CoinSum5jBack%SystemParameter.curUnit );
+ 258   2                              /*
+ 259   2                              switch( SystemParameter.curUnit )               
+ 260   2                              {
+ 261   2                                      case 1:
+ 262   2                                              len += sprintf( line + len, "%lu", TradeCounter.CoinSum5jBack );
+ 263   2                                      break;
+ 264   2                                      case 10:
+ 265   2                                              len += sprintf( line + len, "%lu.%lu", TradeCounter.CoinSum5jBack/SystemParameter.curUnit, TradeCount
+             -er.CoinSum5jBack%SystemParameter.curUnit );
+ 266   2                                      break;
+ 267   2                                      case 100:
+ 268   2                                              len += sprintf( line + len, "%lu.%02lu", TradeCounter.CoinSum5jBack/SystemParameter.curUnit, TradeCou
+             -nter.CoinSum5jBack%SystemParameter.curUnit );
+ 269   2                                      break;
+ 270   2                              }
+ 271   2                              */
+ 272   2                      break;
+ 273   2                      case 5:         
+ 274   2                              memcpy( line, CurrencyMenuStr[iIndex].str, CurrencyMenuStr[iIndex].len );
+ 275   2                      len = CurrencyMenuStr[iIndex].len;
+ 276   2                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.CoinSum5j/SystemParameter
+             -.curUnit, TradeCounter.CoinSum5j%SystemParameter.curUnit );
+ 277   2                              /*
+ 278   2                              switch( SystemParameter.curUnit )               
+ 279   2                              {
+ 280   2                                      case 1:
+ 281   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu", TradeCounter.CoinSum5j );
+ 282   2                                      break;
+ 283   2                                      case 10:
+ 284   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%lu", TradeCounter.CoinSum5j/SystemParameter
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 6   
+
+             -.curUnit, TradeCounter.CoinSum5j%SystemParameter.curUnit );
+ 285   2                                      break;
+ 286   2                                      case 100:
+ 287   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.CoinSum5j/SystemParamet
+             -er.curUnit, TradeCounter.CoinSum5j%SystemParameter.curUnit );
+ 288   2                                      break;
+ 289   2                              }       
+ 290   2                              */
+ 291   2                      break;  
+ 292   2              case 6://#2HOPPER出币总金额     
+ 293   2                              //len = sprintf( line, "%05u %s", TradeCounter.Hopper2SumID,CurrencyMenuStr[iIndex].str );
+ 294   2                              //len += sprintf( line + len, "%lu.%02lu", TradeCounter.Hopper2SumBack/SystemParameter.curUnit, TradeCo
+             -unter.Hopper2SumBack%SystemParameter.curUnit );
+ 295   2                              len = sprintf( line, "%05u %s%lu.%02lu", 0,CurrencyMenuStr[iIndex].str, TradeCounter.Hopper2SumBack/Sys
+             -temParameter.curUnit, TradeCounter.Hopper2SumBack%SystemParameter.curUnit );
+ 296   2                              /*
+ 297   2                              switch( SystemParameter.curUnit )               
+ 298   2                              {
+ 299   2                                      case 1:
+ 300   2                                              len += sprintf( line + len, "%lu", TradeCounter.Hopper2SumBack );
+ 301   2                                      break;
+ 302   2                                      case 10:
+ 303   2                                              len += sprintf( line + len, "%lu.%lu", TradeCounter.Hopper2SumBack/SystemParameter.curUnit, TradeCoun
+             -ter.Hopper2SumBack%SystemParameter.curUnit );
+ 304   2                                      break;
+ 305   2                                      case 100:
+ 306   2                                              len += sprintf( line + len, "%lu.%02lu", TradeCounter.Hopper2SumBack/SystemParameter.curUnit, TradeCo
+             -unter.Hopper2SumBack%SystemParameter.curUnit );
+ 307   2                                      break;
+ 308   2                              }
+ 309   2                              */
+ 310   2                      break;
+ 311   2                      case 7:         
+ 312   2                              memcpy( line, CurrencyMenuStr[iIndex].str, CurrencyMenuStr[iIndex].len );
+ 313   2                      len = CurrencyMenuStr[iIndex].len;
+ 314   2                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.Hopper2Sum/SystemParamete
+             -r.curUnit, TradeCounter.Hopper2Sum%SystemParameter.curUnit );
+ 315   2                              /*
+ 316   2                              switch( SystemParameter.curUnit )               
+ 317   2                              {
+ 318   2                                      case 1:
+ 319   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu", TradeCounter.Hopper2Sum );
+ 320   2                                      break;
+ 321   2                                      case 10:
+ 322   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%lu", TradeCounter.Hopper2Sum/SystemParamete
+             -r.curUnit, TradeCounter.Hopper2Sum%SystemParameter.curUnit );
+ 323   2                                      break;
+ 324   2                                      case 100:
+ 325   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.Hopper2Sum/SystemParame
+             -ter.curUnit, TradeCounter.Hopper2Sum%SystemParameter.curUnit );
+ 326   2                                      break;
+ 327   2                              }       
+ 328   2                              */
+ 329   2                      break;  
+ 330   2                      case 8://#1HOPPER出币总金额     
+ 331   2                              //len = sprintf( line, "%05u %s", TradeCounter.Hopper1SumID,CurrencyMenuStr[iIndex].str );
+ 332   2                              //len += sprintf( line + len, "%lu.%02lu", TradeCounter.Hopper1SumBack/SystemParameter.curUnit, TradeCo
+             -unter.Hopper1SumBack%SystemParameter.curUnit );
+ 333   2                              len = sprintf( line, "%05u %s%lu.%02lu", 0,CurrencyMenuStr[iIndex].str, TradeCounter.Hopper1SumBack/Sys
+             -temParameter.curUnit, TradeCounter.Hopper1SumBack%SystemParameter.curUnit );
+ 334   2                              /*
+ 335   2                              switch( SystemParameter.curUnit )               
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 7   
+
+ 336   2                              {
+ 337   2                                      case 1:
+ 338   2                                              len += sprintf( line + len, "%lu", TradeCounter.Hopper1SumBack );
+ 339   2                                      break;
+ 340   2                                      case 10:
+ 341   2                                              len += sprintf( line + len, "%lu.%lu", TradeCounter.Hopper1SumBack/SystemParameter.curUnit, TradeCoun
+             -ter.Hopper1SumBack%SystemParameter.curUnit );
+ 342   2                                      break;
+ 343   2                                      case 100:
+ 344   2                                              len += sprintf( line + len, "%lu.%02lu", TradeCounter.Hopper1SumBack/SystemParameter.curUnit, TradeCo
+             -unter.Hopper1SumBack%SystemParameter.curUnit );
+ 345   2                                      break;
+ 346   2                              }
+ 347   2                              */
+ 348   2                      break;
+ 349   2                      case 9:         
+ 350   2                              memcpy( line, CurrencyMenuStr[iIndex].str, CurrencyMenuStr[iIndex].len );
+ 351   2                      len = CurrencyMenuStr[iIndex].len;
+ 352   2                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.Hopper1Sum/SystemParamete
+             -r.curUnit, TradeCounter.Hopper1Sum%SystemParameter.curUnit );
+ 353   2                              /*
+ 354   2                              switch( SystemParameter.curUnit )               
+ 355   2                              {
+ 356   2                                      case 1:
+ 357   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu", TradeCounter.Hopper1Sum );
+ 358   2                                      break;
+ 359   2                                      case 10:
+ 360   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%lu", TradeCounter.Hopper1Sum/SystemParamete
+             -r.curUnit, TradeCounter.Hopper1Sum%SystemParameter.curUnit );
+ 361   2                                      break;
+ 362   2                                      case 100:
+ 363   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.Hopper1Sum/SystemParame
+             -ter.curUnit, TradeCounter.Hopper1Sum%SystemParameter.curUnit );
+ 364   2                                      break;
+ 365   2                              }
+ 366   2                              */
+ 367   2                      break;  
+ 368   2                      /*
+ 369   2                      case 10://#3HOPPER出币总金额
+ 370   2                              len = sprintf( line, "%05u %s", TradeCounter.Hopper3SumID,CurrencyMenuStr[iIndex].str );
+ 371   2                              switch( SystemParameter.curUnit )               
+ 372   2                              {
+ 373   2                                      case 1:
+ 374   2                                              len += sprintf( line + len, "%lu", TradeCounter.Hopper3SumBack );
+ 375   2                                      break;
+ 376   2                                      case 10:
+ 377   2                                              len += sprintf( line + len, "%lu.%lu", TradeCounter.Hopper3SumBack/SystemParameter.curUnit, TradeCoun
+             -ter.Hopper3SumBack%SystemParameter.curUnit );
+ 378   2                                      break;
+ 379   2                                      case 100:
+ 380   2                                              len += sprintf( line + len, "%lu.%02lu", TradeCounter.Hopper3SumBack/SystemParameter.curUnit, TradeCo
+             -unter.Hopper3SumBack%SystemParameter.curUnit );
+ 381   2                                      break;
+ 382   2                              }
+ 383   2                      break;
+ 384   2                      case 11:                
+ 385   2                              memcpy( line, CurrencyMenuStr[iIndex].str, CurrencyMenuStr[iIndex].len );
+ 386   2                      len = CurrencyMenuStr[iIndex].len;
+ 387   2      
+ 388   2                              switch( SystemParameter.curUnit )               
+ 389   2                              {
+ 390   2                                      case 1:
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 8   
+
+ 391   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu", TradeCounter.Hopper3Sum );
+ 392   2                                      break;
+ 393   2                                      case 10:
+ 394   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%lu", TradeCounter.Hopper3Sum/SystemParamete
+             -r.curUnit, TradeCounter.Hopper3Sum%SystemParameter.curUnit );
+ 395   2                                      break;
+ 396   2                                      case 100:
+ 397   2                                              len += sprintf( line + CurrencyMenuStr[iIndex].len, "%lu.%02lu", TradeCounter.Hopper3Sum/SystemParame
+             -ter.curUnit, TradeCounter.Hopper3Sum%SystemParameter.curUnit );
+ 398   2                                      break;
+ 399   2                              }       
+ 400   2                      break;  
+ 401   2                      
+ 402   2                      
+ 403   2                      //120419 by cq TotalSell
+ 404   2                      case 10://累计销售数量
+ 405   2                              len = sprintf( line, "%s%lu", CurrencyMenuStr[iIndex].str, TradeCounter.TotalSellNum);
+ 406   2                              break;
+ 407   2                              
+ 408   2                      //120419 by cq TotalSell
+ 409   2                      case 11://累计销售金额
+ 410   2                              len = sprintf( line, "%s%lu.%02lu", CurrencyMenuStr[iIndex].str, TradeCounter.TotalSellMoeny/SystemPara
+             -meter.curUnit, TradeCounter.TotalSellMoeny%SystemParameter.curUnit );
+ 411   2                              break;
+ 412   2                      */
+ 413   2              default:
+ 414   2              break;
+ 415   2      
+ 416   2              }
+ 417   1              Trace("\n %s ",line );
+ 418   1              Trace("\n len = %bu",len );
+ 419   1              DisplayStr( 0, yPos, 1, line, len );    
+ 420   1      
+ 421   1      }
+ 422          
+ 423          
+ 424          
+ 425          ////货币记录值
+ 426          void DispCurrencyList_1( u_char yPos, u_char iIndex )//120521 by cq SellAccumulate
+ 427          {
+ 428   1              u_char xdata len = 0; 
+ 429   1              u_char xdata line[26];  
+ 430   1              
+ 431   1              memset( line, 0, sizeof( line ) );              
+ 432   1              //memcpy( line, CurrencyMenuStr[iIndex].str, CurrencyMenuStr[iIndex].len );
+ 433   1              //len = CurrencyMenuStr[iIndex].len;
+ 434   1              switch( iIndex )
+ 435   1              {
+ 436   2                      case 0://全部量            
+ 437   2                              //len = sprintf( line, "%05u %s%lu.%02lu", TradeCounter.CashSumID,CurrencyMenuStr[iIndex].str, TradeCou
+             -nter.CashSumBack/SystemParameter.curUnit, TradeCounter.CashSumBack%SystemParameter.curUnit );
+ 438   2                          memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 439   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 440   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", TradeCounter.vpSuccessNum );
+ 441   2                              break;
+ 442   2                      case 1://全部额
+ 443   2                          memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 444   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 445   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", TradeCounter.vpSuccessMoney/SystemParamete
+             -r.curUnit );
+ 446   2                              break;
+ 447   2              case 2://现金量
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 9   
+
+ 448   2                              //len = sprintf( line, "%05u %s%lu.%02lu", TradeCounter.CoinSum1yID,CurrencyMenuStr[iIndex].str, TradeC
+             -ounter.CoinSum1yBack/SystemParameter.curUnit, TradeCounter.CoinSum1yBack%SystemParameter.curUnit );
+ 449   2                          memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 450   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 451   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", TradeCounter.vpCashNum );
+ 452   2                              break;
+ 453   2                      case 3://现金额         
+ 454   2                              memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 455   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 456   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", TradeCounter.vpCashMoney/SystemParameter.c
+             -urUnit );
+ 457   2                              break;
+ 458   2                      case 4://游戏量 
+ 459   2                              //len = sprintf( line, "%05u %s%lu.%02lu", TradeCounter.CoinSum5jID,CurrencyMenuStr[iIndex].str, TradeC
+             -ounter.CoinSum5jBack/SystemParameter.curUnit, TradeCounter.CoinSum5jBack%SystemParameter.curUnit );
+ 460   2                          memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 461   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 462   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", TradeCounter.vpGameNum );
+ 463   2                              break;
+ 464   2                      case 5:         
+ 465   2                              memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 466   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 467   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%bu", 0 );
+ 468   2                              break;  
+ 469   2              case 6://刷卡量
+ 470   2                              //len = sprintf( line, "%05u %s%lu.%02lu", TradeCounter.Hopper2SumID,CurrencyMenuStr[iIndex].str, Trade
+             -Counter.Hopper2SumBack/SystemParameter.curUnit, TradeCounter.Hopper2SumBack%SystemParameter.curUnit );
+ 471   2                          memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 472   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 473   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", TradeCounter.vpCardNum );
+ 474   2                              break;
+ 475   2                      case 7:         
+ 476   2                              memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 477   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 478   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%bu", 0 );
+ 479   2                          break;      
+ 480   2                      case 8://在线量
+ 481   2                              //len = sprintf( line, "%05u %s%lu.%02lu", TradeCounter.Hopper1SumID,CurrencyMenuStr[iIndex].str, Trade
+             -Counter.Hopper1SumBack/SystemParameter.curUnit, TradeCounter.Hopper1SumBack%SystemParameter.curUnit );
+ 482   2                          memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 483   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 484   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", TradeCounter.vpOnlineNum );
+ 485   2                              break;
+ 486   2                      case 9:                 
+ 487   2                              memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 488   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 489   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%bu", 0 );
+ 490   2                              break;                  
+ 491   2                      case 10://硬币投入              
+ 492   2                              memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 493   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 494   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", (TradeCounter.CoinSum1y+TradeCounter.CoinS
+             -um5j)/SystemParameter.curUnit );
+ 495   2                              break;
+ 496   2                      case 11://纸币投入              
+ 497   2                              memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 498   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 499   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", (TradeCounter.CashSum)/SystemParameter.cur
+             -Unit );
+ 500   2                              break;
+ 501   2                      case 12://硬币出币              
+ 502   2                              memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 10  
+
+ 503   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 504   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", (TradeCounter.Hopper2Sum+TradeCounter.Hopp
+             -er1Sum)/SystemParameter.curUnit );
+ 505   2                              break;  
+ 506   2                      case 13://区间硬币投入          
+ 507   2                              memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 508   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 509   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", (TradeCounter.CoinSum1yBack+TradeCounter.C
+             -oinSum5jBack)/SystemParameter.curUnit );
+ 510   2                              break;
+ 511   2                      case 14://区间纸币投入          
+ 512   2                              memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 513   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 514   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", (TradeCounter.CashSumBack)/SystemParameter
+             -.curUnit );
+ 515   2                              break;
+ 516   2                      case 15://区间硬币出币          
+ 517   2                              memcpy( line, CurrencyMenuStr_1[iIndex].str, CurrencyMenuStr_1[iIndex].len );
+ 518   2                      len = CurrencyMenuStr_1[iIndex].len;
+ 519   2                              len += sprintf( line + CurrencyMenuStr_1[iIndex].len, "%lu", (TradeCounter.Hopper2SumBack+TradeCounter.
+             -Hopper1SumBack)/SystemParameter.curUnit );
+ 520   2                              break;          
+ 521   2              default:
+ 522   2              break;
+ 523   2      
+ 524   2              }
+ 525   1              Trace("\n %s ",line );
+ 526   1              Trace("\n len = %bu",len );
+ 527   1              DisplayStr( 0, yPos, 1, line, len );    
+ 528   1      
+ 529   1      }
+ 530          
+ 531          
+ 532          /*交易记录维护主函数*/
+ 533          void CounterMainMenu()
+ 534          {
+ 535   1              u_char xdata key = 0;
+ 536   1              bit     data Notout = 1;
+ 537   1              u_char  xdata firstNum = 1;//一级菜单编号
+ 538   1              u_char  xdata LineNum = 2;//选中屏幕的行号      
+ 539   1              u_char xdata  MenuNum = 0;
+ 540   1              
+ 541   1      
+ 542   1              ClearDisplayLine( 1 );
+ 543   1              ClearDisplayLine( 2 );          
+ 544   1              DispCurrencyList( 0, 0 );
+ 545   1              DispCurrencyList( 1, 1 );
+ 546   1              DisplayCursorState( 0, 1, 1, 2, 1 );//第二行整光标
+ 547   1              MenuNum = MENU_COUNT( CurrencyMenuStr ) - 1;    
+ 548   1              
+ 549   1              while( Notout )
+ 550   1              {               
+ 551   2                      /*判断按下何键*/        
+ 552   2                      key = GetKey();
+ 553   2                      switch( key )           
+ 554   2                      {
+ 555   3                              case KEY_UP://上移      
+ 556   3                                  if( LineNum == 2 )//选中标记上移
+ 557   3                                  {                        
+ 558   4                                      DisplayCursorState( 0, 0, 1, 2, 1 );//第一行整光标
+ 559   4                                      LineNum = 1;
+ 560   4                                              if( firstNum == 0 )
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 11  
+
+ 561   4                                                      firstNum = MenuNum;                                     
+ 562   4                                              else
+ 563   4                                                      firstNum--;                         
+ 564   4                                   }
+ 565   3                                   else//菜单上翻
+ 566   3                                   {
+ 567   4                                              DispCurrencyList( 1, firstNum );                             
+ 568   4                                              if( firstNum == 0 )
+ 569   4                                                      firstNum = MenuNum;                                     
+ 570   4                                              else
+ 571   4                                                      firstNum--;                                             
+ 572   4                                              DispCurrencyList( 0, firstNum );
+ 573   4                                              LineNum = 1;                                                                            
+ 574   4                                   }
+ 575   3                                       break;
+ 576   3                              case KEY_DOWN://下移                            
+ 577   3                                      if( LineNum == 1 )//选中标记下移
+ 578   3                                      {                       
+ 579   4                                           DisplayCursorState( 0, 1, 1, 2, 1 );//第二行整光标
+ 580   4                                               if( firstNum == MenuNum )
+ 581   4                                                      firstNum = 0;                                   
+ 582   4                                               else                                           
+ 583   4                                              firstNum++;                                  
+ 584   4                                           LineNum = 2;                                    
+ 585   4                                       }
+ 586   3                                       else//菜单下翻
+ 587   3                                       {
+ 588   4                                              DispCurrencyList( 0, firstNum );
+ 589   4                                              if( firstNum == MenuNum )
+ 590   4                                                      firstNum = 0;                                   
+ 591   4                                              else                                     
+ 592   4                                              firstNum++;                             
+ 593   4                                              DispCurrencyList( 1, firstNum );
+ 594   4                                              LineNum = 2;                                    
+ 595   4                                      }
+ 596   3                                      break;
+ 597   3                              case KEY_CANCEL:
+ 598   3                                      Notout = 0;
+ 599   3                                      break;                                  
+ 600   3                      }
+ 601   2                      SchedulerProcess();//让出时间片
+ 602   2                      WaitForWork( 100, &Lcd );
+ 603   2              }
+ 604   1      }
+ 605          
+ 606          
+ 607          
+ 608          /*交易记录维护主函数*/
+ 609          void CounterMainMenu_1()//120521 by cq SellAccumulate
+ 610          {
+ 611   1              u_char xdata key = 0;
+ 612   1              bit     data Notout = 1;
+ 613   1              u_char  xdata firstNum = 1;//一级菜单编号
+ 614   1              u_char  xdata LineNum = 2;//选中屏幕的行号      
+ 615   1              u_char xdata  MenuNum = 0;
+ 616   1              
+ 617   1      
+ 618   1              ClearDisplayLine( 1 );
+ 619   1              ClearDisplayLine( 2 );          
+ 620   1              DispCurrencyList_1( 0, 0 );
+ 621   1              DispCurrencyList_1( 1, 1 );
+ 622   1              DisplayCursorState( 0, 1, 1, 2, 1 );//第二行整光标
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 12  
+
+ 623   1              MenuNum = MENU_COUNT( CurrencyMenuStr_1 ) - 1;  
+ 624   1              
+ 625   1              while( Notout )
+ 626   1              {               
+ 627   2                      /*判断按下何键*/        
+ 628   2                      key = GetKey();
+ 629   2                      switch( key )           
+ 630   2                      {
+ 631   3                              case KEY_UP://上移      
+ 632   3                                  if( LineNum == 2 )//选中标记上移
+ 633   3                                  {                        
+ 634   4                                      DisplayCursorState( 0, 0, 1, 2, 1 );//第一行整光标
+ 635   4                                      LineNum = 1;
+ 636   4                                              if( firstNum == 0 )
+ 637   4                                                      firstNum = MenuNum;                                     
+ 638   4                                              else
+ 639   4                                                      firstNum--;                         
+ 640   4                                   }
+ 641   3                                   else//菜单上翻
+ 642   3                                   {
+ 643   4                                              DispCurrencyList_1( 1, firstNum );                           
+ 644   4                                              if( firstNum == 0 )
+ 645   4                                                      firstNum = MenuNum;                                     
+ 646   4                                              else
+ 647   4                                                      firstNum--;                                             
+ 648   4                                              DispCurrencyList_1( 0, firstNum );
+ 649   4                                              LineNum = 1;                                                                            
+ 650   4                                   }
+ 651   3                                       break;
+ 652   3                              case KEY_DOWN://下移                            
+ 653   3                                      if( LineNum == 1 )//选中标记下移
+ 654   3                                      {                       
+ 655   4                                           DisplayCursorState( 0, 1, 1, 2, 1 );//第二行整光标
+ 656   4                                               if( firstNum == MenuNum )
+ 657   4                                                      firstNum = 0;                                   
+ 658   4                                               else                                           
+ 659   4                                              firstNum++;                                  
+ 660   4                                           LineNum = 2;                                    
+ 661   4                                       }
+ 662   3                                       else//菜单下翻
+ 663   3                                       {
+ 664   4                                              DispCurrencyList_1( 0, firstNum );
+ 665   4                                              if( firstNum == MenuNum )
+ 666   4                                                      firstNum = 0;                                   
+ 667   4                                              else                                     
+ 668   4                                              firstNum++;                             
+ 669   4                                              DispCurrencyList_1( 1, firstNum );
+ 670   4                                              LineNum = 2;                                    
+ 671   4                                      }
+ 672   3                                      break;
+ 673   3                              case KEY_CANCEL:
+ 674   3                                      Notout = 0;
+ 675   3                                      break;                                  
+ 676   3                      }
+ 677   2                      SchedulerProcess();//让出时间片
+ 678   2                      WaitForWork( 100, &Lcd );
+ 679   2                      if(sysVPMission.msActTimer == 0)
+ 680   2                      {
+ 681   3                              sysVPMission.msActTimer = 100;
+ 682   3                              VPMission_Act_RPT(VP_ACT_ADMIN,VP_ACT_ENTERADMIN);
+ 683   3                      }
+ 684   2              }
+CX51 COMPILER V7.50   COUNTERMAINT                                                         10/23/2014 09:48:26 PAGE 13  
+
+ 685   1      }
+ 686          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   4352    ----
+   CONSTANT SIZE    =    421    ----
+   XDATA SIZE       =   ----      66
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       2
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

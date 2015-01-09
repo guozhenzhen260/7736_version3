@@ -1,0 +1,240 @@
+CX51 COMPILER V7.50   DEVICE                                                               10/23/2014 09:48:30 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE DEVICE
+OBJECT MODULE PLACED IN device.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE device.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define DEVICE_C
+   2          #include "device.h"
+   3          #include "debug.h"
+   4          #include "global.h"
+   5          
+   6          uchar data ZhkHardIOOutputReg;          // IOÊä³ö×´Ì¬´æ´¢Æ÷
+   7          
+   8          #define ZhkHardOutputLock()     ZhkHardSramSelect()     
+   9          
+  10          void ZhkHardSerialSwitch( uchar Route )
+  11          {
+  12   1      //      uchar data P0State;
+  13   1              ZhkHardSramSelect();
+  14   1              Route              &= 0x07;
+  15   1              ZhkHardIOOutputReg &= 0xF8;
+  16   1              ZhkHardIOOutputReg |= Route;
+  17   1              EA = 0;
+  18   1              ZhkHardNullSelect();
+  19   1              P0 = ZhkHardIOOutputReg;
+  20   1              ZhkHardIOOutputSelect();
+  21   1      //      P0State = P0;
+  22   1              _nop_();
+  23   1              _nop_();
+  24   1              ZhkHardOutputLock();
+  25   1              EA = 1;
+  26   1      //      Trace( "ZhkHardIOOutputReg=%bxH\n" , ZhkHardIOOutputReg );
+  27   1      //      Trace( "P0State=%bxH\n" , P0State );
+  28   1      }
+  29          void ZhkHardBuzzerOn( void )
+  30          {
+  31   1              ZhkHardSramSelect();
+  32   1              EA = 0;
+  33   1              ZhkHardIOOutputReg &= ~ BitBuzzer;
+  34   1              ZhkHardNullSelect();
+  35   1              P0 = ZhkHardIOOutputReg;
+  36   1              ZhkHardIOOutputSelect();
+  37   1              ZhkHardOutputLock();
+  38   1              EA = 1;
+  39   1      //      Trace( "ZhkHardIOOutputReg=%bxH\n" , ZhkHardIOOutputReg );
+  40   1      //      Trace( "P0State=%bxH\n" , P0State );
+  41   1              
+  42   1      }
+  43          void ZhkHardBuzzerOff( void )
+  44          {
+  45   1              ZhkHardSramSelect();
+  46   1              EA = 0;
+  47   1              ZhkHardIOOutputReg |= BitBuzzer;
+  48   1              ZhkHardNullSelect();
+  49   1              P0 = ZhkHardIOOutputReg;
+  50   1              ZhkHardIOOutputSelect();
+  51   1              ZhkHardOutputLock();
+  52   1              EA = 1;
+  53   1      //      Trace( "ZhkHardIOOutputReg=%bxH\n" , ZhkHardIOOutputReg );
+  54   1      //      Trace( "P0State=%bxH\n" , P0State );
+  55   1      }
+CX51 COMPILER V7.50   DEVICE                                                               10/23/2014 09:48:30 PAGE 2   
+
+  56          void ZhkHardCoinerDisable( void )
+  57          {
+  58   1              ZhkHardSramSelect();
+  59   1              EA = 0;
+  60   1              ZhkHardIOOutputReg &= ~ BitCoinerEn;
+  61   1              ZhkHardNullSelect();
+  62   1              P0 = ZhkHardIOOutputReg;
+  63   1              ZhkHardIOOutputSelect();
+  64   1              ZhkHardOutputLock();
+  65   1              EA = 1;
+  66   1      //      Trace( "ZhkHardIOOutputReg=%bxH\n" , ZhkHardIOOutputReg );
+  67   1      //      Trace( "P0State=%bxH\n" , P0State );
+  68   1              
+  69   1      }
+  70          void ZhkHardCoinerEnable( void )
+  71          {
+  72   1              ZhkHardSramSelect();
+  73   1              EA = 0;
+  74   1              ZhkHardIOOutputReg |= BitCoinerEn;
+  75   1              ZhkHardNullSelect();
+  76   1              P0 = ZhkHardIOOutputReg;
+  77   1              ZhkHardIOOutputSelect();
+  78   1              ZhkHardOutputLock();
+  79   1              EA = 1;
+  80   1      //      Trace( "ZhkHardIOOutputReg=%bxH\n" , ZhkHardIOOutputReg );
+  81   1      //      Trace( "P0State=%bxH\n" , P0State );
+  82   1      }
+  83          void ZhkHardStatusOn( void )
+  84          {
+  85   1              ZhkHardSramSelect();
+  86   1              EA = 0;
+  87   1              ZhkHardIOOutputReg &= ~ BitStatus;
+  88   1              ZhkHardNullSelect();
+  89   1              P0 = ZhkHardIOOutputReg;
+  90   1              ZhkHardIOOutputSelect();
+  91   1              ZhkHardOutputLock();
+  92   1              EA = 1;
+  93   1      //      Trace( "ZhkHardIOOutputReg=%bxH\n" , ZhkHardIOOutputReg );
+  94   1      //      Trace( "P0State=%bxH\n" , P0State );
+  95   1              
+  96   1      }
+  97          
+  98          
+  99          void ZhkHardPowerOn( void )
+ 100          {
+ 101   1              ZhkHardSramSelect();
+ 102   1              EA = 0;
+ 103   1              ZhkHardIOOutputReg &= ~ BitPowerCtrl;
+ 104   1              ZhkHardNullSelect();
+ 105   1              P0 = ZhkHardIOOutputReg;
+ 106   1              ZhkHardIOOutputSelect();
+ 107   1              ZhkHardOutputLock();
+ 108   1              EA = 1;
+ 109   1        //Trace( "ZhkHardIOOutputReg=%bxH\n" , ZhkHardIOOutputReg );
+ 110   1        //Trace( "P0State=%bxH\n" , P0State );
+ 111   1      
+ 112   1      }
+ 113          
+ 114          void ZhkHardPowerOff( void )
+ 115          {
+ 116   1              ZhkHardSramSelect();
+ 117   1              EA = 0;
+CX51 COMPILER V7.50   DEVICE                                                               10/23/2014 09:48:30 PAGE 3   
+
+ 118   1              ZhkHardIOOutputReg |= BitPowerCtrl;
+ 119   1              ZhkHardNullSelect();
+ 120   1              P0 = ZhkHardIOOutputReg;
+ 121   1              ZhkHardIOOutputSelect();
+ 122   1              ZhkHardOutputLock();
+ 123   1              EA = 1;
+ 124   1        //Trace( "ZhkHardIOOutputReg=%bxH\n" , ZhkHardIOOutputReg );
+ 125   1        //Trace( "P0State=%bxH\n" , P0State );
+ 126   1      }
+ 127          
+ 128          void WaterKeyEnable( void )
+ 129          {
+ 130   1              INT0 = 0;
+ 131   1      }
+ 132          
+ 133          
+ 134          void WaterKeyDisable( void )
+ 135          {
+ 136   1              INT0 = 1;
+ 137   1          //P3 |= 0x04;
+ 138   1      }
+ 139          
+ 140          
+ 141          void GameLedOn( void )
+ 142          {
+ 143   1              ZhkHardSramSelect();
+ 144   1              EA = 0;
+ 145   1              ZhkHardIOOutputReg |= BitPowerCtrl;
+ 146   1              ZhkHardNullSelect();
+ 147   1              P0 = ZhkHardIOOutputReg;
+ 148   1              ZhkHardIOOutputSelect();
+ 149   1              ZhkHardOutputLock();
+ 150   1              EA = 1;
+ 151   1          //Trace( "ZhkHardIOOutputReg=%bxH\n" , ZhkHardIOOutputReg );
+ 152   1          //Trace( "P0State=%bxH\n" , P0State );
+ 153   1      }
+ 154          
+ 155          
+ 156          void GameLedOff( void )
+ 157          {
+ 158   1              ZhkHardSramSelect();
+ 159   1              EA = 0;
+ 160   1              ZhkHardIOOutputReg &= ~BitPowerCtrl;
+ 161   1              ZhkHardNullSelect();
+ 162   1              P0 = ZhkHardIOOutputReg;
+ 163   1              ZhkHardIOOutputSelect();
+ 164   1              ZhkHardOutputLock();
+ 165   1              EA = 1;
+ 166   1          //Trace( "ZhkHardIOOutputReg=%bxH\n" , ZhkHardIOOutputReg );
+ 167   1          //Trace( "P0State=%bxH\n" , P0State );
+ 168   1      }
+ 169          
+ 170          void WatchDogInit( void )
+ 171          {
+ 172   1          /*
+ 173   1              CCAPM4 = 0x4c;
+ 174   1          CCAP4L = 0xff;
+ 175   1          CCAP4H = 0xff;
+ 176   1          //CMOD  |= 0x40;
+ 177   1              CMOD  &= 0xb0;
+ 178   1          */
+ 179   1              sysVPMission.watchDogTimer = 0;
+CX51 COMPILER V7.50   DEVICE                                                               10/23/2014 09:48:30 PAGE 4   
+
+ 180   1              sysVPMission.watchDogCtr   = 1;
+ 181   1              sysVPMission.watchDogIng   = 0;
+ 182   1      }
+ 183          
+ 184          void WatchDogDisable( void )
+ 185          {
+ 186   1          /*
+ 187   1              CCAPM4 = 0x4c;
+ 188   1          CCAP4L = 0xff;
+ 189   1          CCAP4H = 0xff;
+ 190   1          //CMOD  |= 0x40;
+ 191   1              CMOD  &= 0xb0;
+ 192   1          */
+ 193   1              sysVPMission.watchDogTimer = 0;
+ 194   1              sysVPMission.watchDogCtr   = 0;
+ 195   1              sysVPMission.watchDogIng   = 0;
+ 196   1      }
+ 197          
+ 198          void FeedWatchDog( void )
+ 199          {
+ 200   1          
+ 201   1          if( sysVPMission.watchDogCtr == 1 )
+ 202   1          {
+ 203   2              sysVPMission.watchDogTimer = 0;
+ 204   2          }
+ 205   1      
+ 206   1      }
+ 207          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    304    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

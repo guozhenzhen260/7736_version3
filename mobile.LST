@@ -1,0 +1,490 @@
+CX51 COMPILER V7.50   MOBILE                                                               10/23/2014 09:48:32 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE MOBILE
+OBJECT MODULE PLACED IN mobile.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE mobile.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          // 手机模块驱动程序
+   2          // 采用西门子m20手机模块
+   3          #define MOBILE_C
+   4          #define GPRS_C
+   5          #define SMS_C
+   6          
+   7          #include "device.h"
+   8          #include <string.h>
+   9          #include <stdio.h>
+  10          #include <ctype.h>
+  11          #include "serial.h"
+  12          #include "mobile.h"
+  13          #include "timer.h"
+  14          #include "debug.h"
+  15          #include "global.h"
+  16          
+  17          #define ZHKMOBILE_CONNECTTIMEOUT        180
+  18          #define ZHKMOBILE_CMD_ACKTIMEOUT        50
+  19          #define ZHKMOBILE_SMS_ACKTIMEOUT        70
+  20          //存储收到的短信的最大量
+  21          #define SmsRxMaxNum     3
+  22          
+  23          uchar ZhkAtCmd( uchar* AtCmd, uchar CmdFlag );
+  24          uchar ZhkAtCmdGetErr( void );
+  25          uchar xdata ZhkAtCmdBuffer[ 1024 ];
+  26          uint  xdata ZhkAtCmdBufWr;
+  27          uchar MobileInitProcess( void );
+  28          uchar ZhkMobileNullProcess( void );
+  29          void ZhkMobileSignalIn( void ); 
+  30          
+  31          //AT指令命令执行的结果
+  32          #define ATCMD_ERR_NULL          0
+  33          #define ATCMD_ERR_BLOCK         1
+  34          #define ATCMD_ERR_TIMEOUT       2
+  35          #define ATCMD_ERR_ERR           3
+  36          uchar xdata ZhkAtCmdErr = ATCMD_ERR_NULL;
+  37          
+  38          ///任务队列中操作任务定义
+  39          #define ZHKTASKCLAIM_DIAL       0x01            // 拨号请求 
+  40          #define ZHKTASKCLAIM_HANG       0x02            // 挂断请求 
+  41          #define ZHKTASKCLAIM_CONNECT    0x04    // 建链请求 
+  42          #define ZHKTASKCLAIM_SHUT       0x08            // 断链请求 
+  43          #define ZHKTASKCLAIM_TXSMSG     0x10    // 发送短信请求 
+  44          #define ZHKTASKCLAIM_RXTMSG     0x40    // 读短信息请求 
+  45          #define ZHKTASKCLAIM_QUERY      0x80    // 查询状态请求,在短信模式下用于查询手机模块的工作状态
+  46          uchar xdata ZhkTaskClaim;                       // 手机通信任务请求
+  47          
+  48          // 拨号状态
+  49          ////手机模块当前执行的任务
+  50          #define MOBILE_NULL             0x00    // 空闲状态
+  51          #define MOBILE_DIALUP           0x01    // 拨号中
+  52          #define MOBILE_HANGUP           0x02    // 挂断中
+  53          #define MOBILE_TCP_CONNECT      0x03    // 建链中
+  54          #define MOBILE_TXSHORTMSG       0x05    // 发送短信中
+  55          #define MOBILE_RXSHORTMSG       0x06    // 接收短信中
+CX51 COMPILER V7.50   MOBILE                                                               10/23/2014 09:48:32 PAGE 2   
+
+  56          #define MOBILE_TCP_SHUT         0x04    // 断链中
+  57          #define MOBILE_TXTCPMSG         0x07    // 正在发送TCP信息
+  58          #define MOBILE_RXTCPMSG     0x08        // 正在接收TCP信息
+  59          #define MOBILE_INIT             0x09    // 正在初始化
+  60          #define MOBILE_QUERY            0x0A    //查询
+  61          uchar xdata ZhkMobileCurrentTask = MOBILE_NULL;         // 手机模块状态
+  62          
+  63          // 手机模块执行某个任务时的进度定义     
+  64          #define MOBILE_BEGIN    0x00
+  65          #define MOBILE_STEP1    0x01
+  66          #define MOBILE_STEP2    0x02
+  67          #define MOBILE_STEP3    0x03
+  68          #define MOBILE_STEP4    0x04
+  69          #define MOBILE_STEP5    0x05
+  70          #define MOBILE_STEP6    0x06
+  71          #define MOBILE_STEP7    0x07
+  72          #define MOBILE_STEP8    0x08
+  73          #define MOBILE_STEP9    0x09
+  74          #define MOBILE_STEP10   0x0a
+  75          #define MOBILE_FINISH   0x10
+  76          #define MOBILE_TIMEOUT  0x11
+  77          #define MOBILE_ERROR    0x12    
+  78          
+  79          ///手机模块所处的通讯链路状态
+  80          #define GPRS_STATUS_BREAK               1       //在SMS模下表示主控板与手机模块通讯断开
+  81          #define GPRS_STATUS_DIALUP              2
+  82          #define GPRS_STATUS_CONNECTED           3       //在SMS模下表示主控板与手机模块通讯正常
+  83          #define GPRS_STATUS_CONNECTING          4       //在SMS模下表示主控板与手机模块正在连接
+  84          #define GPRS_STATUS_HANGUP              5
+  85          uchar xdata ZhkGprsStatus       = GPRS_STATUS_BREAK;
+  86          
+  87          uchar xdata     ZhkGprsLastErr          = GPRS_ERR_BLOCK;
+  88          //手机模块死机控制
+  89          #define GPRSMDeadJValue  3        //无应答次数
+  90          #define GPRSMResetValue  90      //掉电时长 
+  91          bit data GPRSModuleDeadFlag = 0;        //是否死机标志
+  92          bit data LoadPowerDeleAllSMS = 0;       //系统上电上后是否删除了所有以前的短信
+  93          uchar xdata GPRSDeadTimer = 0;          //无回应次数
+  94          
+  95          
+  96          #ifdef _MOBILE_SMS_1    
+                      
+                      #define SMS_MOBILE_STATUS_OK 1
+                      #define SMS_MOBILE_STATUS_BROKEN 2
+              
+                      uchar xdata     SMSLastErr              = SMS_ERR_BLOCK;        
+              //      uchar xdata SMSMobileStatus = SMS_MOBILE_STATUS_BROKEN;
+                      // 短信接收缓冲区
+                      struct SHORTMSG xdata ZhkSmsRxBuf[SmsRxMaxNum];
+                      uchar xdata ZhkSmsRxNum = 0;
+                      char xdata NewCommingSmsSit[16];
+                      // 短信发送缓冲区
+                      struct SHORTMSG xdata ZhkSmsTxBuf;
+                      uchar xdata ZhkSmsTxNum = 0;
+                      
+              
+                      uchar ZhkMobileSmsRxProcess( void );
+                      uchar ZhkMobileSmsTxProcess( void );
+                      uchar ZhkMobileSmsGetTxMsg( struct SHORTMSG* Msg );
+                      uint ZhkMobileSmsUnpack( struct SHORTMSG xdata* Msg, uchar xdata* DataBuf , uint DataLen );
+                      uint ZhkMobileSmsPack( struct SHORTMSG xdata* Msg, uchar xdata* DataBuf );
+                      uint ZhkGSMToAsc( uchar xdata* GSMCode , uchar xdata* AscCode , uint len );
+CX51 COMPILER V7.50   MOBILE                                                               10/23/2014 09:48:32 PAGE 3   
+
+              //      uchar ZhkAscToGSM( uchar xdata* GSMCode , uchar xdata* AscCode , uchar len );   
+              #endif
+ 120          
+ 121          //公共函数
+ 122          /////当空闲时处理任务队列中的任务
+ 123          uchar ZhkMobileNullProcess( void )
+ 124          {
+ 125   1              
+ 126   1              return 0;
+ 127   1      }
+ 128          
+ 129          //公共函数
+ 130          ////初始化手机模块
+ 131          uchar MobileInitProcess( void )
+ 132          {
+ 133   1          return 0;
+ 134   1      }
+ 135          
+ 136          //公共函数
+ 137          ///循环监控手机模块
+ 138          uchar ZhkMobileProcess( void )
+ 139          {       
+ 140   1              
+ 141   1              return 0;
+ 142   1      }
+ 143          
+ 144          uchar GprsInit( void )
+ 145          {
+ 146   1      
+ 147   1              return 0;
+ 148   1      }
+ 149          //公共函数
+ 150          ///串口的信号进行，然后判断是什么信号
+ 151          void ZhkMobileSignalIn( void )
+ 152          {
+ 153   1              #define SMSHEAD  "+CMTI:"                       
+ 154   1              #define GPRSHEAD "+IPD"
+ 155   1              #define GPRSCLOSE "CLOSED"
+ 156   1              
+ 157   1      }
+ 158          
+ 159          //控制模块代码初始化
+ 160          uchar ZhkMobileInit( void )
+ 161          {       
+ 162   1              
+ 163   1              return 0;
+ 164   1      }
+ 165          
+ 166          uchar SendATcommandToMobile()
+ 167          {
+ 168   1          return 0;
+ 169   1      }
+ 170          
+ 171          #ifdef _MOBILE_SMS_1
+                      
+                      bit IsShortMsgIn( void )
+                      {
+                      //      Trace("\n IsShortMsgIn");
+                              return ! ( ZhkSmsRxNum == 0 );
+                      }
+                      bit IsMessagerBuzy( void )
+                      {
+CX51 COMPILER V7.50   MOBILE                                                               10/23/2014 09:48:32 PAGE 4   
+
+                              return ZhkSmsTxNum;
+                      }
+                      
+                      bit     SMSMobileStatus()
+                      {
+                              if( SMSMobileStatus == SMS_MOBILE_STATUS_OK )
+                                      return 1;
+                              else
+                                      return 0;
+                      }
+              
+                      uchar GetShortMsg( struct SHORTMSG* Msg )
+                      {
+                              if( Msg == 0);  
+                              return 0;       
+                      }
+                      
+                      uchar PutShortMsg( struct SHORTMSG* Msg )
+                      {
+                          if( Msg == 0);
+                              ZhkTaskClaim |= ZHKTASKCLAIM_TXSMSG;
+                              return ZhkSmsTxBuf.len;
+                      }
+              
+                      uchar SMSGetLastErr( void )
+                      {
+                              return SMSLastErr;
+                      }       
+                      
+                      uchar ZhkMobileSmsTxProcess( void )
+                      {
+                              // AT+CMGS=<length><cr><lf>
+                              // waitfor '>'
+                              // SendMsg
+                              // <^Z><cr><lf>
+                              // waitfor OK
+                              return 0;
+                          //return MsgTxStatus;
+                      }
+              
+                      uchar ASCToInt( uchar val )
+                      {
+                              if ((val >= '0') && (val <= '9'))
+                              return  val - '0';
+                      return 0;
+                      }
+              
+                      uchar ZhkMobileSmsRxProcess( void )
+                      {
+                              // AT+CMGR=n
+                              // getline index "+cgml" and 编号n
+                              // getline unpack
+                              // waitfor ok
+                              // AT+CMGD=n
+                              // waitfor ok
+                              return  0;
+                      }
+              
+                      // 返回值等于0表示操作成功从发送缓冲区取到短信
+                      // 返回值非零表示操作失败
+                      uchar ZhkMobileSmsGetTxMsg( struct SHORTMSG* Msg )
+                      {
+CX51 COMPILER V7.50   MOBILE                                                               10/23/2014 09:48:32 PAGE 5   
+
+                              if ( ZhkSmsTxNum == 0) 
+                                      return 1;
+                              memcpy( Msg , &ZhkSmsTxBuf, sizeof( struct SHORTMSG ) );
+                      //      ZhkSmsTxNum --;
+                              return 0;
+                      }
+                      
+                      //////////////////////////
+                      /////如果进来的短信是7位编码，则要用此函数转化为8位编码
+                      // GSM字符串(每个字符7位)转化为Asc字符串(每个字符8位)
+                      // GSMCode：GSM字符串(每个字符7位)，
+                      // AscCode：Asc字符串(每个字符8位)
+                      // len: 字符串长度，即字符个数为
+                      uint ZhkGSMToAsc( uchar xdata* GSMCode , uchar xdata* AscCode , uint len )
+                      {
+                         GSMCode = 0;
+                         AscCode = 0;
+                     len = 0;
+                         return 0;
+                      }
+                              
+                      // GSMCode：GSM字符串(每个字符8位)，
+                      // MessageCode：消息字符串(每个字符8位)
+                      // len: 字符串长度，即字符个数
+                      // 返回转换结果的长度
+                      //此函数是把短信内容变为7位码的函数
+                      uint ZhkMessageToGSM( uchar xdata* GSMCode , uchar xdata* MessageCode , uint len )
+                      {
+                          GSMCode = 0;
+                      MessageCode = 0;
+                      len = 0;
+                              return 0;
+                      }
+              
+                      // 手机短信编码
+                      // 返回编码后去掉短信中心号码剩下部分的字符长度
+                      uint ZhkMobileSmsPack( struct SHORTMSG xdata* Msg, uchar xdata* DataBuf )
+                      {
+                          Msg = 0;
+                              DataBuf = 0;
+                          return 0;
+                      }
+              
+                      // 返回值
+                      // 短信的信息长度
+                      uint ZhkMobileSmsUnpack( struct SHORTMSG xdata* Msg, uchar xdata* DataBuf, uint DataLen ) 
+                      {
+                          Msg = 0;
+                              DataBuf = 0;
+                              DataLen = 0;
+                              return 0;
+                      }       
+              #endif
+ 295          
+ 296          #ifdef _MOBILE_GPRS             
+                      uchar ZhkMobileGprsConnectProcess( void )
+                      {
+                              // AT+CIPSTART="TCP","IP","PORT"
+                              // waitfor ok
+                              // waitfor connect ok
+                              static uchar xdata ConnectStatus = MOBILE_BEGIN;
+                              uchar xdata CmdStr[ 128 ];
+CX51 COMPILER V7.50   MOBILE                                                               10/23/2014 09:48:32 PAGE 6   
+
+                              uchar  data len;
+                              uchar  data temp;
+                              switch( ConnectStatus )
+                              {
+                              case MOBILE_BEGIN:      
+                                      len = sprintf( CmdStr , "AT+CIPSTART=\"TCP\",\"%d.%d.%d.%d\",\"%ld\"\0" ,  
+                                              ( int )ZhkGprsIP[ 0 ] , ( int )ZhkGprsIP[ 1 ] , 
+                                              ( int )ZhkGprsIP[ 2 ] , ( int )ZhkGprsIP[ 3 ] , (long)ZhkGprsPort );
+                                      ZhkAtCmd( CmdStr, 0 );
+                                      ConnectStatus     = MOBILE_STEP1;
+                                      break;
+                              case MOBILE_STEP1:                      // waitfor OK
+                                      temp = ZhkAtCmdGetErr();
+                                      switch( temp )
+                                      {
+                                      case ATCMD_ERR_NULL:
+                                              // 手机模块正确接收指令，
+                                              ZhkMobileSecTimer = ZHKMOBILE_CONNECTTIMEOUT;
+                                              ConnectStatus     = MOBILE_STEP2;
+                                              break;
+                                      case ATCMD_ERR_BLOCK:
+                                              // 阻塞状态直接返回
+                                              break;                                          
+                                      case ATCMD_ERR_TIMEOUT:
+                                              // 手机模块接收指令超时，
+                                              ConnectStatus     = MOBILE_BEGIN;
+                                              ZhkGprsStatus     = GPRS_STATUS_CONNECTING;
+                                              ZhkGprsLastErr    = GPRS_ERR_CONNECTING;
+                                              return MOBILE_TIMEOUT;
+                                      case ATCMD_ERR_ERR:
+                                              // 手机模块接收指令出错，
+                                              ConnectStatus     = MOBILE_BEGIN;
+                                              ZhkGprsStatus     = GPRS_STATUS_CONNECTING;
+                                              ZhkGprsLastErr    = GPRS_ERR_CONNECTING;
+                                              return MOBILE_ERROR;
+                                      }
+                                      break;  
+                              case MOBILE_STEP2:                      // wait for connectok
+                                      // 阻塞状态直接返回
+                                      if ( ZhkAtCmdBufWr == 0 )
+                                      {
+                                              if ( ZhkMobileSecTimer == 0 )
+                                              {
+                                                      ConnectStatus     = MOBILE_BEGIN;
+                                                      ZhkGprsStatus     = GPRS_STATUS_CONNECTING;
+                                                      ZhkGprsLastErr    = GPRS_ERR_CONNECTING;
+                                                      return MOBILE_TIMEOUT;
+                                              }
+                                               break; 
+                                      }
+                                      ZhkAtCmdBufWr = 0;
+                                      // 连接成功
+                                      if ( strcmp( ZhkAtCmdBuffer , "CONNECT OK" ) == 0 )
+                                      {
+                                              ConnectStatus     = MOBILE_BEGIN;
+                                              ZhkGprsStatus     = GPRS_STATUS_CONNECTED;
+                                              ZhkGprsLastErr    = GPRS_ERR_NULL;
+                                              return MOBILE_FINISH;
+                                      }
+                                      if ( strcmp( ZhkAtCmdBuffer , "CONNECT FAIL" ) == 0 )
+                                      {
+                                              ConnectStatus     = MOBILE_BEGIN;
+CX51 COMPILER V7.50   MOBILE                                                               10/23/2014 09:48:32 PAGE 7   
+
+                                              ZhkGprsStatus     = GPRS_STATUS_CONNECTING;
+                                              ZhkGprsLastErr    = GPRS_ERR_CONNECTING;
+                                              return MOBILE_ERROR;
+                                      }
+                                      break;
+                              default:
+                                      ConnectStatus = MOBILE_BEGIN;
+                                      return MOBILE_ERROR;
+                              }
+                              return ConnectStatus;
+                      }
+                      
+                      uchar ZhkMobileGprsShutProcess( void )
+                      {
+                              // AT+CIPSHUT
+                              // waitfor shut ok or error
+                              static uchar xdata ShutStatus = MOBILE_BEGIN;
+                              uchar  data temp;
+                              
+                              switch( ShutStatus )
+                              {
+                              case MOBILE_BEGIN:      
+                                      ZhkAtCmd( "AT+CIPSHUT", 0 );
+                                      ShutStatus        = MOBILE_STEP1;
+                                      break;
+                              case MOBILE_STEP1:                      // waitfor OK
+                                      temp = ZhkAtCmdGetErr();
+                                      ZhkGprsMsgRxBufWr = 0;
+                                      switch( temp )
+                                      {
+                                      case ATCMD_ERR_NULL:
+                                              // 断链成功的标志
+                                              ShutStatus        = MOBILE_BEGIN;
+                                              ZhkGprsStatus     = GPRS_STATUS_DIALUP;
+                                              ZhkGprsLastErr    = GPRS_ERR_NULL;
+                                              return MOBILE_FINISH;
+                                      case ATCMD_ERR_BLOCK:
+                                              // 阻塞状态直接返回
+                                              break;                                          
+                                      case ATCMD_ERR_TIMEOUT:
+                                              // 挂断超时处理
+                                              // 超时处理
+                                              ShutStatus        = MOBILE_BEGIN;
+                                              ZhkGprsLastErr    = GPRS_ERR_TIMEOUT;
+                                              return MOBILE_TIMEOUT;
+                                      case ATCMD_ERR_ERR:
+                                              // 断链成功的标志
+                                              ShutStatus        = MOBILE_BEGIN;
+                                              ZhkGprsStatus     = GPRS_STATUS_DIALUP;
+                                              ZhkGprsLastErr    = GPRS_ERR_NULL;
+                                              return MOBILE_FINISH;
+                                      }
+                                      break;
+                              default:
+                                      ShutStatus        = MOBILE_BEGIN;
+                                      return MOBILE_ERROR;
+                              }
+                              return ShutStatus;
+                      }
+              
+                      uchar ZhkMobileGprsTxProcess( void )
+                      {
+CX51 COMPILER V7.50   MOBILE                                                               10/23/2014 09:48:32 PAGE 8   
+
+                      
+                              return 0;
+                      }
+                      
+                      uchar ZhkMobileGprsRxProcess( void )
+                      {
+                              return 0;
+                      }
+              
+              #endif
+ 438          
+ 439          uchar ZhkAtCmd( uchar* AtCmd, uchar CmdFlag )
+ 440          {
+ 441   1              if( *AtCmd == CmdFlag )  CmdFlag = 0;
+ 442   1              return 0;
+ 443   1      }
+ 444          uchar ZhkAtCmdGetErr( void )
+ 445          {
+ 446   1      
+ 447   1              return ATCMD_ERR_BLOCK;
+ 448   1      }
+ 449          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     44    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   1038    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      2    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

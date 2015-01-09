@@ -1,0 +1,679 @@
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE MAINTMENU
+OBJECT MODULE PLACED IN maintmenu.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE maintmenu.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #include "device.h"     
+   2          //#include <stdio.h>
+   3          //#include <stdlib.h>
+   4          #include <string.h>
+   5          #include "global.h"
+   6          #include "mainflow.h"
+   7          #include "maintmenu.h"
+   8          #include "scheduler.h"
+   9          #include "CommonFunction.h"
+  10          #include "SysParamSet.h"
+  11          #include "devicecheck.h"
+  12          #include "key.h"  
+  13          #include "IOInput.h"
+  14          #include "Clock.h"
+  15          #include "timer.h" 
+  16          #include "common.h"
+  17          #include "DataExchange.h"  
+  18          #include "debug.h"
+  19          #include "initialization.h"
+  20          #include "GoodsWaySet.h"
+  21          #include "countermaint.h"
+  22          #include "RackSet.h"
+  23          #include "VMC_PC.h"
+  24          
+  25          
+  26          //#include "Mobile.h"
+  27          //#include "communication.h"
+  28          
+  29          #ifdef _CHINA_
+  30                  const struct StrAndLen  code MainMenuStr[] =    
+  31                  {        
+  32                          /*
+  33                  { "1.货道参\xca\xfd", 10 },
+  34                  { "2.货道状态快速查询", 18 },
+  35                          { "3.加满全部货道",   14 },
+  36                  { "4.补硬币完成",     12},
+  37                  { "5.全系统同步",     12 },
+  38                  { "6.加满层架货道",   14 },
+  39                  { "7.取纸币完成",     12},              
+  40                          { "8.设备管理",       12 },
+  41                          { "9.系统参\xca\xfd", 12 },             
+  42                          { "10. 货架配置", 12 },
+  43                  { "11. 出厂默认配置", 16 },
+  44                  { "12. 从机添货", 12 },
+  45                  { "13. 货道检测", 12 },
+  46                          { "14. 交易记录", 12   },
+  47                          { "15. 售卖累计", 12   },//120521 by cq SellAccumulate
+  48                          { "16. 补货完成", 12   }
+  49                          */
+  50                          { "1.总销售统计", 12   },
+  51                          { "2.货道参\xca\xfd", 10 },
+  52                  { "3.货道状态查看", 14 },
+  53                          { "4.加满全部货道",   14 },
+  54                  { "5.补硬币完成",     12},
+  55                  { "6.全系统同步",     12 },
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 2   
+
+  56                  { "7.加满层架货道",   14 },
+  57                  { "8.取纸币完成",     12},              
+  58                          { "9.设备管理",       10 },
+  59                          { "10. 系统参\xca\xfd", 12 },           
+  60                          { "11. 货架配置", 12 },
+  61                  { "12. 出厂默认配置", 16 },  
+  62                  { "13. 清零区间销售统计", 20   },
+  63                          { "14. 补货签到", 12   }
+  64                          
+  65                  
+  66                  };
+  67          #else
+                      const struct StrAndLen  code MainMenuStr[] =    
+                      {
+                      /*
+                              { "1.Column", 8 },
+                              { "2.Add full goods", 16 },
+                      { "3.Add layer goods", 17 },
+                      { "4.Add changes", 13 },
+                      { "5.Add Cash", 10 },
+                              { "6.Goods-Column", 14 },
+                      { "7.Count 0.50$ coin", 18 },
+                              { "8.Count 1.00$ coin", 18 },
+                              { "9.Device", 8 },
+                              { "10.Parameter", 11 },
+                              { "11.Record inquiry", 16 },
+                              { "12.Tray", 6 },
+                      { "13.Default setting", 18 },
+                      { "14.Add Slave Goods", 18 },
+                      */
+                          { "1.Column", 8 },
+                      { "2.goods status", 14}
+                              { "3.Add full goods", 16 },
+                      { "4.Add coin", 10 },           
+                              { "5.Goods-Column", 14 },
+                      { "6.Add layer goods", 17 },        
+                      { "7.Add Cash", 10 },
+                      /*              
+                      { "8.Count 0.50$ coin", 18 },
+                              { "9.Count 1.00$ coin", 18 },
+                      */
+                              { "8.Device", 8 },
+                              { "9.Parameter", 11 },
+                              { "10.Tray", 6 },
+                      { "11.Default setting", 18 },
+                      { "12.Add slave Goods", 18 },
+                              { "13.Column test", 13 }
+                   
+                      };
+              #endif
+ 106          
+ 107          
+ 108          
+ 109          //出厂配置设置函数
+ 110          u_char FactorySetting( void )
+ 111          {
+ 112   1          u_char xdata i = 0;
+ 113   1              u_char xdata j = 0;
+ 114   1              u_char xdata key = 0;
+ 115   1          u_char xdata flag = 0;
+ 116   1              u_char xdata ret = 0;
+ 117   1              //u_char xdata str[20];
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 3   
+
+ 118   1              u_char xdata len = 0;
+ 119   1          
+ 120   1              u_char xdata fristNum ;
+ 121   1              u_char xdata columnNum = 0;   
+ 122   1          u_char xdata trayNum = 0;
+ 123   1              
+ 124   1      
+ 125   1              //uchar LineNum;
+ 126   1          //1.
+ 127   1      #ifdef _CHINA_
+ 128   1              DisplayStr( 0, 0, 1, "  确定出厂配置吗?", 17 );   
+ 129   1              DisplayStr( 0, 1, 1, "确定ENTER 取消CANCEL", 20 );      
+ 130   1      #else           
+                      DisplayStr( 0, 0, 1, "   Are you sure?", 16 );  
+                      DisplayStr( 0, 1, 1, "   ENTER   CANCEL", 17 ); 
+              #endif
+ 134   1          while( 1 )
+ 135   1              {
+ 136   2                      key = GetKey();
+ 137   2                      if( ( key == KEY_CANCEL ) || (key == KEY_SUBMIT) )
+ 138   2                              break;
+ 139   2                      WaitForWork( 100, NULL );       
+ 140   2                      if(sysVPMission.msActTimer == 0)
+ 141   2                      {
+ 142   3                              sysVPMission.msActTimer = 100;
+ 143   3                              VPMission_Act_RPT(VP_ACT_ADMIN,VP_ACT_ENTERADMIN);
+ 144   3                      }
+ 145   2              }
+ 146   1              if( key == KEY_CANCEL ) return 0;
+ 147   1      
+ 148   1          //2.System parameter set
+ 149   1              memset( &SystemParameter, 0, sizeof( SystemParameter ) );
+ 150   1          SystemParameter.HopperCoinPrice1 = 50;
+ 151   1              SystemParameter.HopperCoinPrice2 = 100;
+ 152   1              SystemParameter.HopperCoinPrice3 = 0;
+ 153   1              SystemParameter.IsMuliVerd = 1;        //0,1
+ 154   1              SystemParameter.RefundPermission = 1;
+ 155   1              SystemParameter.BillNo = 1;
+ 156   1              SystemParameter.MobileON = 0;
+ 157   1              SystemParameter.Min = 100;
+ 158   1              SystemParameter.BanknoteMax = 2000;
+ 159   1              SystemParameter.DoubtCash = 0;
+ 160   1              //memset( SystemParameter.VmID, 0, sizeof( SystemParameter.VmID ) );
+ 161   1              //memset( SystemParameter.GSMNO, 0, sizeof( SystemParameter.GSMNO ) );
+ 162   1          memcpy( SystemParameter.GSMNO, "0", 1 );
+ 163   1              SystemParameter.NotOutMax = 0;
+ 164   1              SystemParameter.decimal = 2; 
+ 165   1              SystemParameter.curUnit = 100;
+ 166   1          SystemParameter.billValue[0] = 100;
+ 167   1          SystemParameter.billValue[1] = 500;
+ 168   1              SystemParameter.billValue[2] = 1000;
+ 169   1              SystemParameter.billValue[3] = 2000;
+ 170   1              SystemParameter.billValue[4] = 0;
+ 171   1              SystemParameter.billValue[5] = 0;
+ 172   1              SystemParameter.billValue[6] = 0;
+ 173   1              SystemParameter.billValue[7] = 0;
+ 174   1              SystemParameter.coinValue[0] = 50;
+ 175   1              SystemParameter.coinValue[1] = 100;
+ 176   1              SystemParameter.coinValue[2] = 0;
+ 177   1              SystemParameter.coinValue[3] = 0;
+ 178   1              SystemParameter.coinValue[4] = 0;
+ 179   1              SystemParameter.coinValue[5] = 0;
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 4   
+
+ 180   1              SystemParameter.GOCOn = 0;
+ 181   1              SystemParameter.tradeTime = 5;
+ 182   1          SystemParameter.SVC_NoChange = 0;
+ 183   1              SystemParameter.coinOn = 1;
+ 184   1              SystemParameter.busCardOn = 0;     //1,0
+ 185   1              SystemParameter.BCReadTime = 2;
+ 186   1          //SystemParameter.holdingMode  = 1;  //open by default
+ 187   1          //SystemParameter.holdNoteFive = 0;  //add by gzz 20110429
+ 188   1          //SystemParameter.holdNoteTen  = 1;  //add by gzz 20110429
+ 189   1          SystemParameter.ACDCModule   = 1;  //open by default 
+ 190   1          SystemParameter.CompModule = 1;
+ 191   1      
+ 192   1          //写系统参数
+ 193   1              SaveGlobalParam();      
+ 194   1          //3.Column set
+ 195   1              for( i=0; i<RACKNUM; i++ )
+ 196   1              {
+ 197   2                      iRackSet[i].RackNo = i+1;
+ 198   2                      iRackSet[i].UseState = 0;
+ 199   2              iRackSet[i].GoodsMax = 0;
+ 200   2                      for( j=0; j<RACKNUM; j++ )
+ 201   2                      {
+ 202   3                              iRackColumnSet[i][j].UseState = 0;
+ 203   3                      }
+ 204   2      
+ 205   2              }
+ 206   1          for( i=0; i<6; i++ )
+ 207   1              {
+ 208   2              //iRackSet[i].RackNo = i+1;
+ 209   2              iRackSet[i].UseState = 1;
+ 210   2                      iRackSet[i].GoodsMax = 10;
+ 211   2              for( j=0; j<RACKNUM; j++ )
+ 212   2                      {
+ 213   3                              iRackColumnSet[i][j].UseState = 1;
+ 214   3                      }
+ 215   2          }
+ 216   1      
+ 217   1          //层架配置完成，设置号道参数
+ 218   1              columnNum = 0; //总的开启货道数
+ 219   1              trayNum = 0;  //开启层数
+ 220   1              //memset( InputGoodsWayList, 0, sizeof( InputGoodsWayList )*GOODSWAYNUM ); //Disabled by Andy 2011.3.2
+ 221   1          memset( InputGoodsWayList, 0, sizeof( InputGoodsWayList ) );
+ 222   1              for( i = 0; i < RACKNUM; i++ )//货架层数
+ 223   1              {
+ 224   2                      if( iRackSet[ i ].UseState == 1 )//如果此层开启了
+ 225   2                      {
+ 226   3                              key = iRackSet[ i ].GoodsMax;//此层中各货道最大存货量
+ 227   3                              fristNum = 1;//辑逻货道编号的个位       
+ 228   3                              for( len = 0; len < RACKCOLUMNNUM; len ++ )//检索每层中开启的货道数
+ 229   3                              {
+ 230   4                                      Trace("\n iRackColumnSet[ %bu ][ %bu ].UseState = %bu", i, len, iRackColumnSet[i][len].UseState  );
+ 231   4                                      if( iRackColumnSet[i][len].UseState == 1)
+ 232   4                                      {
+ 233   5                                              InputGoodsWayList[ columnNum ].GoodsWayNo = ( trayNum + 1 ) * 10 + fristNum;//逻辑货道  
+ 234   5                                              Trace("\n InputGoodsWayList[ %bu ].GoodsWayNo = %bu", LineNum, InputGoodsWayList[ LineNum ].GoodsWayN
+             -o);
+ 235   5                                      //      InputGoodsWayList[ LineNum ].SetArrayNo = i*RACKCOLUMNNUM + len + 1 ;//物理货道
+ 236   5                                              InputGoodsWayList[ columnNum ].SetArrayNo = 64 - i*RACKCOLUMNNUM - 8 + len + 1;//物理货道
+ 237   5                                              Trace("\n InputGoodsWayList[ %bu ].SetArrayNo = %bu", LineNum, InputGoodsWayList[ LineNum ].SetArrayN
+             -o);
+ 238   5                                              InputGoodsWayList[ columnNum ].UseState = 1;//开启状态
+ 239   5                                              Trace("\n InputGoodsWayList[ %bu ].UseState = %bu", LineNum, InputGoodsWayList[ LineNum ].UseState);
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 5   
+
+ 240   5                                              InputGoodsWayList[ columnNum ].GoodsMax = key;//最大存货量
+ 241   5                                              Trace("\n InputGoodsWayList[ %bu ].GoodsMax = %bu", columnNum, InputGoodsWayList[ LineNum ].GoodsMax)
+             -;
+ 242   5                                              columnNum += 1;                                                         
+ 243   5                                              fristNum += 1;
+ 244   5                                      }                                                       
+ 245   4                              }
+ 246   3                              trayNum += 1;
+ 247   3                      }
+ 248   2                      else
+ 249   2                      {
+ 250   3                              iRackSet[i].GoodsMax = 0;
+ 251   3                              memset( iRackColumnSet[i], 0, 16 );
+ 252   3                      }
+ 253   2              }
+ 254   1              //memset( GoodsWaySetVal, 0, sizeof( struct WaySet ) * GOODSWAYNUM );
+ 255   1              memset( GoodsWaySetVal, 0, sizeof( GoodsWaySetVal ) );
+ 256   1              Trace("\n EnableNum = %bu", LineNum);
+ 257   1              for( i = 0; i < columnNum; i ++ )
+ 258   1          {
+ 259   2                      GoodsWaySetVal[i].WayNo = InputGoodsWayList[ i ].GoodsWayNo;
+ 260   2                      Trace("\n GoodsWaySetVal[ %bu ].WayNo = %bu", i, GoodsWaySetVal[ i ].WayNo);
+ 261   2                      GoodsWaySetVal[i].WayState = 0;                                 
+ 262   2                      GoodsWaySetVal[i].GoodsCurrentSum = 0;
+ 263   2              //-----------------------------------------------
+ 264   2              //GoodsWaySetVal[i].Price = 0;
+ 265   2              GoodsWaySetVal[i].Price = SystemParameter.curUnit;
+ 266   2              //===============================================
+ 267   2              }
+ 268   1              //保存货架设置和货道开启设置
+ 269   1              SaveGoodsSet();
+ 270   1              SaveRackSet();
+ 271   1              SaveRackColumnSet();  
+ 272   1              WaitForWork( 100, NULL );
+ 273   1          //4.
+ 274   1          //恢复默认参数，交易记录不能清空;by gzz 20110721
+ 275   1              //memset( &TradeCounter, 0, sizeof( struct TRADECOUNTER ) );                        
+ 276   1          //memset( DoubtTradeLog, 0, sizeof( DoubtTradeLog ) );
+ 277   1              /*
+ 278   1              memset( TradeLog, 0, sizeof( TradeLog ) );      
+ 279   1              for( key = 0; key < GOODSWAYNUM; key++ )
+ 280   1              {                               
+ 281   1                      TradeLog[key].WayNo = InputGoodsWayList[key].GoodsWayNo;
+ 282   1          }
+ 283   1              */
+ 284   1          /*  
+ 285   1          memset( &Temptime, 0, sizeof( struct time ) );
+ 286   1              GetCurrentTime( &Temptime );
+ 287   1              TradeCounter.Date[0] = ( Temptime.year & 0xff00 ) >> 8;
+ 288   1              TradeCounter.Date[1] = ( Temptime.year & 0x00ff );
+ 289   1              TradeCounter.Date[2] = Temptime.mon;
+ 290   1              TradeCounter.Date[3] = Temptime.date;                   
+ 291   1              SgwSecTimer = 0;
+ 292   1              */
+ 293   1              SaveTradeParam();
+ 294   1              SaveTradeCounter();
+ 295   1              WaitForWork( 100, NULL );
+ 296   1              return 0;
+ 297   1      
+ 298   1      }
+ 299          
+ 300          
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 6   
+
+ 301          
+ 302          void mainmenu()
+ 303          {
+ 304   1              u_char  xdata firstNum ;//一级菜单编号
+ 305   1              u_char  xdata LineNum ;//选中屏幕的行号 
+ 306   1              u_char  xdata i = 0;
+ 307   1              bit     data Notout = 1;
+ 308   1              u_char xdata ErrFlag = 0;
+ 309   1              u_char xdata key = 0;
+ 310   1              struct WaySet  xdata TempGoodsWaySetVal[GOODSWAYNUM];
+ 311   1              struct SYSTEMPARAMETER xdata TempSystemParameter;       
+ 312   1              //u_char xdata str[20];
+ 313   1          //struct SHORTMSG xdata message;
+ 314   1      
+ 315   1              ErrFlag = 0;
+ 316   1              while( ErrFlag == 0 )
+ 317   1              {
+ 318   2                      ErrFlag = 0;
+ 319   2                      Notout = 1;
+ 320   2                      //sysVPMission.sWeihuTimer=20;
+ 321   2                      ClearKey();     
+ 322   2                      /*显示两行菜单及其值*/
+ 323   2                      DisplayStr( 0, 0, 1, MainMenuStr[0].str, MainMenuStr[0].len );//显示菜单        
+ 324   2                      DisplayStr( 0, 1, 1, MainMenuStr[1].str, MainMenuStr[1].len );//显示菜单                                
+ 325   2                      DisplayCursorState( 0, 1, 1, 2, 1 );//设置光标在第二行上且为整行光标状态
+ 326   2                      firstNum = 1;
+ 327   2                      LineNum = 2;    
+ 328   2                      while( Notout )    //超时或客户退出
+ 329   2                      {                               
+ 330   3                              key = GetKey();
+ 331   3                              switch( key )           
+ 332   3                              {
+ 333   4                                      case KEY_UP://上移      
+ 334   4                                               //sysVPMission.sWeihuTimer=20;
+ 335   4                                           if( LineNum == 2 )//选中标记上移
+ 336   4                                           {                       
+ 337   5                                              DisplayCursorState( 0, 0, 1, 2, 1 );//第一行整光标
+ 338   5                                              LineNum = 1;                       
+ 339   5                                                      if( firstNum == 0 )
+ 340   5                                                              firstNum = MENU_COUNT(MainMenuStr)-1;                                   
+ 341   5                                                      else
+ 342   5                                                              firstNum--;
+ 343   5                                           }
+ 344   4                                           else//菜单上翻
+ 345   4                                           {
+ 346   5                                              /*当firstNum<=1不能上翻了*/                                     
+ 347   5                                              //      DispDeviceMenu( firstNum, 1);                                                                       
+ 348   5                                                      DisplayStr( 0, 1, 1, MainMenuStr[firstNum].str, MainMenuStr[firstNum].len );
+ 349   5                                                      if( firstNum == 0 )
+ 350   5                                                              firstNum = MENU_COUNT(MainMenuStr)-1;                                   
+ 351   5                                                      else
+ 352   5                                                              firstNum--;
+ 353   5                                              //      DispDeviceMenu( firstNum, 0);                                           
+ 354   5                                                      DisplayStr( 0, 0, 1, MainMenuStr[firstNum].str, MainMenuStr[firstNum].len );
+ 355   5                                                      LineNum = 1;                                    
+ 356   5                                           }
+ 357   4                                               break;
+ 358   4                                      case KEY_DOWN://下移    
+ 359   4                                              //sysVPMission.sWeihuTimer=20; 
+ 360   4                                              if( LineNum == 1 )//选中标记下移
+ 361   4                                              {                                
+ 362   5                                                   DisplayCursorState( 0, 1, 1, 2, 1 );//第二行整光标                            
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 7   
+
+ 363   5                                                      if( firstNum == MENU_COUNT(MainMenuStr)-1 )
+ 364   5                                                              firstNum = 0;                                   
+ 365   5                                                      else
+ 366   5                                                              firstNum++;
+ 367   5                                                   LineNum = 2;                                    
+ 368   5                                               }
+ 369   4                                               else//菜单下翻
+ 370   4                                               {
+ 371   5                                                  /*当firstNum<=2不能上翻了*/                                                         
+ 372   5                                                      DisplayStr( 0, 0, 1, MainMenuStr[firstNum].str, MainMenuStr[firstNum].len );
+ 373   5                                              if( firstNum == MENU_COUNT(MainMenuStr)-1 )
+ 374   5                                                              firstNum = 0;                                   
+ 375   5                                                      else
+ 376   5                                                              firstNum++;
+ 377   5                                                      DisplayStr( 0, 1, 1, MainMenuStr[firstNum].str, MainMenuStr[firstNum].len );
+ 378   5                                                      LineNum = 2;                                    
+ 379   5                                              }
+ 380   4                                              break;
+ 381   4                                      case KEY_CANCEL:
+ 382   4                                              Notout = 0;
+ 383   4                                              break;                  
+ 384   4                                      case KEY_SUBMIT://Enter,选中了某项菜单  
+ 385   4                                              //sysVPMission.sWeihuTimer=20;
+ 386   4                                              DisplayCursorState( 0, 0, 0, 0, 1 );//第二行整光标
+ 387   4                                              ClearKey();                             
+ 388   4                                              switch(firstNum)
+ 389   4                                              {       
+ 390   5                              case 0:
+ 391   5                                  //交易记录  
+ 392   5                                  //VPMission_ColumnSta_RPT();        
+ 393   5                                  CounterMainMenu_1();        //Trade record
+ 394   5                                  //sysVPMission.sWeihuTimer=20;
+ 395   5                                                              break;                                                  
+ 396   5                                                      case 1:                                                 
+ 397   5                                  //货道设置
+ 398   5                                  GoodsParamManage(); 
+ 399   5                                                              //sysVPMission.sWeihuTimer=20;
+ 400   5                                                              break;
+ 401   5                                                      case 2:
+ 402   5                                  //故障货道
+ 403   5                                  DispFaultGoodsWays();       
+ 404   5                                                              //sysVPMission.sWeihuTimer=20;
+ 405   5                                                              break;
+ 406   5                                                      case 3:                                             
+ 407   5                                                          //添货全部货道
+ 408   5                                                          VPAddAllColGoods();
+ 409   5                                                              //sysVPMission.sWeihuTimer=20;
+ 410   5                                                              break;
+ 411   5                                                      case 4:
+ 412   5                                                          //补硬币
+ 413   5                                                          VPAddChanges(1);     //Add coin
+ 414   5                                                          //sysVPMission.sWeihuTimer=20;
+ 415   5                                                          break;
+ 416   5                              case 5:                                             
+ 417   5                                  //全系统同步
+ 418   5                                  VPSynGoodsCol();    //Add goods
+ 419   5                                  //sysVPMission.sWeihuTimer=20;
+ 420   5                                                              break;                                                                  
+ 421   5                              case 6:
+ 422   5                                                          //添货层架货道 
+ 423   5                                                          VPAddLayerColGoods();
+ 424   5                                                              //sysVPMission.sWeihuTimer=20;
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 8   
+
+ 425   5                                                              break;                                          
+ 426   5                              //--------------------------------------------
+ 427   5                              /*
+ 428   5                                                      case 7:
+ 429   5                                                          //VPCountCoin(1);     //Count the 0.5$ coin
+ 430   5                                                          break;                         
+ 431   5                                                      case 8:
+ 432   5                                                          //VPCountCoin(2);     //Count the 1$ coin
+ 433   5                                                          break;
+ 434   5                              */
+ 435   5                                                      //============================================
+ 436   5                                                      case 7:
+ 437   5                                                              //取纸币
+ 438   5                                                              VPAddChanges(2);     //Get cash;by gzz 20110506
+ 439   5                                                              //sysVPMission.sWeihuTimer=20;
+ 440   5                                                              break;                                  
+ 441   5                                                      case 8: 
+ 442   5                                                              //设备管理
+ 443   5                                                              DeviceCheck();      //Device check
+ 444   5                                                              //sysVPMission.sWeihuTimer=20;
+ 445   5                                                              break;
+ 446   5                              case 9:
+ 447   5                                                              //系统参数
+ 448   5                                                              SysParamManage();   //System parameter
+ 449   5                                                              //sysVPMission.sWeihuTimer=20;
+ 450   5                                                              break;  
+ 451   5                              case 10:
+ 452   5                                  //层架配置
+ 453   5                                  RackParamManage();  //Tray set
+ 454   5                                  //sysVPMission.sWeihuTimer=20;
+ 455   5                                  break;
+ 456   5                              case 11:
+ 457   5                                                              //出厂配置
+ 458   5                                                              FactorySetting();
+ 459   5                                                              //sysVPMission.sWeihuTimer=20;
+ 460   5                                                              break;
+ 461   5                                                      case 12:
+ 462   5                                                              InitAllCounter_1();     //Trade record          
+ 463   5                                                              //sysVPMission.sWeihuTimer=20;
+ 464   5                                                              break;          
+ 465   5                              case 13:
+ 466   5                                                              //补货完成
+ 467   5                                          VPBuhuoCol();       //Trade record
+ 468   5                                          //sysVPMission.sWeihuTimer=20;
+ 469   5                                                              break;                                          
+ 470   5                                                      /*case 14://120521 by cq SellAccumulate
+ 471   5                                                              //CounterMainMenu_1();  //Trade record
+ 472   5                                                              break;
+ 473   5                                                      case 15://120521 by cq SellAccumulate
+ 474   5                                                              VPBuhuoCol();   //Trade record
+ 475   5                                                              break;  
+ 476   5                                                              */
+ 477   5                              default:
+ 478   5                                                          break;
+ 479   5                                              }
+ 480   4                                              if(LineNum ==2)
+ 481   4                                              {       
+ 482   5                                                      if( firstNum == 0 )                                                                                     
+ 483   5                                                              DisplayStr( 0, 0, 1, MainMenuStr[MENU_COUNT(MainMenuStr)-1].str, MainMenuStr[MENU_COUNT(MainMenuStr
+             -)-1].len );
+ 484   5                                                      else                                            
+ 485   5                                                              DisplayStr( 0, 0, 1, MainMenuStr[firstNum - 1].str, MainMenuStr[firstNum - 1].len );
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 9   
+
+ 486   5                                                      DisplayStr( 0, 1, 1, MainMenuStr[firstNum].str, MainMenuStr[firstNum].len );
+ 487   5                                              }
+ 488   4                                              else
+ 489   4                                              {                                                                                               
+ 490   5                                                      if( firstNum == ( MENU_COUNT(MainMenuStr)-1 ) )                         
+ 491   5                                                              DisplayStr( 0, 1, 1, MainMenuStr[0].str, MainMenuStr[0].len );
+ 492   5                                                      else                                            
+ 493   5                                                              DisplayStr( 0, 1, 1, MainMenuStr[firstNum + 1].str, MainMenuStr[firstNum + 1].len );
+ 494   5                                                      DisplayStr( 0, 0, 1, MainMenuStr[firstNum].str, MainMenuStr[firstNum].len );
+ 495   5                                              }                               
+ 496   4                                              DisplayCursorState( 0, LineNum - 1, 1, 2, 1 );//第二行整光标
+ 497   4                                              ClearKey();     
+ 498   4                                              break;
+ 499   4                              }
+ 500   3                              CoreProcessCycle();//让出时间片
+ 501   3                              DelayMs( 10 );
+ 502   3                              if(sysVPMission.msActTimer == 0)
+ 503   3                              {
+ 504   4                                      sysVPMission.msActTimer = 100;
+ 505   4                                      VPMission_Act_RPT(VP_ACT_ADMIN,VP_ACT_ENTERADMIN);
+ 506   4                              }
+ 507   3                              //退出维护页面
+ 508   3                              //if(sysVPMission.sWeihuTimer==0)
+ 509   3                              //{
+ 510   3                              //      Notout = 0;
+ 511   3                              //}
+ 512   3                      }       
+ 513   2                      WaitForWork( 300, &Lcd );
+ 514   2                      DisplayClear();//清屏操作               
+ 515   2                      DisplayCursorState( 0, 0, 1, 0, 1 );//无光标
+ 516   2                      DisplayCursorState( 1, 0, 1, 0, 1 );//无光标
+ 517   2                      //////////////////
+ 518   2              //Trace("\n GoodsSetSave3 = %bu", GoodsSetSave );
+ 519   2                      if( ( GoodsSetSave ) || ( SystemSave ) )
+ 520   2                      {
+ 521   3                      #ifdef _CHINA_
+ 522   3                              DisplayStr( 0, 0, 1, "  \xd5\xfd在保存", 10 );  
+ 523   3                      #else
+                                      DisplayStr( 0, 0, 1, "  Saving...", 11 );       
+                              #endif
+ 526   3                              DisplayStr( 0, 1, 1, " ", 1 );
+ 527   3                              WaitForWork( 2500, &Lcd );
+ 528   3                      }       
+ 529   2                      ///////////
+ 530   2                  //Trace("\n GoodsSetSave4 = %bu", GoodsSetSave );
+ 531   2                      if( GoodsSetSave )
+ 532   2                      {
+ 533   3                      //Trace("\n GoodsSetSave5 = %bu", GoodsSetSave );
+ 534   3                              //写货道参数
+ 535   3                              SaveGoodsParSet();        //Added by Andy 2010.12.29!
+ 536   3                              WaitForWork( 100, NULL );
+ 537   3                              SaveGoodsSet(); 
+ 538   3                              WaitForWork( 100, NULL );
+ 539   3                              memset( TempGoodsWaySetVal, 0, sizeof( TempGoodsWaySetVal ) );
+ 540   3                              MovFlashToSram( ADDRF_GOODSWAYS_SET , ( unsigned char xdata * )TempGoodsWaySetVal , sizeof( TempGoodsWa
+             -ySetVal ) );
+ 541   3                          //TempGoodsWaySetVal[2].GoodsCurrentSum = 324;
+ 542   3                              for( i = 0; i < GOODSWAYNUM; i ++ )
+ 543   3                              {
+ 544   4                              //Trace("\n GoodsWaySetVal[%bu].WayState = %bu", i ,GoodsWaySetVal[i].WayState );
+ 545   4                              //Trace("\n TempGoodsWaySetVal[%bu].WayState = %bu",i, TempGoodsWaySetVal[i].WayState );
+ 546   4                                      if( ( GoodsWaySetVal[i].GoodsCurrentSum != TempGoodsWaySetVal[i].GoodsCurrentSum ) || \
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 10  
+
+ 547   4                                              ( GoodsWaySetVal[i].WayState != TempGoodsWaySetVal[i].WayState ) || \
+ 548   4                                              ( GoodsWaySetVal[i].Price != TempGoodsWaySetVal[i].Price ) )
+ 549   4                                              break;
+ 550   4                              }
+ 551   3                              if( i != GOODSWAYNUM )//不相同
+ 552   3                              {
+ 553   4                                      Trace("\n GoodsWaySetVal error" );
+ 554   4                                      ErrFlag = 1;    
+ 555   4                              }
+ 556   3                              GoodsSetSave = 0;
+ 557   3                      }
+ 558   2      
+ 559   2                      if( SystemSave )
+ 560   2                      {
+ 561   3                              //写系统参数
+ 562   3                              SaveGlobalParam();      
+ 563   3                              WaitForWork( 100, NULL );       
+ 564   3                              //检测定入flash中的数据
+ 565   3                              memset( &TempSystemParameter, 0, sizeof( TempSystemParameter ) );               
+ 566   3                              //本机系统参数
+ 567   3                              MovFlashToSram( ADDRF_SYSTEMPARAM , ( unsigned char xdata * )&TempSystemParameter , sizeof(struct SYSTE
+             -MPARAMETER) );        
+ 568   3                                              
+ 569   3                              if( ( SystemParameter.RefundPermission != TempSystemParameter.RefundPermission ) || \
+ 570   3                                      ( SystemParameter.HopperCoinPrice1 != TempSystemParameter.HopperCoinPrice1 ) || \
+ 571   3                                      ( SystemParameter.HopperCoinPrice2 != TempSystemParameter.HopperCoinPrice2 ) || \
+ 572   3                                      ( SystemParameter.HopperCoinPrice3 != TempSystemParameter.HopperCoinPrice3 ) || \
+ 573   3                                      ( SystemParameter.BillNo != TempSystemParameter.BillNo ) || \
+ 574   3                                      ( SystemParameter.IsMuliVerd != TempSystemParameter.IsMuliVerd ) || \
+ 575   3                                      ( SystemParameter.Min != TempSystemParameter.Min ) || \
+ 576   3                                      ( SystemParameter.BanknoteMax != TempSystemParameter.BanknoteMax ) || \
+ 577   3                                      ( SystemParameter.NotOutMax != TempSystemParameter.NotOutMax ) || \
+ 578   3                                      ( SystemParameter.Checkbyte != TempSystemParameter.Checkbyte ) )
+ 579   3                              {
+ 580   4                                      Trace("\n SystemParameter error" );
+ 581   4                                      ErrFlag = 1;
+ 582   4                              }
+ 583   3                              SystemSave = 0;
+ 584   3                      }
+ 585   2                      if( ErrFlag )
+ 586   2                      {
+ 587   3                              ClearKey();     
+ 588   3                       #ifdef _CHINA_
+ 589   3                              DisplayStr( 0, 0, 1, "保存失败，重新设置?", 19 );       
+ 590   3                       #else
+                                      DisplayStr( 0, 0, 1, "Save failed,reenter?", 20 );      
+                               #endif                 
+ 593   3                              DisplayStr( 0, 1, 1, "  ENTER   CANCEL", 16 );
+ 594   3                              LzjSecTimer= 15;
+ 595   3                              i = 0;
+ 596   3                              while( LzjSecTimer )
+ 597   3                              {
+ 598   4                                      SchedulerProcess();
+ 599   4                                      key = GetKey();
+ 600   4                                      if ( key == KEY_NULL ) 
+ 601   4                                              continue;
+ 602   4                                      switch ( key )
+ 603   4                                      {                       
+ 604   5                                              case KEY_SUBMIT:                        
+ 605   5                                                      ErrFlag = 0;
+ 606   5                                                      i = 1;
+ 607   5                                                      break;
+CX51 COMPILER V7.50   MAINTMENU                                                            10/23/2014 09:48:22 PAGE 11  
+
+ 608   5                                              case KEY_CANCEL:                                
+ 609   5                                                      ErrFlag = 1 ;                                   
+ 610   5                                                      i = 1;
+ 611   5                                                      break;
+ 612   5                                              default:
+ 613   5                                                      continue;
+ 614   5                                      }       
+ 615   4                                      if( i == 1 )
+ 616   4                                              break;
+ 617   4                              }
+ 618   3                              if( LzjSecTimer == 0 )
+ 619   3                                      ErrFlag = 0;
+ 620   3                      }
+ 621   2                      else
+ 622   2                              ErrFlag = 1;
+ 623   2              }
+ 624   1              ClearKey();             
+ 625   1      }
+ 626          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   3054    ----
+   CONSTANT SIZE    =    343    ----
+   XDATA SIZE       =   ----     565
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

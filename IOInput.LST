@@ -1,0 +1,906 @@
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE IOINPUT
+OBJECT MODULE PLACED IN IOInput.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE IOInput.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define IOINPUT_C
+   2          #include "device.h"
+   3          #include "IOInput.h"
+   4          #include "timer.h"
+   5          #include "common.h"
+   6          #include "global.h"
+   7          #include "STRING.H"
+   8          #include "VMC_PC.h"
+   9          //#include "CommonFunction.h"
+  10          
+  11          
+  12          #ifndef _COIN_INPUT_PARALLEL
+                      struct ZHKCOINER
+                      {
+                              uchar State;                    // 硬币器状态 bit6 = 故障 bit5 = 使能
+                              uchar Count;                    // 当前接收到硬币的数量
+                      };
+              #else   
+  19                  struct ZHKCOINER
+  20              {
+  21                      uchar State;                        // 硬币器状态 bit6 = 故障 bit5 = 使能
+  22                      uchar Count;                        // 当前接收到硬币的数量        
+  23                  uchar CountChn1;
+  24                  uchar CountChn2;
+  25                  uchar CountChn3;
+  26                  uchar CountChn4;
+  27                  uchar CountChn5;
+  28                  uchar CountChn6;
+  29              };          
+  30                  struct COINAPCCEPTOR xdata CoinSet;
+  31          #endif
+  32          
+  33          uchar xdata ZhkModeState;               // 0 表示模式开关处于关闭状态
+  34                                                          // 1 表示模式开关处于打开状态
+  35          
+  36          uchar xdata ZhkPowerState;              // 0 表示系统处于正常供电状态
+  37                                                          // 1 表示系统处于电池供电状态
+  38          
+  39          uchar xdata HardShakeAlarmState;// 0 表示系统有震动触发
+  40                                          // 1 表示系统无震动触发
+  41                                          // Added on 2006.06.02
+  42          
+  43          struct ZHKCOINER xdata ZhkCoiner;                       
+  44          
+  45          
+  46          bit IsModeOff( void )
+  47          {
+  48   1              #ifdef   _SHUPING_
+  49   1                      return ZhkModeState == 1;
+  50   1              #else
+                              return ZhkModeState == 0;
+                      #endif
+  53   1      }
+  54          
+  55          
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 2   
+
+  56          //Power off or game key
+  57          bit IsPowerOff( void )
+  58          {
+  59   1              return ZhkPowerState == 1;
+  60   1      }
+  61          
+  62          //Return key
+  63          bit IfShakeAlarm( void )                // Added on 2006.06.02  
+  64          {
+  65   1              return HardShakeAlarmState == 1;    //return "1", identify "Shake alrm" !
+  66   1      }
+  67          
+  68          bit IfGameKeyOn( void )
+  69          {
+  70   1          if( sysVPMission.gameKey == 1 )
+  71   1              {
+  72   2                      sysVPMission.gameKey = 0;
+  73   2                      return 1;
+  74   2              }
+  75   1              else
+  76   1              {
+  77   2                      return 0;
+  78   2              }
+  79   1      }
+  80          
+  81          bit IfReturnKeyOn( void )
+  82          {
+  83   1          uchar xdata flag = 0;
+  84   1          /*
+  85   1          if( sysVPMission.returnKey == 1 )
+  86   1              {
+  87   1                      sysVPMission.returnKey = 0;
+  88   1                      return 1;
+  89   1              }
+  90   1              else
+  91   1              {
+  92   1                      return 0;
+  93   1              }
+  94   1          */   
+  95   1              
+  96   1          if( sysVPMission.returnKey == 1 )
+  97   1          {
+  98   2              sysVPMission.returnKey = 0;
+  99   2              flag = 1;
+ 100   2          }
+ 101   1          if( sysMDBMission.returnKeyFlag == 1 )
+ 102   1          {
+ 103   2              sysMDBMission.returnKeyFlag = 0;
+ 104   2              flag = 1;
+ 105   2          }
+ 106   1              if( sysMDBMission.returnCmdFlag == 1 )
+ 107   1          {
+ 108   2              sysMDBMission.returnCmdFlag = 0;
+ 109   2              flag = 2;
+ 110   2          }
+ 111   1              
+ 112   1          if( flag == 1 ) 
+ 113   1          {
+ 114   2              VPMission_Button_RPT( VP_BUT_RETURN, VP_BUT_RETURNNO );
+ 115   2                      //DisplayStr( 0, 0, 1, "1", 1 );  
+ 116   2                      //WaitForWork(2000,NULL);
+ 117   2              return 1;
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 3   
+
+ 118   2          }
+ 119   1              else if( flag == 2 ) 
+ 120   1          {
+ 121   2              return 1;
+ 122   2          }
+ 123   1          else
+ 124   1          {
+ 125   2              return 0;
+ 126   2          }       
+ 127   1      }
+ 128          
+ 129          /*
+ 130          void AlertOn( void )
+ 131          {
+ 132                  ZhkBuzzerTimer = -1;
+ 133                  ZhkHardBuzzerOn();      
+ 134          }
+ 135          */
+ 136          void Beep( void )
+ 137          {
+ 138   1              ZhkBuzzerTimer = 20;
+ 139   1              ZhkHardBuzzerOn();
+ 140   1      }
+ 141          
+ 142          void ZhkIOInputIsr( void ) using 1
+ 143          {
+ 144   1      
+ 145   1              #define HardIsPowerOff()     !( IOState & BitPowerOff )
+ 146   1              #define HardIsModeSwitchOn() !( IOState & BitModeSw )
+ 147   1              #define HardIsAlertOn()      !( IOState & BitAlert )
+ 148   1          
+ 149   1              #define PWRCHKTIMES   1   //2,1
+ 150   1              #define ALARMCHKTIMES 2   //
+ 151   1          #define ISPCHKTIMES   10
+ 152   1      
+ 153   1          static uchar xdata ModeSwitchTimer=0,PowerTimer=0,ShakeAlarmTimer=0;
+ 154   1          //static bit ModeTemp=0,PowerTemp=0,ShakeAlarmFlag=0;
+ 155   1      
+ 156   1              //static uchar xdata ModeSwitchTimer;
+ 157   1              static bit ModeTemp = 0;
+ 158   1      
+ 159   1              uchar data IOState;
+ 160   1              
+ 161   1              
+ 162   1              ZhkHardIOInputSelect();
+ 163   1              _nop_();
+ 164   1              _nop_();
+ 165   1              _nop_();
+ 166   1              IOState = P0;
+ 167   1              ZhkHardSramSelect();    
+ 168   1              
+ 169   1              //掉电检测              
+ 170   1          if( (HardIsPowerOff())/*&&(sysVPMission.gameKeyLock==0)*/ )
+ 171   1              {
+ 172   2                  if( sysVPMission.gameKeyLock==0 )
+ 173   2                      {
+ 174   3                              PowerTimer++;
+ 175   3                              if( PowerTimer >= PWRCHKTIMES )
+ 176   3                              {
+ 177   4                                      PowerTimer = 0;
+ 178   4                                      sysVPMission.gameKey = 1;
+ 179   4                                      sysVPMission.gameKeyLock = 1;
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 4   
+
+ 180   4                              }
+ 181   3                      }
+ 182   2              }
+ 183   1              else
+ 184   1              {
+ 185   2                      sysVPMission.gameKeyLock = 0;
+ 186   2              }
+ 187   1          
+ 188   1              //震动信号检测 & Return key  
+ 189   1          if( (HardAlarmCheck())/*&&(sysVPMission.returnKeyLock==0)*/ )
+ 190   1              {
+ 191   2                  if( (sysVPMission.returnKeyLock==0) )
+ 192   2                      {
+ 193   3                              ShakeAlarmTimer++;
+ 194   3                              if( ShakeAlarmTimer >= ALARMCHKTIMES )
+ 195   3                              {
+ 196   4                                      ShakeAlarmTimer = 0;
+ 197   4                                      sysVPMission.returnKey = 1;
+ 198   4                                      sysVPMission.returnKeyLock = 1;
+ 199   4                              }
+ 200   3                      }
+ 201   2              }
+ 202   1              else
+ 203   1              {
+ 204   2                      sysVPMission.returnKeyLock = 0;
+ 205   2              }
+ 206   1      
+ 207   1              //模式开关检测
+ 208   1              if ( HardIsModeSwitchOn() )
+ 209   1              {
+ 210   2                      if ( ModeTemp )
+ 211   2                      {
+ 212   3                              if ( ModeSwitchTimer )
+ 213   3                                      ModeSwitchTimer --;
+ 214   3                              else
+ 215   3                                      ZhkModeState = 1;
+ 216   3                      }
+ 217   2                      else
+ 218   2                      {
+ 219   3                              ModeTemp = 1;
+ 220   3                              ModeSwitchTimer = ISPCHKTIMES;
+ 221   3                      }
+ 222   2              }
+ 223   1              else
+ 224   1              {
+ 225   2                      ZhkModeState = 0;
+ 226   2                      ModeTemp     = 0;
+ 227   2              }
+ 228   1      
+ 229   1      }
+ 230          
+ 231          
+ 232          bit CoinerEnable( void )
+ 233          {
+ 234   1              ZhkCoiner.State &= ~ 0x20;
+ 235   1              ZhkHardCoinerDisable(); 
+ 236   1      #ifdef  _COIN_INPUT_PARALLEL
+ 237   1              CoinSet.Line1 = 50 ;
+ 238   1              CoinSet.Line2 = 50 ;
+ 239   1              CoinSet.Line3 = 100 ;
+ 240   1              CoinSet.Line4 = 100 ;   
+ 241   1              CoinSet.Line5 = 0 ;
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 5   
+
+ 242   1              CoinSet.Line6 = 0 ;             
+ 243   1      #endif
+ 244   1              return 1;
+ 245   1      }
+ 246          bit CoinerDisable( void )
+ 247          {
+ 248   1              ZhkCoiner.State |= 0x20;
+ 249   1              ZhkHardCoinerEnable();
+ 250   1      //      ZhkCoiner.State &= ~ 0x20;
+ 251   1      //      ZhkHardCoinerDisable();
+ 252   1              return 1;
+ 253   1      }
+ 254          bit IsCoinerException( void )
+ 255          {
+ 256   1              return ZhkCoiner.State & 0x40;
+ 257   1      }
+ 258          
+ 259          #ifndef _COIN_INPUT_PARALLEL
+                      void ZhkIOInit( void )
+                      {       
+                          PinCoinIn = 1;
+                      PinAlarmSIn = 1;
+                              ZhkHardPowerOff();
+                              ZhkHardBuzzerOff();
+                              ZhkHardStatusOn();
+                              ZhkHardSramSelect();
+                              DelayMs( 250 );
+                              DelayMs( 250 );
+                      //      DelayMs( 250 );
+                      //      DelayMs( 250 );
+                              ZhkHardPowerOn();
+                              ZhkHardSramSelect();
+                              DelayMs( 250 );
+                              DelayMs( 250 );
+                              DelayMs( 250 );
+                              DelayMs( 250 ); 
+                              ZhkCoiner.Count = 0;
+                              ZhkModeState    = 0;
+                              ZhkPowerState   = 0;
+                              ZhkBuzzerTimer  = 0;
+                      }
+                      
+                      void ZhkChkCoinInIsr( void ) using 1
+                      {
+                              static uchar xdata PinLowCount;
+                              static bit PinLow,PinPulse;
+                              
+                              if ( HardIsCoinIn() )
+                              {
+                                      if ( PinLow )
+                                      {
+                                              if ( PinLowCount < 250 ) PinLowCount ++;
+                                              if ( PinLowCount >= 3 ) PinPulse = 1;
+                                      }
+                                      else
+                                      {
+                                              PinLow   = 1;
+                                              PinPulse = 0;
+                                              PinLowCount = 0;
+                                      }
+                                      
+                              }
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 6   
+
+                              else
+                              {
+                                      if ( PinLow )
+                                      {
+                                              PinLowCount = 0;
+                                              PinLow      = 0;
+                                      }       
+                                      else
+                                      {
+                                              PinLowCount ++;
+                                              if ( PinLowCount >= 3 && PinPulse )
+                                              {
+                                                      ZhkCoiner.Count ++;
+                                                      PinPulse = 0;
+                                                      PinLowCount = 0;
+                                              }
+                                      }
+                              }
+                              if ( PinLowCount >= 250 ) 
+                                      ZhkCoiner.State |= 1 << 6;
+                              else
+                                      ZhkCoiner.State &= ~( 1 << 6 );
+                      }
+                      
+                      uint GetCoin( void )
+                      {
+                              uint data ch;
+                              
+                              EA = 0;
+                              //ch = ZhkCoiner.Count;
+                      ch = ZhkCoiner.Count * SystemParameter.coinValue[0];   // In single line puluse mode, just use Sys
+             -temParameter.coinValue[0].
+                              ZhkCoiner.Count = 0;
+                              EA = 1;
+                              return ch;
+                      }
+              
+              #else
+ 341                  
+ 342                  void ZhkIOInit( void )
+ 343                  {       
+ 344   1                  PinCoinIn = 1;
+ 345   1              PinAlarmSIn = 1;
+ 346   1                      ZhkHardPowerOff();
+ 347   1                      ZhkHardBuzzerOff();
+ 348   1                      ZhkHardStatusOn();
+ 349   1                      ZhkHardCoinerEnable();
+ 350   1                      ZhkHardSramSelect();
+ 351   1              
+ 352   1                      DelayMs( 250 );
+ 353   1                      DelayMs( 250 );
+ 354   1              //      DelayMs( 250 );
+ 355   1              //      DelayMs( 250 );
+ 356   1                      ZhkHardPowerOn();
+ 357   1                      ZhkHardSramSelect();
+ 358   1                      DelayMs( 250 );
+ 359   1                      DelayMs( 250 );
+ 360   1                      DelayMs( 250 );
+ 361   1                      DelayMs( 250 );
+ 362   1              //      ZhkCoiner.State = 0;
+ 363   1                      ZhkCoiner.Count = 0;
+ 364   1                      ZhkCoiner.CountChn1 = 0;
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 7   
+
+ 365   1                      ZhkCoiner.CountChn2 = 0;
+ 366   1                      ZhkCoiner.CountChn3 = 0;
+ 367   1                      ZhkCoiner.CountChn4 = 0;
+ 368   1                      ZhkCoiner.CountChn5 = 0;
+ 369   1                      ZhkCoiner.CountChn6 = 0;
+ 370   1                      ///硬币器通道面值
+ 371   1                      memset( &CoinSet, 0, sizeof(struct COINAPCCEPTOR));
+ 372   1                      ZhkModeState    = 0;
+ 373   1                      ZhkPowerState   = 0;
+ 374   1                      ZhkBuzzerTimer  = 0;
+ 375   1              }
+ 376                  
+ 377                  void ScanSPCoin( void )
+ 378                  {
+ 379   1                      static uchar xdata PinLowCount;
+ 380   1                      static bit PinLow,PinPulse;
+ 381   1              #define CoinTimes_SP  2
+ 382   1      
+ 383   1                      if( HardIsCoinIn() )
+ 384   1                      {
+ 385   2                              if ( PinLow )
+ 386   2                              {
+ 387   3                                      if ( PinLowCount < 250 ) PinLowCount ++;
+ 388   3                                      if ( PinLowCount >= CoinTimes_SP ) PinPulse = 1;
+ 389   3                              }
+ 390   2                              else
+ 391   2                              {
+ 392   3                                      PinLow   = 1;
+ 393   3                                      PinPulse = 0;
+ 394   3                                      PinLowCount = 0;
+ 395   3                              }
+ 396   2                              
+ 397   2                      }
+ 398   1                      else
+ 399   1                      {
+ 400   2                              if ( PinLow )
+ 401   2                              {
+ 402   3                                      PinLowCount = 0;
+ 403   3                                      PinLow      = 0;
+ 404   3                              }       
+ 405   2                              else
+ 406   2                              {
+ 407   3                                      PinLowCount ++;
+ 408   3                                      if( (PinLowCount >= CoinTimes_SP)&&(PinPulse) )
+ 409   3                                      {
+ 410   4                                              ZhkCoiner.Count ++;
+ 411   4                                              PinPulse = 0;
+ 412   4                                              PinLowCount = 0;
+ 413   4                                      }
+ 414   3                              }
+ 415   2                      }
+ 416   1                      if( PinLowCount >= 250 ) 
+ 417   1                              ZhkCoiner.State |= 1 << 6;
+ 418   1                      else
+ 419   1                              ZhkCoiner.State &= ~( 1 << 6 );
+ 420   1              }
+ 421          
+ 422                  void ZyzChkCoinChnSta( void ) using 1
+ 423                  {
+ 424   1                      //------------------------------------------------------
+ 425   1                  //Added by Andy on 20071027 for test02 .
+ 426   1                  #define HardIsCoinChn1In()   !( CountIOState & BitCoinChn1 )
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 8   
+
+ 427   1                      #define HardIsCoinChn2In()   !( CountIOState & BitCoinChn2 )
+ 428   1                  #define HardIsCoinChn3In()   !( CountIOState & BitCoinChn3 )
+ 429   1                      #define HardIsCoinChn4In()   !( CountIOState & BitCoinChn4 )
+ 430   1                  #define HardIsCoinChn5In()   !( CountIOState & BitCoinChn5 )
+ 431   1                      #define HardIsCoinChn6In()   !( CountIOState & BitCoinChn6 )
+ 432   1                  #define CoinTimes  2
+ 433   1                  static uchar xdata PinLowCount1 = 0;
+ 434   1                      static uchar xdata PinLowCount2 = 0;
+ 435   1                      static uchar xdata PinLowCount3 = 0;
+ 436   1                      static uchar xdata PinLowCount4 = 0;
+ 437   1                      static uchar xdata PinLowCount5 = 0;
+ 438   1                      static uchar xdata PinLowCount6 = 0;
+ 439   1                      static bit PinLow1   = 0;
+ 440   1                      static bit PinLow2   = 0;
+ 441   1                      static bit PinLow3   = 0;
+ 442   1                      static bit PinLow4   = 0;
+ 443   1                      static bit PinLow5   = 0;
+ 444   1                      static bit PinLow6   = 0;
+ 445   1                  static bit PinPulse1 = 0;
+ 446   1                  static bit PinPulse2 = 0;
+ 447   1                      static bit PinPulse3 = 0;
+ 448   1                  static bit PinPulse4 = 0;
+ 449   1                  static bit PinPulse5 = 0;
+ 450   1                      static bit PinPulse6 = 0;
+ 451   1                //static bit PowerOn1MinFlag = 0;
+ 452   1                  static uchar xdata CurrentChannel = 0; 
+ 453   1                      uchar data CountIOState;
+ 454   1      
+ 455   1                      /*
+ 456   1                  if( (PowerOn1MinFlag == 0) && ( ColumnTestTimer != 0 ) )
+ 457   1                      {
+ 458   1                          return;
+ 459   1                      }
+ 460   1                      else
+ 461   1                  {
+ 462   1                          PowerOn1MinFlag = 1;
+ 463   1                      }
+ 464   1                  */
+ 465   1              ScanSPCoin();  //Scan the single pulse interface coin acceptor...
+ 466   1                      ZhkHardIOInputSelect();
+ 467   1                      _nop_();
+ 468   1                      _nop_();
+ 469   1                      _nop_();
+ 470   1                      CountIOState = P0;
+ 471   1                      ZhkHardSramSelect();
+ 472   1                  if( !( CountIOState & 0x04 ) )
+ 473   1                  {
+ 474   2                          //CurrentChannel |= 0x01;
+ 475   2                              CurrentChannel = 0x01;
+ 476   2                      }
+ 477   1                      else if( !( CountIOState & 0x08 ) )
+ 478   1                      {
+ 479   2                          CurrentChannel = 0x02;
+ 480   2                      }
+ 481   1                      else if( !( CountIOState & 0x10 ) )
+ 482   1                      {
+ 483   2                          CurrentChannel = 0x04;
+ 484   2                      }
+ 485   1                      else if( !( CountIOState & 0x20 ) )
+ 486   1                      {
+ 487   2                          CurrentChannel = 0x08;
+ 488   2                      }
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 9   
+
+ 489   1                      else if( !( CountIOState & 0x40 ) )
+ 490   1                      {
+ 491   2                          CurrentChannel = 0x10;
+ 492   2                      }
+ 493   1                      else if( !( CountIOState & 0x80 ) )
+ 494   1                      {
+ 495   2                      CurrentChannel = 0x20;
+ 496   2                      }
+ 497   1      
+ 498   1                      //******************************************************************
+ 499   1                      //Chn1 
+ 500   1              if( HardIsCoinChn1In() )   //Just for coin hopper full sign!
+ 501   1                      {
+ 502   2                              if( PinLow1 )
+ 503   2                              {
+ 504   3                                      if( PinLowCount1 < 255 ) PinLowCount1 ++;
+ 505   3                                      if( PinLowCount1 >= 250 )  
+ 506   3                      {
+ 507   4                              PinPulse1 = 1;
+ 508   4                          ZhkCoiner.CountChn1 = 1;
+ 509   4                      }
+ 510   3                              }
+ 511   2                              else
+ 512   2                              {
+ 513   3                                      PinLow1      = 1;
+ 514   3                                      PinPulse1    = 0;
+ 515   3                                      PinLowCount1 = 0;
+ 516   3                              }
+ 517   2                              
+ 518   2                      }
+ 519   1                      else
+ 520   1                      {
+ 521   2                          PinLow1      = 0;
+ 522   2                              PinPulse1    = 0;
+ 523   2                              PinLowCount1 = 0;
+ 524   2                      ZhkCoiner.CountChn1 = 0;
+ 525   2                      }
+ 526   1      
+ 527   1              /*
+ 528   1              if( CurrentChannel & 0x01 )
+ 529   1                      {
+ 530   1                              if( HardIsCoinChn1In() )
+ 531   1                              {
+ 532   1                                      if ( PinLow1 )
+ 533   1                                      {
+ 534   1                                              if ( PinLowCount1 < 250 ) PinLowCount1 ++;
+ 535   1                                              if ( PinLowCount1 >= CoinTimes )  PinPulse1 = 1;
+ 536   1                                      }
+ 537   1                                      else
+ 538   1                                      {
+ 539   1                                              PinLow1      = 1;
+ 540   1                                              PinPulse1    = 0;
+ 541   1                                              PinLowCount1 = 0;
+ 542   1                                      }
+ 543   1                                      
+ 544   1                              }
+ 545   1                              else
+ 546   1                              {
+ 547   1                                      if ( PinLow1 )
+ 548   1                                      {
+ 549   1                                              PinLowCount1 = 0;
+ 550   1                                              PinLow1      = 0;
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 10  
+
+ 551   1                                      }       
+ 552   1                                      else
+ 553   1                                      {
+ 554   1                                              PinLowCount1 ++;
+ 555   1                                              if ( PinLowCount1 >= CoinTimes && PinPulse1 )
+ 556   1                                              {
+ 557   1                                                      ZhkCoiner.CountChn1 ++;
+ 558   1                                                      PinPulse1 = 0;
+ 559   1                                                      PinLowCount1 = 0;
+ 560   1                                  CurrentChannel &= 0xfe;
+ 561   1                                              }
+ 562   1                                      }
+ 563   1                              }
+ 564   1                              if ( PinLowCount1 >= 250 ) 
+ 565   1                                      ZhkCoiner.State |= 1 << 6;
+ 566   1                              else
+ 567   1                                      ZhkCoiner.State &= ~( 1 << 6 );    
+ 568   1                      }
+ 569   1                      else
+ 570   1                  */
+ 571   1                      if( CurrentChannel & 0x02 )
+ 572   1                      {
+ 573   2                              if( HardIsCoinChn2In() )
+ 574   2                              {
+ 575   3                                      if ( PinLow2 )
+ 576   3                                      {
+ 577   4                                              if ( PinLowCount2 < 250 ) PinLowCount2 ++;
+ 578   4                                              if ( PinLowCount2 >= CoinTimes )  PinPulse2 = 1;
+ 579   4                                      }
+ 580   3                                      else
+ 581   3                                      {
+ 582   4                                              PinLow2      = 1;
+ 583   4                                              PinPulse2    = 0;
+ 584   4                                              PinLowCount2 = 0;
+ 585   4                                      }
+ 586   3                                      
+ 587   3                              }
+ 588   2                              else
+ 589   2                              {
+ 590   3                                      if ( PinLow2 )
+ 591   3                                      {
+ 592   4                                              PinLowCount2 = 0;
+ 593   4                                              PinLow2      = 0;
+ 594   4                                      }       
+ 595   3                                      else
+ 596   3                                      {
+ 597   4                                              PinLowCount2 ++;
+ 598   4                                              if ( PinLowCount2 >= CoinTimes && PinPulse2 )
+ 599   4                                              {
+ 600   5                                                      ZhkCoiner.CountChn2 ++;
+ 601   5                                                      PinPulse2 = 0;
+ 602   5                                                      PinLowCount2 = 0;
+ 603   5                                  CurrentChannel &= 0xfd;
+ 604   5                                              }
+ 605   4                                      }
+ 606   3                              }
+ 607   2                              if ( PinLowCount2 >= 250 ) 
+ 608   2                                      ZhkCoiner.State |= 1 << 6;
+ 609   2                              else
+ 610   2                                      ZhkCoiner.State &= ~( 1 << 6 );    
+ 611   2                      }
+ 612   1                  else if( CurrentChannel & 0x04 )
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 11  
+
+ 613   1                      {
+ 614   2                              if( HardIsCoinChn3In() )
+ 615   2                              {
+ 616   3                                      if ( PinLow3 )
+ 617   3                                      {
+ 618   4                                              if ( PinLowCount3 < 250 ) PinLowCount3 ++;
+ 619   4                                              if ( PinLowCount3 >= CoinTimes )  PinPulse3 = 1;
+ 620   4                                      }
+ 621   3                                      else
+ 622   3                                      {
+ 623   4                                              PinLow3      = 1;
+ 624   4                                              PinPulse3    = 0;
+ 625   4                                              PinLowCount3 = 0;
+ 626   4                                      }
+ 627   3                                      
+ 628   3                              }
+ 629   2                              else
+ 630   2                              {
+ 631   3                                      if ( PinLow3 )
+ 632   3                                      {
+ 633   4                                              PinLowCount3 = 0;
+ 634   4                                              PinLow3      = 0;
+ 635   4                                      }       
+ 636   3                                      else
+ 637   3                                      {
+ 638   4                                              PinLowCount3 ++;
+ 639   4                                              if ( PinLowCount3 >= CoinTimes && PinPulse3 )
+ 640   4                                              {
+ 641   5                                                      ZhkCoiner.CountChn3 ++;
+ 642   5                                                      PinPulse3 = 0;
+ 643   5                                                      PinLowCount3 = 0;
+ 644   5                                  CurrentChannel &= 0xfb;
+ 645   5                                              }
+ 646   4                                      }
+ 647   3                              }
+ 648   2                              if ( PinLowCount3 >= 250 ) 
+ 649   2                                      ZhkCoiner.State |= 1 << 6;
+ 650   2                              else
+ 651   2                                      ZhkCoiner.State &= ~( 1 << 6 );    
+ 652   2                      }
+ 653   1                  else if( CurrentChannel & 0x08 )
+ 654   1                      {
+ 655   2                              if( HardIsCoinChn4In() )
+ 656   2                              {
+ 657   3                                      if ( PinLow4 )
+ 658   3                                      {
+ 659   4                                              if ( PinLowCount4 < 250 ) PinLowCount4 ++;
+ 660   4                                              if ( PinLowCount4 >= CoinTimes )  PinPulse4 = 1;
+ 661   4                                      }
+ 662   3                                      else
+ 663   3                                      {
+ 664   4                                              PinLow4      = 1;
+ 665   4                                              PinPulse4    = 0;
+ 666   4                                              PinLowCount4 = 0;
+ 667   4                                      }
+ 668   3                                      
+ 669   3                              }
+ 670   2                              else
+ 671   2                              {
+ 672   3                                      if ( PinLow4 )
+ 673   3                                      {
+ 674   4                                              PinLowCount4 = 0;
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 12  
+
+ 675   4                                              PinLow4      = 0;
+ 676   4                                      }       
+ 677   3                                      else
+ 678   3                                      {
+ 679   4                                              PinLowCount4 ++;
+ 680   4                                              if ( PinLowCount4 >= CoinTimes && PinPulse4 )
+ 681   4                                              {
+ 682   5                                                      ZhkCoiner.CountChn4 ++;
+ 683   5                                                      PinPulse4 = 0;
+ 684   5                                                      PinLowCount4 = 0;
+ 685   5                                  CurrentChannel &= 0xf7;
+ 686   5                                              }
+ 687   4                                      }
+ 688   3                              }
+ 689   2                              if ( PinLowCount4 >= 250 ) 
+ 690   2                                      ZhkCoiner.State |= 1 << 6;
+ 691   2                              else
+ 692   2                                      ZhkCoiner.State &= ~( 1 << 6 );    
+ 693   2                      }
+ 694   1                  else if( CurrentChannel & 0x10 )
+ 695   1                      {
+ 696   2                              if( HardIsCoinChn5In() )
+ 697   2                              {
+ 698   3                                      if ( PinLow5 )
+ 699   3                                      {
+ 700   4                                              if ( PinLowCount5 < 250 ) PinLowCount5 ++;
+ 701   4                                              if ( PinLowCount5 >= CoinTimes )  PinPulse5 = 1;
+ 702   4                                      }
+ 703   3                                      else
+ 704   3                                      {
+ 705   4                                              PinLow5      = 1;
+ 706   4                                              PinPulse5    = 0;
+ 707   4                                              PinLowCount5 = 0;
+ 708   4                                      }
+ 709   3                                      
+ 710   3                              }
+ 711   2                              else
+ 712   2                              {
+ 713   3                                      if ( PinLow5 )
+ 714   3                                      {
+ 715   4                                              PinLowCount5 = 0;
+ 716   4                                              PinLow5      = 0;
+ 717   4                                      }       
+ 718   3                                      else
+ 719   3                                      {
+ 720   4                                              PinLowCount5 ++;
+ 721   4                                              if ( PinLowCount5 >= CoinTimes && PinPulse5 )
+ 722   4                                              {
+ 723   5                                                      ZhkCoiner.CountChn5 ++;
+ 724   5                                                      PinPulse5 = 0;
+ 725   5                                                      PinLowCount5 = 0;
+ 726   5                                  CurrentChannel &= 0xef;
+ 727   5                                              }
+ 728   4                                      }
+ 729   3                              }
+ 730   2                              if ( PinLowCount5 >= 250 ) 
+ 731   2                                      ZhkCoiner.State |= 1 << 6;
+ 732   2                              else
+ 733   2                                      ZhkCoiner.State &= ~( 1 << 6 );    
+ 734   2                      }
+ 735   1                      else if( CurrentChannel & 0x20 )
+ 736   1                      {
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 13  
+
+ 737   2                              if( HardIsCoinChn6In() )
+ 738   2                              {
+ 739   3                                      if ( PinLow6 )
+ 740   3                                      {
+ 741   4                                              if ( PinLowCount6 < 250 ) PinLowCount6 ++;
+ 742   4                                              if ( PinLowCount6 >= CoinTimes )  PinPulse6 = 1;
+ 743   4                                      }
+ 744   3                                      else
+ 745   3                                      {
+ 746   4                                              PinLow6      = 1;
+ 747   4                                              PinPulse6    = 0;
+ 748   4                                              PinLowCount6 = 0;
+ 749   4                                      }
+ 750   3                                      
+ 751   3                              }
+ 752   2                              else
+ 753   2                              {
+ 754   3                                      if ( PinLow6 )
+ 755   3                                      {
+ 756   4                                              PinLowCount6 = 0;
+ 757   4                                              PinLow6      = 0;
+ 758   4                                      }       
+ 759   3                                      else
+ 760   3                                      {
+ 761   4                                              PinLowCount6 ++;
+ 762   4                                              if ( PinLowCount6 >= CoinTimes && PinPulse6 )
+ 763   4                                              {
+ 764   5                                                      ZhkCoiner.CountChn6 ++;
+ 765   5                                                      PinPulse6 = 0;
+ 766   5                                                      PinLowCount6 = 0;
+ 767   5                                  CurrentChannel &= 0xdf;
+ 768   5                                              }
+ 769   4                                      }
+ 770   3                              }
+ 771   2                              if ( PinLowCount6 >= 250 ) 
+ 772   2                                      ZhkCoiner.State |= 1 << 6;
+ 773   2                              else
+ 774   2                                      ZhkCoiner.State &= ~( 1 << 6 );    
+ 775   2                      }
+ 776   1                  
+ 777   1              }
+ 778              
+ 779                  uchar IfCoinHopperFull( void )
+ 780                  {
+ 781   1                      if( ZhkCoiner.CountChn1 >= 1 )
+ 782   1                  {
+ 783   2                              return 1;
+ 784   2                      }
+ 785   1                      else
+ 786   1                      {
+ 787   2                              return 0;
+ 788   2                      }
+ 789   1              
+ 790   1              }
+ 791          
+ 792                  uint GetCoin( void )
+ 793                  {
+ 794   1                      uint data ch=0; 
+ 795   1                      EA = 0;
+ 796   1                      if( ZhkCoiner.Count >= 1 )
+ 797   1                      {
+ 798   2                          //ch = ZhkCoiner.Count * 25;
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 14  
+
+ 799   2                  ch = ZhkCoiner.Count * SystemParameter.coinValue[0];
+ 800   2                      ZhkCoiner.Count = 0;
+ 801   2                      }
+ 802   1              /*
+ 803   1                      else if( ZhkCoiner.CountChn1 >= 1 )
+ 804   1                      {
+ 805   1                          //ch = ZhkCoiner.CountChn1 * 1;
+ 806   1                              //ch = ZhkCoiner.CountChn1 * CoinSet.Line1;
+ 807   1                  ch = ZhkCoiner.CountChn1 * SystemParameter.coinValue[0];
+ 808   1                              ZhkCoiner.CountChn1 = 0;
+ 809   1                      }
+ 810   1                  else if( ZhkCoiner.CountChn2 >= 1 )
+ 811   1                      {
+ 812   1                          //ch = ZhkCoiner.CountChn2 * 2;
+ 813   1                              //ch = ZhkCoiner.CountChn2 * CoinSet.Line2;
+ 814   1                  ch = ZhkCoiner.CountChn2 * SystemParameter.coinValue[1];
+ 815   1                              ZhkCoiner.CountChn2 = 0;
+ 816   1                      }
+ 817   1                      else if( ZhkCoiner.CountChn3 >= 1 )
+ 818   1                      {
+ 819   1                          //ch = ZhkCoiner.CountChn3 * 5;
+ 820   1                              //ch = ZhkCoiner.CountChn3 * CoinSet.Line3;
+ 821   1                  ch = ZhkCoiner.CountChn3 * SystemParameter.coinValue[2];
+ 822   1                              ZhkCoiner.CountChn3 = 0;
+ 823   1                      }
+ 824   1                      else if( ZhkCoiner.CountChn4 >= 1 )
+ 825   1                      {
+ 826   1                          //ch = ZhkCoiner.CountChn4 * SystemParameter.Exchange;    //30,
+ 827   1                              //ch = ZhkCoiner.CountChn4 * CoinSet.Line4;
+ 828   1                  ch = ZhkCoiner.CountChn4 * SystemParameter.coinValue[3];
+ 829   1                              ZhkCoiner.CountChn4 = 0;
+ 830   1                      }
+ 831   1                      else if( ZhkCoiner.CountChn5 >= 1 )
+ 832   1                      {
+ 833   1                          //ch = ZhkCoiner.CountChn5 * SystemParameter.Exchange;    //60,
+ 834   1                              //ch = ZhkCoiner.CountChn5 * CoinSet.Line5;
+ 835   1                  ch = ZhkCoiner.CountChn5 * SystemParameter.coinValue[4];
+ 836   1                              ZhkCoiner.CountChn5 = 0;
+ 837   1                      }
+ 838   1                      else if( ZhkCoiner.CountChn6 >= 1 )
+ 839   1                      {
+ 840   1                          //ch = ZhkCoiner.CountChn6 * SystemParameter.Exchange;
+ 841   1                              //ch = ZhkCoiner.CountChn6 * CoinSet.Line6;
+ 842   1                  ch = ZhkCoiner.CountChn6 * SystemParameter.coinValue[5];
+ 843   1                              ZhkCoiner.CountChn6 = 0;
+ 844   1                      }
+ 845   1              */
+ 846   1                      EA = 1;
+ 847   1                      return ch;          
+ 848   1              }
+ 849          #endif
+ 850          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1672    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     36       1
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =     15    ----
+CX51 COMPILER V7.50   IOINPUT                                                              10/23/2014 09:48:28 PAGE 15  
+
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

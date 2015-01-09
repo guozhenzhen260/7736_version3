@@ -1,0 +1,721 @@
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE GOODSWAYSET
+OBJECT MODULE PLACED IN GoodsWaySet.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE GoodsWaySet.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define  GOODS_WAY_C
+   2          #include "device.h"
+   3          #include "global.h"
+   4          #include "scheduler.h"
+   5          #include "CommonFunction.h"
+   6          #include "STRING.h"
+   7          #include "GoodsWaySet.h"
+   8          #include "key.h"
+   9          #include "common.h"
+  10          #include "mainflow.h"
+  11          #include "CommonFunction.h"
+  12          //#include "AllMenuStr.h"
+  13          //#include "language.h"
+  14          #include "debug.h"
+  15          #include "VMC_PC.h"
+  16          
+  17          #undef _DEBUG_TRACE
+  18          /***********************************/
+  19          
+  20          #ifdef _CHINA_
+  21                  const struct StrAndLen code GoodsWaystr[] =
+  22                  {       
+  23                          { "1.货道编号: ", 12 },
+  24                  { "2.商品余量: ", 12 },
+  25                  { "3.商品编号: ", 12 },
+  26                          { "4.单价: ", 8 },
+  27                          { "5.货道状态: ", 12 },
+  28                      
+  29                  };
+  30          #else
+                      const struct StrAndLen code GoodsWaystr[] =
+                      {       
+                              { "1.Column code:", 14 },
+                      { "2.Goods remain:", 15 },
+                              { "3.Price:", 8 },
+                              { "4.Column status:", 16 },
+                          { "5.Goods code:", 13},
+                      };
+              #endif
+  40          
+  41          u_char xdata  m_SetArrayNo = 0;
+  42          u_char xdata  GoodsSetSave = 0;
+  43          u_char xdata  goodsTypeSave = 0;
+  44          
+  45          
+  46          /***********************************/
+  47          //读\写内存中的货道设置参数,Num,选中的菜单项编号,len字符串长度,OutInFlag为0时是读,为1时是写
+  48          void ReadWriteGoodsParam( u_char Num,u_char xdata *OutStr,u_char xdata *InStr ,u_char xdata *len, bit OutI
+             -nFlag )
+  49          {       
+  50   1              u_char  xdata  Templen = 0;     
+  51   1              u_char  xdata  i = 0;
+  52   1              uint    xdata  temp = 0;        
+  53   1          u_char  xdata  oldNum = 0;
+  54   1              u_int   xdata  oldPrice = 0;
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 2   
+
+  55   1      
+  56   1              switch( Num )
+  57   1              {
+  58   2                      case 0: //货道编号      
+  59   2                              if( OutInFlag == 0 )
+  60   2                              {
+  61   3                                      //*len = 2;
+  62   3                                      //*len = sprintf( OutStr, "%02bu", GoodsWaySetVal[m_SetArrayNo].WayNo );
+  63   3                                      /*
+  64   3                                      if( m_SetArrayNo == 0 )
+  65   3                                      {
+  66   3                                              *len = sprintf( OutStr, "%02bu", 11 );  
+  67   3                                      }
+  68   3                                      else
+  69   3                                      {
+  70   3                              *len = sprintf( OutStr, "%02bu", GoodsWaySetVal[m_SetArrayNo].WayNo );  
+  71   3                                      }
+  72   3                                      */
+  73   3                                      *len = sprintf( OutStr, "%02bu", InputGoodsWayList[m_SetArrayNo].GoodsWayNo );
+  74   3                                      
+  75   3                              }                       
+  76   2                      break;
+  77   2              case 1://货品现存量                             
+  78   2                              if(  OutInFlag == 0 )
+  79   2                              {                                       
+  80   3                                      *len = sprintf( OutStr, "%3bu", GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum );                                                                                         
+  81   3                              }                       
+  82   2                              else//存入
+  83   2                              {
+  84   3                                      Templen = *len;
+  85   3                                      if( Templen == 0 )
+  86   3                                              break;
+  87   3                                      if( Templen > 3 )
+  88   3                                              Templen = 3;
+  89   3                          oldNum = GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum;
+  90   3                                      GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum = 0;       
+  91   3                                      for( i = 0; i < Templen; i ++ )
+  92   3                                      {                                       
+  93   4                                              if( ( *( InStr + i ) >= 0 ) && ( *( InStr + i ) <= 9 ) )
+  94   4                                                      GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum = 
+  95   4                                                                      GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum * 10 + *( InStr + i );                                     
+  96   4                                      }
+  97   3                                      GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum = (GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum>63)?63:(G
+             -oodsWaySetVal[m_SetArrayNo].GoodsCurrentSum);
+  98   3                                      if( GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum == 0 ) Templen = 3;
+  99   3                                      GoodsSetSave = 1;
+ 100   3                                      //------------------------------------------------------------------------------------------
+ 101   3                      if( ( GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum != oldNum )&&(sysVPMission.offLineFlag 
+             -== 0) )
+ 102   3                                      {
+ 103   4                                              VPAddSingleColGoods( m_SetArrayNo, GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum, oldNum, 1 );
+ 104   4                                      }
+ 105   3                                      //==========================================================================================
+ 106   3                              }                                               
+ 107   2                      break;
+ 108   2                      //------------------------------------------------------------
+ 109   2                      //Good code edit
+ 110   2                      case 2:                                 
+ 111   2                              if(  OutInFlag == 0 )
+ 112   2                              {                                       
+ 113   3                                      sprintf( OutStr, "%2bu", GoodsWaySetVal[m_SetArrayNo].GoodsType );      //3bu, 2,                       
+ 114   3                                      *len = 2;                                                               
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 3   
+
+ 115   3                              }       
+ 116   2                              /*
+ 117   2                              else //存入
+ 118   2                              {
+ 119   2                                      Templen = *len;
+ 120   2                                      if( Templen == 0 )
+ 121   2                                              break;
+ 122   2                                      if( Templen > 2 )  //3,2
+ 123   2                                              Templen = 2;    
+ 124   2                                      GoodsWaySetVal[m_SetArrayNo].GoodsType = 0;     
+ 125   2                                      for( i = 0; i < Templen; i ++ )
+ 126   2                                      {                                       
+ 127   2                                              if( ( *( InStr + i ) >= 0 ) && ( *( InStr + i ) <= 9 ) )
+ 128   2                                                      GoodsWaySetVal[m_SetArrayNo].GoodsType = 
+ 129   2                                                                      GoodsWaySetVal[m_SetArrayNo].GoodsType * 10 + *( InStr + i );                                   
+ 130   2                                      }
+ 131   2                                      if( GoodsWaySetVal[m_SetArrayNo].GoodsType == 0 )                                                               
+ 132   2                                              Templen = 2;  //3,2
+ 133   2                                      GoodsSetSave = 1;
+ 134   2                                      goodsTypeSave = 1;
+ 135   2                              }       
+ 136   2                              */                                      
+ 137   2                      break;
+ 138   2                      case 3://单价
+ 139   2                              ////////////////////
+ 140   2                              if( OutInFlag == 0 )
+ 141   2                              {
+ 142   3                                      switch( SystemParameter.curUnit )
+ 143   3                                      {
+ 144   4                                              case 1:
+ 145   4                                                      *len = sprintf( OutStr, "%u", GoodsWaySetVal[m_SetArrayNo].Price );
+ 146   4                                              break;                          
+ 147   4                                              case 10:
+ 148   4                                                      *len = sprintf( OutStr, "%u.%u", GoodsWaySetVal[m_SetArrayNo].Price/SystemParameter.curUnit, GoodsWa
+             -ySetVal[m_SetArrayNo].Price%SystemParameter.curUnit );
+ 149   4                                              break;
+ 150   4                                              case 100:
+ 151   4                                                      *len = sprintf( OutStr, "%u.%02u", GoodsWaySetVal[m_SetArrayNo].Price/SystemParameter.curUnit, Goods
+             -WaySetVal[m_SetArrayNo].Price%SystemParameter.curUnit );
+ 152   4                                              break;                                  
+ 153   4                                      }
+ 154   3                              }
+ 155   2                              /*
+ 156   2                              else
+ 157   2                              {
+ 158   2                                      Templen = *len;
+ 159   2                                      if( Templen == 0 )
+ 160   2                                              break;
+ 161   2                                      if( Templen > 5 )
+ 162   2                                              Templen = 5;
+ 163   2                                      oldPrice = GoodsWaySetVal[m_SetArrayNo].Price;
+ 164   2                                      GoodsWaySetVal[m_SetArrayNo].Price = 0;
+ 165   2                                      for( i = 0; i < Templen; i ++ )
+ 166   2                                      {                                       
+ 167   2                                              if( ( *( InStr + i ) >= 0 ) && ( *( InStr + i ) <= 9 ) )
+ 168   2                                                      GoodsWaySetVal[m_SetArrayNo].Price = GoodsWaySetVal[m_SetArrayNo].Price * 10 + *( InStr + i );                                  
+ 169   2                                      }       
+ 170   2                                      GoodsSetSave = 1;
+ 171   2                                  //------------------------------------------------------------------------------------------
+ 172   2                      if( GoodsWaySetVal[m_SetArrayNo].Price != oldPrice )
+ 173   2                                      {
+ 174   2                                              VPChangeColPrice( m_SetArrayNo, GoodsWaySetVal[m_SetArrayNo].Price, oldPrice );
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 4   
+
+ 175   2                                      }
+ 176   2                                      //==========================================================================================
+ 177   2                              }
+ 178   2                              */                      
+ 179   2                      break;          
+ 180   2                      case 4:// 货道状态 修改货道状态查询;by gzz 20120323
+ 181   2                              if(  OutInFlag == 0 )
+ 182   2                              {                               
+ 183   3                                      Templen = 1;
+ 184   3                                      /*
+ 185   3                                      if( GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum == 0 )
+ 186   3                                              Templen = 3;
+ 187   3                                      i = ( GoodsWaySetVal[m_SetArrayNo].WayState & 0x0f );                           
+ 188   3                                      if( ( i & 0x01 ) != 0x01 )
+ 189   3                                              Templen = 0;                            
+ 190   3                                      else if( ( i & 0x02 ) == 0x02 )
+ 191   3                                              Templen = 2;
+ 192   3                                      else if( ( i & 0x04 ) == 0x04 )
+ 193   3                                              Templen = 3;
+ 194   3                                      else if( ( i & 0x08 ) == 0x08 )
+ 195   3                                              Templen = 4;            
+ 196   3                                      */
+ 197   3                                      if(( GoodsWaySetVal[m_SetArrayNo].WayState & 0x01 )!= 0x01)
+ 198   3                                      {
+ 199   4                                          //未
+ 200   4                                          Templen = 0;
+ 201   4                                      }
+ 202   3                                      else if( GoodsWaySetVal[m_SetArrayNo].WayState & 0x0A )
+ 203   3                                      {
+ 204   4                                          //故
+ 205   4                                          Templen = 2;
+ 206   4                                      }
+ 207   3                                      else if( (GoodsWaySetVal[m_SetArrayNo].WayState & 0x04) || (GoodsWaySetVal[m_SetArrayNo].GoodsCurrentS
+             -um == 0) )
+ 208   3                                      {
+ 209   4                                          //缺
+ 210   4                                          Templen = 3;
+ 211   4                                      }
+ 212   3                                      else
+ 213   3                                      {
+ 214   4                                          //正
+ 215   4                                          Templen = 1;
+ 216   4                                      }
+ 217   3                                      sprintf( OutStr, "%bu", Templen );                              
+ 218   3                                      *len = 1;                               
+ 219   3                              }                       
+ 220   2                              /*
+ 221   2                              else//存入加入条件控制;by gzz 20110926
+ 222   2                              {
+ 223   2                                      Templen = *len;
+ 224   2                                      if( Templen == 0 )
+ 225   2                                              break;
+ 226   2                                      if( Templen > 1 )
+ 227   2                                              Templen = 1;    
+ 228   2                                      GoodsWaySetVal[m_SetArrayNo].WayState = 0x01;   
+ 229   2                                      if( *InStr == 0 )//手动设为不确定
+ 230   2                                      {
+ 231   2                                              GoodsWaySetVal[m_SetArrayNo].WayState = 0x00;
+ 232   2                                              GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum = 0;//by gzz 20110926
+ 233   2                                      }       
+ 234   2                                      else if( *InStr == 1 )//手动设为正常
+ 235   2                                              GoodsWaySetVal[m_SetArrayNo].WayState = 0x01; 
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 5   
+
+ 236   2                                      else if( *InStr == 2 )//手动设为故障
+ 237   2                                      {
+ 238   2                                              GoodsWaySetVal[m_SetArrayNo].WayState = 0x03;
+ 239   2                                              GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum = 0;//by gzz 20110926
+ 240   2                                      }       
+ 241   2                                      else if( *InStr == 3 )//手动设为无货
+ 242   2                                      {
+ 243   2                                              GoodsWaySetVal[m_SetArrayNo].WayState = 0x05;
+ 244   2      
+ 245   2                                              //修改存货数量
+ 246   2                                              oldNum = GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum;
+ 247   2                                              GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum = 0;//by gzz 20110926
+ 248   2                                              if( GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum != oldNum )
+ 249   2                                              {
+ 250   2                                                      VPAddSingleColGoods( m_SetArrayNo, GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum, oldNum, 1 );
+ 251   2                                              }
+ 252   2                                      }
+ 253   2                                      else if( *InStr == 4 )//手动设为板坏
+ 254   2                                              GoodsWaySetVal[m_SetArrayNo].WayState = 0x09;
+ 255   2                                      else
+ 256   2                                              GoodsWaySetVal[m_SetArrayNo].WayState = *InStr;                         
+ 257   2                                      GoodsSetSave = 1;
+ 258   2                      //-------------------------
+ 259   2                                      VPMission_ColumnSta_RPT();//by gzz 20120223
+ 260   2                                      //=========================
+ 261   2                              }       
+ 262   2                              */
+ 263   2                      break;          
+ 264   2                      default: break;                 
+ 265   2              }
+ 266   1      }
+ 267          
+ 268          /***********************************/
+ 269          /*y为行号,Num为菜单项序号,flag为是否显示值*/
+ 270          void  DisplayGoodsMenuAndVal( u_char line, u_char Num, bit flag )
+ 271          {
+ 272   1              u_char  xdata y_displaystr[22]; 
+ 273   1              u_char  xdata  len ;
+ 274   1          u_char  xdata dispVal[10];
+ 275   1              u_char  xdata i=0;
+ 276   1          u_char  xdata j=0;
+ 277   1      
+ 278   1              len = 0;        
+ 279   1              memset( y_displaystr,0,sizeof( y_displaystr ) );
+ 280   1              if( Num != 3 )
+ 281   1              {                               
+ 282   2                      {
+ 283   3                              memcpy( y_displaystr, GoodsWaystr[Num].str, GoodsWaystr[Num].len );
+ 284   3                      }
+ 285   2                      if( flag == 1 )
+ 286   2                      {               
+ 287   3                              
+ 288   3                          //ReadWriteGoodsParam( Num, y_displaystr + GoodsWaystr[Num].len  , 0, &len, 0 );//得到菜单对应的值
+ 289   3                              
+ 290   3                              //-----------------------------------------------                       
+ 291   3                          //得到菜单对应的值;by gzz 20110505
+ 292   3                              //ReadWriteGoodsParam( Num, dispVal, 0, &len, 0 );
+ 293   3                              //strcat(y_displaystr,dispVal);
+ 294   3      
+ 295   3                  //得到菜单对应的值;by gzz 20110611            
+ 296   3                              ReadWriteGoodsParam( Num, dispVal, 0, &len, 0 );
+ 297   3                              j = GoodsWaystr[Num].len;
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 6   
+
+ 298   3                              while(i<len)
+ 299   3                             y_displaystr[j++]=dispVal[i++];
+ 300   3                          y_displaystr[j]='\0';            
+ 301   3                              //===============================================
+ 302   3              }       
+ 303   2              //y_displaystr[GoodsWaystr[Num].len + len ] = '\0';//20110611           
+ 304   2                      DisplayStr( 0, line, 1, y_displaystr, GoodsWaystr[Num].len + len  );//显示菜单          
+ 305   2              }
+ 306   1              else
+ 307   1              {               
+ 308   2                      //Trace( "\n GPRS MenuStr" );
+ 309   2                      if( flag == 0 )//编辑此项菜单
+ 310   2                      {       
+ 311   3                              DisplayStr( 0, 0, 1, GoodsWaystr[Num].str, GoodsWaystr[Num].len );//显示菜单                    
+ 312   3                      }
+ 313   2                      else//显示此项菜单
+ 314   2                      {
+ 315   3                              memcpy( y_displaystr, GoodsWaystr[Num].str, GoodsWaystr[Num].len );//菜单串转化为unicode串      
+ 316   3                              //ReadWriteGoodsParam( Num, y_displaystr + GoodsWaystr[Num].len, 0, &len, 0 );//得到菜单对应的值
+ 317   3      
+ 318   3                              //----------------------------------------------------------------------------------------------        
+ 319   3                              //得到菜单对应的值;by gzz 20110505
+ 320   3                              //ReadWriteGoodsParam( Num, dispVal, 0, &len, 0 );            
+ 321   3                              //strcat(y_displaystr,dispVal);
+ 322   3      
+ 323   3                              //得到菜单对应的值;by gzz 20110611
+ 324   3                  ReadWriteGoodsParam( Num, dispVal, 0, &len, 0 );
+ 325   3                              j = GoodsWaystr[Num].len;
+ 326   3                              while(i<len)
+ 327   3                             y_displaystr[j++]=dispVal[i++];
+ 328   3                          y_displaystr[j]='\0';           
+ 329   3                              //==============================================================================================
+ 330   3                  //y_displaystr[GoodsWaystr[Num].len + len ] = '\0';//20110611
+ 331   3                              DisplayStr( 0, line, 1,  y_displaystr, GoodsWaystr[Num].len + len );//显示菜单                                          
+ 332   3                      }
+ 333   2              }
+ 334   1          //Trace( "\n edit SysParamMenu Num= %bd", Num );
+ 335   1              //Trace( "display one SysParanMenu and val end\n" );
+ 336   1      }       
+ 337          
+ 338          unsigned char Led_Good( u_char ledMode )//这个商品对应的灯是否亮1亮,0灭
+ 339          {
+ 340   1              u_char xdata i = 0;
+ 341   1              sysVPMission.sel1ReadyLed = 0x00;
+ 342   1          sysVPMission.sel1ErrLed   = 0x00;
+ 343   1          sysVPMission.sel2ReadyLed = 0x00;
+ 344   1          sysVPMission.sel2ErrLed   = 0x00;
+ 345   1          sysVPMission.sel3ReadyLed = 0x00;
+ 346   1          sysVPMission.sel3ErrLed   = 0x00;
+ 347   1              
+ 348   1              if(ledMode == 1)
+ 349   1              {
+ 350   2                      for( i=0; i<KEYEXTRAVAL; i++ )
+ 351   2                  {
+ 352   3                      if(GoodsWaySetVal[m_SetArrayNo].GoodsType == SystemParameter.selItem[i])
+ 353   3                      {
+ 354   4                              sysVPMission.sel1ReadyLed |= 1<<i;
+ 355   4                      }
+ 356   3                      }
+ 357   2                      for( i=KEYEXTRAVAL; i<KEYEXTRAVAL*2; i++ )
+ 358   2                  {
+ 359   3                              if(GoodsWaySetVal[m_SetArrayNo].GoodsType == SystemParameter.selItem[i])
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 7   
+
+ 360   3                      {
+ 361   4                              sysVPMission.sel2ReadyLed |= 1<<(i-KEYEXTRAVAL);
+ 362   4                      }               
+ 363   3                  }
+ 364   2                      for( i=KEYEXTRAVAL*2; i<KEYEXTRAVAL*3; i++ )
+ 365   2                  {
+ 366   3                              if(GoodsWaySetVal[m_SetArrayNo].GoodsType == SystemParameter.selItem[i])
+ 367   3                      {
+ 368   4                              sysVPMission.sel3ReadyLed |= 1<<(i-KEYEXTRAVAL*2);
+ 369   4                      }               
+ 370   3                  }
+ 371   2              }
+ 372   1              GetKey_M2();
+ 373   1              return 0;
+ 374   1      }
+ 375          
+ 376          
+ 377          /***********************************/
+ 378          /*编辑选中项,Num为选中的菜单编号,line为编辑行号*/
+ 379          bit  EditGoodsParam( u_char Num, u_char line )
+ 380          {
+ 381   1              u_char  xdata Inputstr[10];
+ 382   1              u_char  xdata  key;
+ 383   1              u_char  xdata  Inputlen;
+ 384   1      
+ 385   1              //Led_Good(1);
+ 386   1              key = 0;        
+ 387   1              Inputlen = 5;
+ 388   1              memset( Inputstr, 0, sizeof( Inputstr ) );
+ 389   1              if( Num == 2 )   //1,2(2010.12.30)
+ 390   1                      key = GetLineMoney( GoodsWaystr[Num].str, GoodsWaystr[Num].len, line, Inputstr, &Inputlen );
+ 391   1              else
+ 392   1                      key = GetLine( GoodsWaystr[Num].str, GoodsWaystr[Num].len, line, Inputstr, &Inputlen );                 
+ 393   1              ClearKey();             
+ 394   1              if( key == 1 )//Enter   
+ 395   1              {               
+ 396   2                      DisplayCursorState( 0, 0, 0, 0, 1 );            
+ 397   2                      //Trace( "selected Enter \n" );                 
+ 398   2                      ReadWriteGoodsParam( Num, 0, Inputstr ,&Inputlen, 1 );          
+ 399   2                      ClearKey();             
+ 400   2              }               
+ 401   1              //Trace( "edit one SysParanMenu end\n" );
+ 402   1              //Led_Good(0);
+ 403   1              return 0;
+ 404   1      }
+ 405          
+ 406          /************************************/
+ 407          /*光标在菜单中移动或选择,SelectedNum当前光标所在的菜单编号,
+ 408                  CursorLine，当前光标所覆盖的行,值为1或2,MoveRange,菜单翻动的范围
+ 409          */
+ 410          void  Goods_MenuSelected( u_char xdata *SelectedNum, u_char xdata *CursorLine, u_char MoveRange )
+ 411          {
+ 412   1              u_char xdata  MenuNum = *SelectedNum;
+ 413   1              u_char xdata  Cursor = *CursorLine;
+ 414   1              bit        data  flag = 1;
+ 415   1              u_char xdata  key = 0xff;
+ 416   1              u_char  xdata  len = 0; 
+ 417   1      
+ 418   1              while( flag )
+ 419   1              {
+ 420   2                      key = GetKey();
+ 421   2                      switch( key )           
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 8   
+
+ 422   2                      {
+ 423   3                              case KEY_CANCEL:
+ 424   3                                      flag = 0;
+ 425   3                                      *SelectedNum = 100;                             
+ 426   3                                      break;
+ 427   3                              case KEY_UP://上移                              
+ 428   3                                      if( Cursor == 2 )//选中标记上移
+ 429   3                                      {                       
+ 430   4                                              DisplayCursorState( 0, 0, 1, 2, 1 );//第一行整光标                                      
+ 431   4                                              Cursor = 1;
+ 432   4                                              if( MenuNum == 0 )
+ 433   4                                                      MenuNum = MoveRange;                                    
+ 434   4                                              else                                                                        
+ 435   4                                                      MenuNum--;                                      
+ 436   4                                      }
+ 437   3                                      else//菜单上翻
+ 438   3                                      {                                               
+ 439   4                                              DisplayGoodsMenuAndVal( 1, MenuNum, 1 );                                        
+ 440   4                                              if( MenuNum == 0 )
+ 441   4                                                      MenuNum = MoveRange;                                    
+ 442   4                                              else                                                                        
+ 443   4                                                      MenuNum--;                                      
+ 444   4                                              DisplayGoodsMenuAndVal( 0, MenuNum , 1 );                                                                                                                                                                       
+ 445   4                                              Cursor = 1;                                             
+ 446   4                                      }
+ 447   3                                      break;
+ 448   3                              case KEY_DOWN://下移                                            
+ 449   3                                      if( Cursor == 1 )//选中标记下移
+ 450   3                                      {
+ 451   4                                              DisplayCursorState( 0, 1, 1, 2, 1 );//第二行整光标
+ 452   4                                              if( MenuNum == MoveRange )
+ 453   4                                                      MenuNum = 0;                                    
+ 454   4                                              else                                                                                                                    
+ 455   4                                                      MenuNum++;                                   
+ 456   4                                              Cursor = 2;                                             
+ 457   4                                      }
+ 458   3                                      else//菜单下翻
+ 459   3                                      {                                       
+ 460   4                                              DisplayGoodsMenuAndVal( 0, MenuNum, 1 );                                                
+ 461   4                                              if( MenuNum == MoveRange )
+ 462   4                                                      MenuNum = 0;                                    
+ 463   4                                              else                                                                        
+ 464   4                                                      MenuNum++;                                      
+ 465   4                                              DisplayGoodsMenuAndVal( 1, MenuNum , 1 );                                                                                                                                                                       
+ 466   4                                              Cursor = 2;
+ 467   4                                      }
+ 468   3                                      break;
+ 469   3                              case KEY_SUBMIT://Enter,选中了某项菜单
+ 470   3                                      {                       
+ 471   4                                              *SelectedNum = MenuNum;
+ 472   4                                              *CursorLine = Cursor;                                   
+ 473   4                                              flag = 0;       
+ 474   4                                      }
+ 475   3                                      break;  
+ 476   3                              case KEY_4://上一个货道 
+ 477   3                                      if(m_SetArrayNo==0)
+ 478   3                                      {
+ 479   4                                          m_SetArrayNo = (GOODSWAYNUM-1);
+ 480   4                                      }
+ 481   3                                      else
+ 482   3                                      {
+ 483   4                                              m_SetArrayNo--;
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 9   
+
+ 484   4                                      }
+ 485   3                                      while(InputGoodsWayList[m_SetArrayNo].UseState == 0)
+ 486   3                                      {
+ 487   4                                          m_SetArrayNo--;
+ 488   4                                      }       
+ 489   3                                      
+ 490   3                                      if( Cursor == 1 )
+ 491   3                                      {
+ 492   4                                              DisplayGoodsMenuAndVal( 0, MenuNum, 1 );                                
+ 493   4                                              if( MenuNum == MoveRange )
+ 494   4                                                      DisplayGoodsMenuAndVal( 1, 0, 1 );                                      
+ 495   4                                              else                                                                            
+ 496   4                                                      DisplayGoodsMenuAndVal( 1, MenuNum+1, 1 );      
+ 497   4                                      }
+ 498   3                                      else
+ 499   3                                      {                                               
+ 500   4                                              DisplayGoodsMenuAndVal( 1, MenuNum, 1 );                                        
+ 501   4                                              if( MenuNum == 0 )
+ 502   4                                                      DisplayGoodsMenuAndVal( 0, MoveRange, 1 );
+ 503   4                                              else                                                                        
+ 504   4                                                      DisplayGoodsMenuAndVal( 0, MenuNum-1, 1 );                                      
+ 505   4                                      }
+ 506   3                                      break;
+ 507   3                              case KEY_3://下一个货道 
+ 508   3                                      do
+ 509   3                                      {
+ 510   4                                          m_SetArrayNo++;
+ 511   4                                      }
+ 512   3                                      while( (InputGoodsWayList[m_SetArrayNo].UseState == 0)&&(m_SetArrayNo < GOODSWAYNUM) );
+ 513   3                                      if(m_SetArrayNo>=GOODSWAYNUM)
+ 514   3                                      {
+ 515   4                                          m_SetArrayNo = 0;
+ 516   4                                      }
+ 517   3                                      if( Cursor == 1 )
+ 518   3                                      {
+ 519   4                                              DisplayGoodsMenuAndVal( 0, MenuNum, 1 );                                
+ 520   4                                              if( MenuNum == MoveRange )
+ 521   4                                                      DisplayGoodsMenuAndVal( 1, 0, 1 );                                      
+ 522   4                                              else                                                                            
+ 523   4                                                      DisplayGoodsMenuAndVal( 1, MenuNum+1, 1 );      
+ 524   4                                      }
+ 525   3                                      else
+ 526   3                                      {                                               
+ 527   4                                              DisplayGoodsMenuAndVal( 1, MenuNum, 1 );                                        
+ 528   4                                              if( MenuNum == 0 )
+ 529   4                                                      DisplayGoodsMenuAndVal( 0, MoveRange, 1 );
+ 530   4                                              else                                                                        
+ 531   4                                                      DisplayGoodsMenuAndVal( 0, MenuNum-1, 1 );                                      
+ 532   4                                      }       
+ 533   3                                      break;  
+ 534   3                      }
+ 535   2                      CoreProcessCycle();//让出时间片
+ 536   2                      DelayMs( 5 );
+ 537   2                      if(sysVPMission.msActTimer == 0)
+ 538   2                      {
+ 539   3                              sysVPMission.msActTimer = 100;
+ 540   3                              VPMission_Act_RPT(VP_ACT_ADMIN,VP_ACT_ENTERADMIN);
+ 541   3                      }
+ 542   2              }
+ 543   1              ClearKey();             
+ 544   1      }
+ 545          
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 10  
+
+ 546          /***********************************/
+ 547          ////////////////
+ 548          bit GoodsParamManage()          
+ 549          {
+ 550   1              u_char  xdata fristNum ;//一级菜单编号
+ 551   1              u_char  xdata LineNum ;//选中屏幕的行号 
+ 552   1              u_char  xdata key = 0;
+ 553   1              u_char xdata  i = 0;
+ 554   1              
+ 555   1              ClearKey();     
+ 556   1              //GoodsSetSave = 0;   //Disabled by Andy on 2011.6.8
+ 557   1              //输入货道编号
+ 558   1              m_SetArrayNo = 0;
+ 559   1          //m_SetArrayNo = InputGoodsWayNo( );
+ 560   1              /////////////////////////////////////////
+ 561   1              while( 1 )
+ 562   1              {               
+ 563   2                      ClearKey();     
+ 564   2                      //输入货道编号
+ 565   2                      m_SetArrayNo = 0;
+ 566   2                      m_SetArrayNo = InputGoodsWayNo( 1 );
+ 567   2                      if( ( m_SetArrayNo == 100 ) || ( m_SetArrayNo == 99 ) )
+ 568   2                              return 0;       
+ 569   2                      Trace("\n input m_SetArrayNo = %bu", m_SetArrayNo );    
+ 570   2                      DisplayGoodsMenuAndVal( 0, 0, 1 );      
+ 571   2                      DisplayGoodsMenuAndVal( 1, 1, 1 );              
+ 572   2                      DisplayCursorState( 0, 1, 1, 2, 1 );//设置光标在第二行上且为整行光标状态
+ 573   2                      fristNum = 1;
+ 574   2                      LineNum = 2;
+ 575   2                      Led_Good(1);
+ 576   2                      WaitForWork( 300, NULL );
+ 577   2                      while( 1 )
+ 578   2                      {               
+ 579   3                              /*判断按下何键*/                        
+ 580   3                              Goods_MenuSelected( &fristNum, &LineNum, MENU_COUNT( GoodsWaystr ) - 1 );                       
+ 581   3                              //选中了某项菜单                                
+ 582   3                              if( fristNum == 100 )//选中退出                                                                 
+ 583   3                                      break;          
+ 584   3                              else if( fristNum != 1 )//没有选中退出
+ 585   3                                      continue;
+ 586   3                              else
+ 587   3                              {                               
+ 588   4                                      ClearKey();                                                                     
+ 589   4                                      EditGoodsParam( fristNum, LineNum - 1 );                        
+ 590   4                                      //重新显示此项参数的值                  
+ 591   4                                      if( LineNum == 2 )
+ 592   4                                      {                       
+ 593   5                                              if( fristNum == 0 )
+ 594   5                                                      DisplayGoodsMenuAndVal( 0, MENU_COUNT( GoodsWaystr ) - 1, 1 );
+ 595   5                                              else                                            
+ 596   5                                                      DisplayGoodsMenuAndVal( 0, fristNum-1, 1 );                                             
+ 597   5                                              DisplayGoodsMenuAndVal( 1, fristNum, 1 );       
+ 598   5                                      }
+ 599   4                                      else
+ 600   4                                      {                                                                       
+ 601   5                                              if( fristNum == ( MENU_COUNT( GoodsWaystr ) - 1 ) )
+ 602   5                                                      DisplayGoodsMenuAndVal( 1, 0, 1 );      
+ 603   5                                              else                                            
+ 604   5                                                      DisplayGoodsMenuAndVal( 1, fristNum + 1, 1 );   
+ 605   5                                              DisplayGoodsMenuAndVal( 0, fristNum, 1 );
+ 606   5                                      }                       
+ 607   4                                      DisplayCursorState( 0, LineNum - 1, 1, 2, 1 );//设置光标为整行状态                      
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 11  
+
+ 608   4                              }                                       
+ 609   3                      }
+ 610   2                      Led_Good(0);            
+ 611   2              }       
+ 612   1              return 0;
+ 613   1      }
+ 614          /////////////////
+ 615          
+ 616          /*bit AddSalveGoods()
+ 617          {
+ 618                  u_char  xdata  i = 0;
+ 619              u_char  xdata  y_displaystr[22];    
+ 620              u_char  xdata  key;
+ 621              u_char  xdata  Inputstr[10];
+ 622              u_char  xdata  Inputlen = 2;
+ 623                  u_char  xdata  CurrentSum;
+ 624                  
+ 625                          
+ 626                  /////////////////////////////////////////
+ 627                  while( 1 )
+ 628                  {               
+ 629                          ClearKey();     
+ 630                          //输入货道编号
+ 631                          m_SetArrayNo = 0;
+ 632                          m_SetArrayNo = InputGoodsWayNo( 1 );
+ 633                          if( ( m_SetArrayNo == 100 ) || ( m_SetArrayNo == 99 ) )
+ 634                                  return 0;       
+ 635                          //Trace("\n input m_SetArrayNo = %bu", m_SetArrayNo );  
+ 636                          
+ 637                          ClearDisplayLine( 1 );
+ 638                          ClearDisplayLine( 2 );
+ 639                  Inputlen = 2;   
+ 640                      //sprintf(y_displaystr,"货道%02bu余量：", GoodsWaySetVal[m_SetArrayNo].WayNo);
+ 641                  sprintf(y_displaystr,"货道%02bu余量：", InputGoodsWayList[m_SetArrayNo].GoodsWayNo);
+ 642                  key = GetLine( y_displaystr, 12, 0, Inputstr, &Inputlen );
+ 643                  WaitForWork( 500, NULL );
+ 644                  ClearKey();     
+ 645                  if( key == 1 )//Enter.
+ 646                  {       
+ 647                          DisplayCursorState( 0, 0, 0, 0, 1 );            
+ 648                      CurrentSum = 0;
+ 649                      for( i = 0; i < Inputlen; i ++ )
+ 650                                  {                                       
+ 651                                          if( ( *( Inputstr + i ) >= 0 ) && ( *( Inputstr + i ) <= 9 ) )
+ 652                                                  CurrentSum = CurrentSum * 10 + *( Inputstr + i );                                       
+ 653                                  }                       
+ 654                                  //------------------------------------------------------------------------------------------
+ 655                      if( CurrentSum != 0 )
+ 656                                  {
+ 657                                          VPAddSingleColGoods( m_SetArrayNo, CurrentSum, 0, 2 );
+ 658                          //sprintf(y_displaystr,"货道余量：%02bu", CurrentSum);
+ 659                          //DisplayStr( 0, 0, 1, y_displaystr, 14 );
+ 660                                          //WaitForWork( 2000, NULL );
+ 661                                  }                       
+ 662                  }
+ 663                  }
+ 664                  return 0;       
+ 665          }
+ 666          */
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+CX51 COMPILER V7.50   GOODSWAYSET                                                          10/23/2014 09:48:24 PAGE 12  
+
+   CODE SIZE        =   3113    ----
+   CONSTANT SIZE    =    118    ----
+   XDATA SIZE       =      3      78
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       3
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

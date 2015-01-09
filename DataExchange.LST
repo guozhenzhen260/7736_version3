@@ -1,0 +1,186 @@
+CX51 COMPILER V7.50   DATAEXCHANGE                                                         09/30/2014 13:53:01 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE DATAEXCHANGE
+OBJECT MODULE PLACED IN DataExchange.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE DataExchange.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define DATAEXCHANGE_C
+   2          #include "debug.h"
+   3          #include "device.h"
+   4          #include "DataExchange.h"
+   5          #include "SstFlash.h"
+   6          #include "stdio.h"
+   7          #include "string.h"
+   8          
+   9          bit MovDataFromSram( uchar xdata* SramAddr , uchar idata* RamAddr , uchar len )
+  10          {
+  11   1              while(len --)
+  12   1                      *RamAddr ++ = *SramAddr ++;
+  13   1      
+  14   1              return 1;       
+  15   1      }
+  16          
+  17          bit MovDataToSram( uchar xdata* SramAddr , uchar idata* RamAddr , uchar len )
+  18          {
+  19   1              while(len --)
+  20   1                      *SramAddr ++ = *RamAddr ++;
+  21   1      
+  22   1              return 1;
+  23   1      }
+  24          
+  25          bit MovSramToSram( uchar xdata* Sourse , uchar xdata* Object , uint len ) 
+  26          {
+  27   1              while( len -- )
+  28   1                      *Object ++ = *Sourse ++;
+  29   1              return 1;
+  30   1      }
+  31          
+  32          bit PogramFlash( ulong FlashAddr , uchar xdata* SramAddr , uint len ) small
+  33          {
+  34   1              uchar data lentemp;
+  35   1      
+  36   1              while( len )
+  37   1              {
+  38   2                      lentemp = sizeof( Cache );
+  39   2                      if ( len < sizeof( Cache ) ) 
+  40   2                              lentemp = len;          
+  41   2      
+  42   2                      MovDataFromSram( SramAddr , Cache , lentemp );
+  43   2                      if ( (FlashAddr & 0x80000) == 0)                        
+  44   2                              P1 = 0x09;
+  45   2                      else                    
+  46   2                              P1 = 0x0a;
+  47   2      
+  48   2                      SstFlashStringProgam( FlashAddr , Cache , lentemp );
+  49   2                      ZhkHardSramSelect();
+  50   2                      FlashAddr += lentemp;
+  51   2                      SramAddr  += lentemp;           
+  52   2                      len       -= lentemp;
+  53   2              }       
+  54   1              return 1;
+  55   1      }
+CX51 COMPILER V7.50   DATAEXCHANGE                                                         09/30/2014 13:53:01 PAGE 2   
+
+  56          
+  57          bit MovSramToFlash( ulong FlashAddr , uchar xdata* SramAddr , uint len ) small
+  58          {
+  59   1              uchar xdata TempBuf[ SECTORSIZE ];
+  60   1              uint  data len1;
+  61   1              uint  data len2;
+  62   1      
+  63   1      //      Trace("\n FlashAddr2 = 0x%02lx", FlashAddr );
+  64   1              while( len > 0)
+  65   1              {
+  66   2                      len1 = FlashAddr % SECTORSIZE;
+  67   2                      len2 = SECTORSIZE - len1;
+  68   2      
+  69   2                      if( len1 > 0 || len2 > len )
+  70   2                              MovFlashToSram( FlashAddr - len1, TempBuf, SECTORSIZE );
+  71   2      
+  72   2                      len2 = (len > len2) ? len2 : len;
+  73   2                      MovSramToSram( SramAddr, TempBuf + len1, len2 );                
+  74   2      
+  75   2                      if ( FlashAddr & 0x80000 == 0) 
+  76   2                              P1 = 0x09;
+  77   2                      else
+  78   2                              P1 = 0x0a;              
+  79   2      
+  80   2                      SstFlashSectorErase( FlashAddr );
+  81   2                      ZhkHardSramSelect();            
+  82   2                      PogramFlash( FlashAddr - len1, TempBuf, SECTORSIZE );
+  83   2      
+  84   2                      FlashAddr += len2;
+  85   2                      SramAddr += len2;
+  86   2                      len -= len2;
+  87   2              }
+  88   1      
+  89   1              return 1;
+  90   1      }
+  91          
+  92          bit MovFlashToSram( ulong FlashAddr , uchar xdata* SramAddr , uint len ) small
+  93          {
+  94   1              uint data lentemp;
+  95   1              
+  96   1              while( len > 0 )
+  97   1              {
+  98   2                      lentemp = (len > sizeof( Cache )) ? sizeof( Cache ) : len;
+  99   2                      ////////////////////////
+ 100   2      //              MovDataFromFlash( FlashAddr, Cache, lentemp );
+ 101   2      /*              if ( (FlashAddr & 0x80000) == 0) 
+ 102   2                              ZhkHardFlashSelect();                   
+ 103   2                      else
+ 104   2                              ZhkHardFlash1Select();  
+ 105   2      */                      
+ 106   2                      if ( (FlashAddr & 0x80000) == 0)                        
+ 107   2                              P1 = 0x09;
+ 108   2                      else                    
+ 109   2                              P1 = 0x0a;
+ 110   2      
+ 111   2                      SstFlashReadString( FlashAddr ,Cache , lentemp );
+ 112   2                      ZhkHardSramSelect();            
+ 113   2      
+ 114   2                      MovDataToSram( SramAddr,Cache,lentemp); 
+ 115   2      //              memcpy( SramAddr,Cache,lentemp);        
+ 116   2      
+ 117   2                      FlashAddr += lentemp;
+CX51 COMPILER V7.50   DATAEXCHANGE                                                         09/30/2014 13:53:01 PAGE 3   
+
+ 118   2                      SramAddr += lentemp;
+ 119   2                      len -= lentemp;
+ 120   2              }
+ 121   1              return 1;
+ 122   1      }
+ 123          /*
+ 124          bit FlashDel( ulong FlashAddr , ulong len ) small
+ 125          {
+ 126                  ZhkHardSramSelect();
+ 127                  FlashAddr = FlashAddr / SECTORSIZE * SECTORSIZE;
+ 128                  
+ 129                  while( len )
+ 130                  {
+ 131                          if ( FlashAddr % FLASHCHIPSIZE == 0 && len >= FLASHCHIPSIZE )
+ 132                          {               
+ 133                                  if ( (FlashAddr & 0x80000) == 0)                        
+ 134                                          P1 = 0x09;
+ 135                                  else                    
+ 136                                          P1 = 0x0a;
+ 137                                  SstFlashChipErase();
+ 138                                  ZhkHardSramSelect();
+ 139                                  FlashAddr += FLASHCHIPSIZE;
+ 140                                  if ( len < FLASHCHIPSIZE ) len = FLASHCHIPSIZE;
+ 141                                  len -= FLASHCHIPSIZE;
+ 142                                  continue;
+ 143                          }       
+ 144                          if ( (FlashAddr & 0x80000) == 0)                        
+ 145                                  P1 = 0x09;
+ 146                          else                    
+ 147                                  P1 = 0x0a;
+ 148                          SstFlashSectorErase( FlashAddr );
+ 149                          ZhkHardSramSelect();
+ 150                          FlashAddr += SECTORSIZE;
+ 151                          if ( len < SECTORSIZE ) len = SECTORSIZE;
+ 152                          len -= SECTORSIZE;
+ 153                  }
+ 154                  return 1;
+ 155          }*/
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    773    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----     136
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      31
+   IDATA SIZE       =     64    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

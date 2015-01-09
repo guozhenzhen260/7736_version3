@@ -1,0 +1,300 @@
+CX51 COMPILER V7.50   TIMER                                                                10/23/2014 09:48:27 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE TIMER
+OBJECT MODULE PLACED IN timer.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE timer.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define TIMER_C
+   2          #define ZHK_INTERRUPT
+   3          #include "device.h"
+   4          #include "timer.h"
+   5          #include "global.h"
+   6          //#include "IOInput.h"
+   7          //#include "VMC_PC.h"
+   8          
+   9          extern unsigned char VPMission_Button_RPT( unsigned char type, unsigned char value );
+  10          extern bit IfGameKeyOn( void );
+  11          extern void ZhkKeyScanIsr( void );
+  12          extern void ZhkIOInputIsr( void );
+  13          
+  14          #ifdef _COIN_INPUT_PARALLEL
+  15                  extern void ZyzChkCoinChnSta( void ); 
+  16          #else
+                      extern void ZhkChkCoinInIsr();
+              #endif
+  19          
+  20          
+  21          uchar xdata Tick;
+  22          uchar xdata Second;
+  23          
+  24          char xdata lifterTimer;
+  25          void ZhkTimerInit( void )
+  26          {
+  27   1              TMOD &= 0xF0;
+  28   1              TMOD |= 0x01;
+  29   1              TL0   = ( uint )( 0x10000 + 16 - 10.0 * 1000 * OSCRATE / 1000000 / MACHINECYCLE / 12 ) % 256;
+  30   1              TH0   = ( uint )( 0x10000 + 16 - 10.0 * 1000 * OSCRATE / 1000000 / MACHINECYCLE / 12 ) / 256;
+  31   1              TR0   = 1;
+  32   1              ET0   = 1;
+  33   1              SgpSecTimer = 0;
+  34   1              SgwSecTimer = 0;
+  35   1              Tick = 0;
+  36   1              Second = 0;
+  37   1              YgpSecTimer = 0;
+  38   1              LzjSecTimer = 0;
+  39   1              ZhkDownMsgAckTimer = 0;
+  40   1              ZhkBuzzerTimer = 0;
+  41   1              QueryCashTimer = 0;
+  42   1              ZhkMobileSecTimer = 0;
+  43   1              AlarmSpacing = 0;
+  44   1              GPRSModuleResetTimer = 0;
+  45   1              SendSMSTimer = 0;
+  46   1              ReceiveSMSTimer = 0;
+  47   1              QueryTimer = 0;
+  48   1              sysVPMission.watchDogCtr = 0;
+  49   1          sysVPMission.watchDogTimer = 0;
+  50   1          sysVPMission.watchDogIng = 0;
+  51   1          sysVPMission.hopperOutTimer = 0;
+  52   1      }
+  53          void Zhktmr0( void ) interrupt 1 using 1 
+  54          {
+  55   1              ZhkSaveChipSelect();
+CX51 COMPILER V7.50   TIMER                                                                10/23/2014 09:48:27 PAGE 2   
+
+  56   1              ZhkHardSramSelect();
+  57   1              TL0   = ( uint )( 0x10000 + 16 - 10.0 * 1000 * OSCRATE / 1000000 / MACHINECYCLE ) % 256;
+  58   1              TH0   = ( uint )( 0x10000 + 16 - 10.0 * 1000 * OSCRATE / 1000000 / MACHINECYCLE ) / 256;
+  59   1              
+  60   1              Tick ++ ;
+  61   1              if ( Tick % 5 == 0 ) 
+  62   1                      ZhkKeyScanIsr();
+  63   1              // 时钟周期(10ms)延时区
+  64   1              if ( LzjMSecTimer > 10 ) 
+  65   1                      LzjMSecTimer -= 10;
+  66   1              else
+  67   1                      LzjMSecTimer = 0;
+  68   1      //      if ( SerialAckTimer ) SerialAckTimer --;
+  69   1              ZhkSchedulerClock ++;
+  70   1              if ( ZhkDownMsgAckTimer ) 
+  71   1                      ZhkDownMsgAckTimer --;
+  72   1              if(lifterTimer)
+  73   1                      lifterTimer--;
+  74   1              if ( ZhkBuzzerTimer > 0 ) 
+  75   1                      ZhkBuzzerTimer --;
+  76   1              else
+  77   1              {
+  78   2                      ZhkHardBuzzerOff();
+  79   2              }
+  80   1              
+  81   1          if( sysMDBMission.MDBMSTimer > 0 )
+  82   1              sysMDBMission.MDBMSTimer--;
+  83   1      
+  84   1              //-------------------------------------------
+  85   1              if( sysVPMission.msTimer1 > 0 )
+  86   1                      sysVPMission.msTimer1--;
+  87   1              if( sysVPMission.msTimer2 > 0 )
+  88   1                  sysVPMission.msTimer2--;
+  89   1          if( sysVPMission.msTimer3 > 0 )
+  90   1                  sysVPMission.msTimer3--;    
+  91   1          if( sysVPMission.msGameTimer1 > 0 )
+  92   1              sysVPMission.msGameTimer1 --;
+  93   1          if( sysITLMission.msPoll > 0 )
+  94   1              sysITLMission.msPoll --;
+  95   1          if( sysITLMission.msTimer2 > 0 )
+  96   1              sysITLMission.msTimer2 --;
+  97   1          if( sysBCMission.msPoll > 0 )
+  98   1              sysBCMission.msPoll --;
+  99   1          if( sysBCMission.msTimer2 > 0 )
+ 100   1              sysBCMission.msTimer2 --;
+ 101   1              if(sysVPMission.msActTimer)
+ 102   1                      sysVPMission.msActTimer--;
+ 103   1          sysVPMission.dspTimer1 ++; 
+ 104   1              //sysVPMission.sWeihuTimer++;
+ 105   1          //===========================================
+ 106   1      
+ 107   1              if ( Tick >= 100 )
+ 108   1              {
+ 109   2                      Tick = 0;
+ 110   2                      Second ++;
+ 111   2                      //---------------------------------------
+ 112   2              //watch dog
+ 113   2              if( sysVPMission.watchDogCtr == 1 )
+ 114   2              {
+ 115   3                      if( sysVPMission.watchDogTimer >= WATCHDOGTIMEOUT )
+ 116   3                  {
+ 117   4                                  if( sysVPMission.watchDogIng == 0 )
+CX51 COMPILER V7.50   TIMER                                                                10/23/2014 09:48:27 PAGE 3   
+
+ 118   4                                      {
+ 119   5                          //CMOD |= 0x40;
+ 120   5                          //WDCON  = 0x07; 
+ 121   5                                              WDTRST = 0x1E;
+ 122   5                                              WDTRST = 0xe1;
+ 123   5                                      }
+ 124   4                                      else
+ 125   4                                      {
+ 126   5                                              sysVPMission.watchDogIng = 1;
+ 127   5                                      }
+ 128   4                  }
+ 129   3                  else
+ 130   3                  {
+ 131   4                      sysVPMission.watchDogTimer++;
+ 132   4                  }
+ 133   3              }
+ 134   2              //=======================================
+ 135   2              if( sysVPMission.menuTimer )
+ 136   2                  sysVPMission.menuTimer--;
+ 137   2                      if( SgpSecTimer ) 
+ 138   2                              SgpSecTimer --;
+ 139   2                      if( SgwSecTimer )
+ 140   2                              SgwSecTimer--;
+ 141   2                      if( YgpSecTimer ) 
+ 142   2                              YgpSecTimer --;
+ 143   2                      if( LzjSecTimer ) 
+ 144   2                              LzjSecTimer --;
+ 145   2                      if(( QueryCashTimer > 0 ) && ( QueryCashTimer < 240 ) )
+ 146   2                              QueryCashTimer--;
+ 147   2                      if ( ZhkMobileSecTimer ) 
+ 148   2                                      ZhkMobileSecTimer --;
+ 149   2            //if ( g_byCommTimeOutSeconds ) g_byCommTimeOutSeconds --;
+ 150   2                      
+ 151   2                      if( SendSMSTimer )
+ 152   2                              SendSMSTimer --;                
+ 153   2                      if( ReceiveSMSTimer )
+ 154   2                              ReceiveSMSTimer --;
+ 155   2                      if( QueryTimer )
+ 156   2                              QueryTimer--;        
+ 157   2              
+ 158   2      
+ 159   2              //sysVPMission.sTimerHopperEmp++;//20110502
+ 160   2      
+ 161   2              //----------------------------------------------------------
+ 162   2              if( ( sysVPMission.sTimer1 > 0 )&&(sysVPMission.sTimer1 < 255) )
+ 163   2                      sysVPMission.sTimer1--;
+ 164   2              if( sysVPMission.sTimer2 > 0 )
+ 165   2                  sysVPMission.sTimer2--;
+ 166   2              if( sysVPMission.billSTimer > 0 )
+ 167   2                  sysVPMission.billSTimer--;
+ 168   2              if( sysVPMission.hopperTimer > 0 )
+ 169   2                          sysVPMission.hopperTimer--;
+ 170   2                      if( sysVPMission.hopperOutTimer ) 
+ 171   2                              sysVPMission.hopperOutTimer --;
+ 172   2                      if(sysVPMission.sTimerHeart)
+ 173   2                              sysVPMission.sTimerHeart--;
+ 174   2                      //if(sysVPMission.sWeihuTimer)
+ 175   2                      //      sysVPMission.sWeihuTimer--;
+ 176   2      
+ 177   2                      if( sysVPMission.VPDevCtr & 0x01 )
+ 178   2                      {
+ 179   3                  sysVPMission.sTimerBC++;
+CX51 COMPILER V7.50   TIMER                                                                10/23/2014 09:48:27 PAGE 4   
+
+ 180   3                  }
+ 181   2      
+ 182   2              //if( sysVPMission.VPDevCtr & 0x02 )
+ 183   2                      {
+ 184   3                  sysVPMission.sTimerChanger1++;
+ 185   3                  }
+ 186   2              
+ 187   2              if( sysVPMission.VPDevCtr & 0x04 )
+ 188   2                      {
+ 189   3                  sysVPMission.sTimerChanger2++;
+ 190   3                  }
+ 191   2              
+ 192   2              if( sysVPMission.VPDevCtr & 0x08 )
+ 193   2                      {
+ 194   3                  sysVPMission.sTimerChanger3++;
+ 195   3                  }
+ 196   2              
+ 197   2              if( sysVPMission.VPDevCtr & 0x10 )
+ 198   2                      {
+ 199   3                  sysVPMission.sTimerGOC++;
+ 200   3                  }
+ 201   2      
+ 202   2              sysVPMission.sTimertubeRemoved++;//币管没有关紧检测;by gzz 20110827 
+ 203   2      
+ 204   2                      if( sysVPMission.sTimerTubeUpdate > 0 )
+ 205   2                  sysVPMission.sTimerTubeUpdate --; 
+ 206   2      
+ 207   2              if( sysITLMission.sTimer1 > 0 )
+ 208   2                  sysITLMission.sTimer1 --; 
+ 209   2      
+ 210   2              if( sysITLMission.sTimer2 > 0 )
+ 211   2                  sysITLMission.sTimer2 --;
+ 212   2      
+ 213   2              if( sysITLMission.reEnableFlag == 1 )
+ 214   2              {
+ 215   3                  sysITLMission.reEnableTime ++;
+ 216   3              }
+ 217   2      
+ 218   2              if( sysITLMission.billJamedFlag == 1 )
+ 219   2              {
+ 220   3                      sysITLMission.billJamedTime ++;
+ 221   3              }
+ 222   2              
+ 223   2              if( sysITLMission.restartTime )
+ 224   2              {
+ 225   3                  sysITLMission.restartTime--;
+ 226   3              }
+ 227   2              //==========================================================
+ 228   2      
+ 229   2      
+ 230   2                      // 秒级延时区域
+ 231   2                      if ( Second >= 60 )
+ 232   2                      {
+ 233   3                              Second = 0;
+ 234   3                              if( AlarmSpacing < 255 )
+ 235   3                                      AlarmSpacing ++ ;
+ 236   3                              else
+ 237   3                                      AlarmSpacing = 0;                               
+ 238   3                              // 分钟级延时区域
+ 239   3                      //      if ( g_byCommHeartBeatMins ) g_byCommHeartBeatMins --;          
+ 240   3                      }               
+ 241   2                      if( GPRSModuleResetTimer > 0 )
+CX51 COMPILER V7.50   TIMER                                                                10/23/2014 09:48:27 PAGE 5   
+
+ 242   2                              GPRSModuleResetTimer--;
+ 243   2              }
+ 244   1          //#ifndef _DEBUG_MOBILE_TEST
+ 245   1              ZhkIOInputIsr();
+ 246   1      
+ 247   1      #ifdef _COIN_INPUT_PARALLEL
+ 248   1              ZyzChkCoinChnSta();
+ 249   1      #else
+                      ZhkChkCoinInIsr();
+              #endif
+ 252   1          //----------------------------------------------------------
+ 253   1              /*
+ 254   1          if( ( IfGameKeyOn() )&&(sysVPMission.comLock==0) )
+ 255   1              {
+ 256   1                      VPMission_Button_RPT( 0, 0 );
+ 257   1                  //Beep();
+ 258   1              }
+ 259   1              */
+ 260   1          //==========================================================
+ 261   1       
+ 262   1          //if ( Tick % 5 == 0 ) ZhkKeyScanIsr();
+ 263   1          //#endif    // _DEBUG_MOBILE_TEST   
+ 264   1              ZhkLoadChipSelect();
+ 265   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1161    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     20    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

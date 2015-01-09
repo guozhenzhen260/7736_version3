@@ -1,0 +1,51 @@
+---- sysVPMission.offLineFlag Æ¥Åä (50 ÔÚ 3 ÎÄ¼þ ) ----
+GoodsWaySet.c:101:                if( ( GoodsWaySetVal[m_SetArrayNo].GoodsCurrentSum != oldNum )&&(sysVPMission.offLineFlag == 0) )
+Mainflow.c:1941:	if(sysVPMission.offLineFlag==1)
+Mainflow.c:4461:			if(sysVPMission.offLineFlag == 1)
+Mainflow.c:7058:	if(sysVPMission.offLineFlag==1)
+Mainflow.c:7117:	if(sysVPMission.offLineFlag==1)
+VMC_PC.c:2905:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:2969:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:2992:			if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:2994:				sysVPMission.offLineFlag = 0;
+VMC_PC.c:3009:        if((  sysVPMission.comErrNum >= VP_TIME_OUNT_NUM )&&(sysVPMission.offLineFlag != 1) )
+VMC_PC.c:3011:			sysVPMission.offLineFlag = 1;
+VMC_PC.c:3031:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:3096:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:3125:			if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:3127:				sysVPMission.offLineFlag = 0;
+VMC_PC.c:3142:        if((  sysVPMission.comErrNum >= VP_TIME_OUNT_NUM )&&(sysVPMission.offLineFlag != 1) )
+VMC_PC.c:3144:			sysVPMission.offLineFlag = 1;
+VMC_PC.c:3278:		if(sysVPMission.offLineFlag == 0)
+VMC_PC.c:3285:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:3317:			if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:3319:				sysVPMission.offLineFlag = 0;
+VMC_PC.c:3334:        if((  sysVPMission.comErrNum >= VP_TIME_OUNT_NUM )&&(sysVPMission.offLineFlag != 1) )
+VMC_PC.c:3336:			sysVPMission.offLineFlag = 1;
+VMC_PC.c:3356:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:3376:			if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:3378:				sysVPMission.offLineFlag = 0;
+VMC_PC.c:3393:        if((  sysVPMission.comErrNum >= VP_TIME_OUNT_NUM )&&(sysVPMission.offLineFlag != 1) )
+VMC_PC.c:3395:			sysVPMission.offLineFlag = 1;
+VMC_PC.c:3417:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:3457:			if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:3459:				sysVPMission.offLineFlag = 0;
+VMC_PC.c:3475:		if((  sysVPMission.comErrNum >= VP_TIME_OUNT_NUM )&&(sysVPMission.offLineFlag != 1) )
+VMC_PC.c:3477:			sysVPMission.offLineFlag = 1;
+VMC_PC.c:3541:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:3606:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:4122:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:4144:			if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:4146:				sysVPMission.offLineFlag = 0;
+VMC_PC.c:4161:		if((  sysVPMission.comErrNum >= VP_TIME_OUNT_NUM )&&(sysVPMission.offLineFlag != 1) )
+VMC_PC.c:4163:			sysVPMission.offLineFlag = 1;
+VMC_PC.c:4185:	if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:4195:	if(sysVPMission.offLineFlag == 0)
+VMC_PC.c:4226:			if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:4228:				sysVPMission.offLineFlag = 0;
+VMC_PC.c:4242:		if((  sysVPMission.comErrNum >= VP_TIME_OUNT_NUM )&&(sysVPMission.offLineFlag != 1) )
+VMC_PC.c:4244:			sysVPMission.offLineFlag = 1;
+VMC_PC.c:4423:	sysVPMission.offLineFlag = 0;
+VMC_PC.c:4425:	while( (sysVPMission.VPInit == 0)&&(sysVPMission.offLineFlag == 0)&&(time<5) )
+VMC_PC.c:5015:		if(sysVPMission.offLineFlag == 1)
+VMC_PC.c:5091:	if(sysVPMission.offLineFlag == 1)

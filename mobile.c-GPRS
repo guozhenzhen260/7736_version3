@@ -1,0 +1,1719 @@
+// 手机模块驱动程序
+// 采用西门子m20手机模块
+#define MOBILE_C
+#define GPRS_C
+#define SMS_C
+
+#include "device.h"
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+#include "serial.h"
+#include "mobile.h"
+#include "timer.h"
+#include "debug.h"
+#include "global.h"
+
+#define ZHKMOBILE_CONNECTTIMEOUT  	180
+#define ZHKMOBILE_ACKTIMEOUT  		30
+
+uchar ZhkAtCmd( uchar* AtCmd );
+uchar ZhkAtCmdGetErr( void );
+uchar xdata ZhkAtCmdBuffer[ 1024 ];
+uint  xdata ZhkAtCmdBufWr;
+uchar MobileInitProcess( void );
+uchar ZhkMobileNullProcess( void );
+void ZhkMobileSignalIn( void );	
+
+#define ATCMD_ERR_NULL 		0
+#define ATCMD_ERR_BLOCK  	1
+#define ATCMD_ERR_TIMEOUT 	2
+#define ATCMD_ERR_ERR 		3
+uchar xdata ZhkAtCmdErr = ATCMD_ERR_NULL;
+
+#define ZHKTASKCLAIM_DIAL  	0x01		// 拨号请求 
+#define ZHKTASKCLAIM_HANG  	0x02		// 挂断请求 
+#define ZHKTASKCLAIM_CONNECT  	0x04	// 建链请求 
+#define ZHKTASKCLAIM_SHUT  	0x08		// 断链请求 
+#define ZHKTASKCLAIM_TXSMSG  	0x10 	// 发送短信请求 
+#define ZHKTASKCLAIM_TXTMSG  	0x40 	// 发送TCP信息请求 
+#define ZHKTASKCLAIM_QUERY  	0x80 	// 查询状态请求
+uchar xdata ZhkTaskClaim;			// 手机通信任务请求
+
+// 拨号状态
+#define MOBILE_NULL  		0x00  	// 空闲状态
+#define MOBILE_DIALUP 		0x01	// 拨号中
+#define MOBILE_HANGUP 		0x02	// 挂断中
+#define MOBILE_TCP_CONNECT 	0x03	// 建链中
+#define MOBILE_TXSHORTMSG	0x05	// 发送短信中
+#define MOBILE_RXSHORTMSG  	0x06 	// 接收短信中
+#define MOBILE_TCP_SHUT 	0x04	// 断链中
+#define MOBILE_TXTCPMSG  	0x07 	// 正在发送TCP信息
+#define MOBILE_RXTCPMSG     0x08	// 正在接收TCP信息
+#define MOBILE_INIT      	0x09	// 正在初始化
+#define MOBILE_QUERY      	0x0A	//查询
+uchar xdata ZhkMobileCurrentTask = MOBILE_NULL;		// 手机模块状态
+
+// 手机模块工作进度定义					
+#define MOBILE_BEGIN 	0x00
+#define MOBILE_STEP1 	0x01
+#define MOBILE_STEP2 	0x02
+#define MOBILE_STEP3 	0x03
+#define MOBILE_STEP4 	0x04
+#define MOBILE_STEP5 	0x05
+#define MOBILE_STEP6 	0x06
+#define MOBILE_STEP7 	0x07
+#define MOBILE_STEP8 	0x08
+#define MOBILE_STEP9 	0x09
+#define MOBILE_STEP10 	0x0a
+#define MOBILE_FINISH	0x10
+#define MOBILE_TIMEOUT 	0x11
+#define MOBILE_ERROR 	0x12	
+
+//手机模块死机控制
+#define GPRSMDeadJValue  3        //无应答次数
+#define GPRSMResetValue  150      //掉电时长 
+bit data GPRSModuleDeadFlag = 0;	//是否死机标志
+uchar xdata GPRSDeadTimer = 0;	  	//无回应次数
+
+#ifdef	_MOBILE_GPRS
+	// 服务器信息接收缓冲区
+	uchar xdata ZhkGprsMsgRxBuf[ 8192 ];
+	uint  xdata ZhkGprsMsgRxBufWr;
+	// 服务器信息发送缓冲区
+	uchar xdata ZhkGprsMsgTxBuf[ 1024 ];
+	uint  xdata ZhkGprsMsgTxBufWr;
+	
+	uchar xdata ZhkGprsVPN[20];
+	uchar xdata ZhkGprsIP[4];
+	uint  xdata ZhkGprsPort;
+
+	#define GPRS_STATUS_BREAK  		1
+	#define GPRS_STATUS_DIALUP  		2
+	#define GPRS_STATUS_CONNECTED  		3
+	#define GPRS_STATUS_CONNECTING  	4
+	#define GPRS_STATUS_HANGUP  		5
+	uchar xdata ZhkGprsStatus     	= GPRS_STATUS_BREAK;
+	uchar xdata	ZhkGprsLastErr       	= GPRS_ERR_BLOCK;
+	
+	uchar ZhkMobileGprsTxProcess( void );
+	uchar ZhkMobileGprsRxProcess( void );
+	uchar ZhkMobileGprsShutProcess( void );
+	uchar ZhkMobileGprsConnectProcess( void );
+	uchar ZhkMobileHangUpProcess( void );
+	uchar ZhkMobileDialUpProcess( void );	
+#endif
+
+#ifdef _MOBILE_SMS_1	
+	
+	#define SMS_MOBILE_STATUS_OK 1
+	#define SMS_MOBILE_STATUS_BROKEN 2
+	
+	uchar xdata SMSMobileStatus = SMS_MOBILE_STATUS_BROKEN;
+	// 短信接收缓冲区
+	struct SHORTMSG xdata ZhkSmsRxBuf;
+	uchar xdata ZhkSmsRxNum = 0;
+	uchar xdata NewCommingSmsSit[16];
+	// 短信发送缓冲区
+	struct SHORTMSG xdata ZhkSmsTxBuf;
+	uchar xdata ZhkSmsTxNum = 0;
+
+	uchar ZhkMobileSmsRxProcess( void );
+	uchar ZhkMobileSmsTxProcess( void );
+	uchar ZhkMobileSmsGetTxMsg( struct SHORTMSG* Msg );
+	uint ZhkMobileSmsUnpack( struct SHORTMSG xdata* Msg, uchar xdata* DataBuf , uint DataLen );
+	uint ZhkMobileSmsPack( struct SHORTMSG xdata* Msg, uchar xdata* DataBuf );
+	uchar ZhkGSMToAsc( uchar xdata* GSMCode , uchar xdata* AscCode , uchar len );
+//	uchar ZhkAscToGSM( uchar xdata* GSMCode , uchar xdata* AscCode , uchar len );	
+#endif
+
+//公共函数
+/////当空闲时处理任务队列中的任务
+uchar ZhkMobileNullProcess( void )
+{
+#ifdef _MOBILE_GPRS
+	if ( ZhkTaskClaim & ZHKTASKCLAIM_QUERY )
+	{
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+		ZhkMobileCurrentTask  = MOBILE_QUERY;
+		ZhkTaskClaim   &= ~ ZHKTASKCLAIM_QUERY;
+		return ZhkMobileCurrentTask;
+	}
+	if ( ZhkTaskClaim & ZHKTASKCLAIM_DIAL )
+	{
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+		ZhkMobileCurrentTask  = MOBILE_DIALUP;
+		ZhkTaskClaim   &= ~ ZHKTASKCLAIM_DIAL;
+		return ZhkMobileCurrentTask;
+	}
+	if ( ZhkTaskClaim & ZHKTASKCLAIM_HANG )
+	{
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+		ZhkMobileCurrentTask  = MOBILE_HANGUP;
+		ZhkTaskClaim   &= ~ ZHKTASKCLAIM_HANG;
+		return ZhkMobileCurrentTask;
+	}
+	if ( ZhkTaskClaim & ZHKTASKCLAIM_CONNECT )
+	{
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+		ZhkMobileCurrentTask  = MOBILE_TCP_CONNECT;
+		ZhkTaskClaim   &= ~ ZHKTASKCLAIM_CONNECT;
+		return ZhkMobileCurrentTask;
+	}
+	if ( ZhkTaskClaim & ZHKTASKCLAIM_SHUT )
+	{
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+		ZhkMobileCurrentTask  = MOBILE_TCP_SHUT;
+		ZhkTaskClaim   &= ~ ZHKTASKCLAIM_SHUT;
+		return ZhkMobileCurrentTask;
+	}	
+	if ( ( ZhkGprsMsgTxBufWr != 0 ) && ( ZhkGprsStatus == GPRS_STATUS_CONNECTED ))
+	{
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+		ZhkMobileCurrentTask  = MOBILE_TXTCPMSG;
+		ZhkTaskClaim   &= ~ZHKTASKCLAIM_TXTMSG;
+		return ZhkMobileCurrentTask;
+	}
+#endif
+
+#ifdef _MOBILE_SMS_1
+	if ( ZhkTaskClaim & ZHKTASKCLAIM_TXSMSG )
+	{
+		ZhkMobileCurrentTask  = MOBILE_TXSHORTMSG;
+		ZhkTaskClaim   &= ~ZHKTASKCLAIM_TXSMSG;
+		return ZhkMobileCurrentTask;
+	}
+
+	if ( NewCommingSmsSit[ 0 ] != -1 ) 
+	{
+		ZhkMobileCurrentTask  = MOBILE_RXSHORTMSG;
+		return ZhkMobileCurrentTask;
+	}
+#endif
+	return 0;
+}
+
+//公共函数
+////初始化手机模块
+uchar MobileInitProcess( void )
+{
+	static uchar xdata InitStatus = MOBILE_BEGIN;
+	uchar data temp;
+
+//	Trace( "\n MobileInitProcess start" );
+	switch( InitStatus )
+	{
+		case MOBILE_BEGIN:
+			ZhkSerialInit();
+		#ifdef _MOBILE_GPRS		
+			ZhkGprsMsgRxBufWr 	= 0;
+			ZhkGprsMsgTxBufWr 	= 0;
+			ZhkGprsStatus     	= GPRS_STATUS_BREAK;
+			ZhkGprsLastErr       	= GPRS_ERR_BLOCK;
+			ZhkTaskClaim           &= ZHKTASKCLAIM_TXTMSG;
+		#endif
+		#ifdef _MOBILE_SMS_1
+			ZhkSmsRxNum 		= 0;
+			ZhkSmsTxNum 		= 0;
+			SMSMobileStatus	    = SMS_MOBILE_STATUS_BROKEN;
+		#endif
+			ZhkMobileCurrentTask 	= MOBILE_INIT;			
+			ZhkAtCmd( "ATZ" );		
+			InitStatus = MOBILE_STEP1;
+		break;
+		case MOBILE_STEP1:
+			temp = ZhkAtCmdGetErr();
+			switch( temp )
+			{
+				case ATCMD_ERR_NULL:				
+					ZhkAtCmd( "AT+IPR=38400" );				
+					InitStatus = MOBILE_STEP2;				
+				break;
+				case ATCMD_ERR_BLOCK:
+				break;
+				case ATCMD_ERR_TIMEOUT:
+				case ATCMD_ERR_ERR:		
+					ZhkAtCmd( "ATZ" );
+				break;
+			}
+		break;
+		case MOBILE_STEP2:
+			temp = ZhkAtCmdGetErr();		
+			switch( temp )
+			{
+				case ATCMD_ERR_NULL:
+					ZhkAtCmd( "ATE0" );				
+					InitStatus = MOBILE_STEP3;				 
+				break;
+				case ATCMD_ERR_BLOCK:
+				break;
+				case ATCMD_ERR_TIMEOUT:
+				case ATCMD_ERR_ERR:	
+					ZhkAtCmd( "AT+IPR=38400" );	
+				break;
+			}
+		break;
+		case MOBILE_STEP3:
+			temp = ZhkAtCmdGetErr();
+			switch( temp )
+			{
+				case ATCMD_ERR_NULL:
+				#ifdef _MOBILE_GPRS		
+					ZhkAtCmd( "AT+CMGF=0" );
+				#endif
+					InitStatus = MOBILE_STEP4;
+				break;
+				case ATCMD_ERR_BLOCK:
+				break;
+				case ATCMD_ERR_TIMEOUT:
+				case ATCMD_ERR_ERR:
+					ZhkAtCmd( "ATE0" );
+				break;
+			}
+		break;
+		case MOBILE_STEP4:
+			temp = ZhkAtCmdGetErr();		
+			switch( temp )
+			{
+				case ATCMD_ERR_NULL:				
+				#ifdef _MOBILE_SMS_1				
+					ZhkAtCmd( "AT+CSCS=\"HEX\"" );
+				#endif
+					InitStatus = MOBILE_STEP5;		
+				break;
+				case ATCMD_ERR_BLOCK:
+				break;
+				case ATCMD_ERR_TIMEOUT:
+				case ATCMD_ERR_ERR:
+					ZhkAtCmd( "AT+CMGF=0" );			
+				break;
+			}
+		break;
+		case MOBILE_STEP5:
+		#ifdef  _MOBILE_SMS_1
+			temp = ZhkAtCmdGetErr();			
+		#else
+			temp = ATCMD_ERR_NULL;		
+		#endif
+			switch( temp )
+			{
+				case ATCMD_ERR_NULL:
+				#ifdef _MOBILE_GPRS
+					ZhkAtCmd( "AT+CNMI=2,1,0,0,1" );
+					InitStatus = MOBILE_STEP6;
+				#else
+					InitStatus        = MOBILE_BEGIN;
+					SMSMobileStatus	    = SMS_MOBILE_STATUS_OK;
+					return MOBILE_FINISH;
+				#endif									
+				break;
+				case ATCMD_ERR_BLOCK:
+				break;
+				case ATCMD_ERR_TIMEOUT:
+				case ATCMD_ERR_ERR:
+				#ifdef _MOBILE_SMS_1
+					ZhkAtCmd( "AT+CSCS=\"HEX\"" );
+				#endif
+				break;
+			}
+		break;
+		case MOBILE_STEP6:
+			temp = ZhkAtCmdGetErr();		
+			switch( temp )
+			{
+				case ATCMD_ERR_NULL:
+					InitStatus = MOBILE_STEP7;
+					ZhkAtCmd( "AT+CIPHEAD=1" );		
+				break;
+				case ATCMD_ERR_BLOCK:
+				break;
+				case ATCMD_ERR_TIMEOUT:
+				case ATCMD_ERR_ERR:
+		//		#ifdef _MOBILE_GPRS
+		//			ZhkAtCmd( "AT+CIPHEAD=1" );
+		//		#endif
+					ZhkAtCmd( "AT+CNMI=2,1,0,0,1" );
+				break;
+			}
+		break;
+		case MOBILE_STEP7:
+			temp = ZhkAtCmdGetErr();		
+			switch( temp )
+			{
+				case ATCMD_ERR_NULL:
+					InitStatus = MOBILE_STEP8;
+					ZhkAtCmd( "AT+CIPSHUT" );
+				break;
+				case ATCMD_ERR_BLOCK:
+				break;
+				case ATCMD_ERR_TIMEOUT:
+				case ATCMD_ERR_ERR:	
+					ZhkAtCmd( "AT+CIPHEAD=1" );		
+				break;
+			}
+		break;
+		case MOBILE_STEP8:
+			temp = ZhkAtCmdGetErr();
+			Trace( " temp = %bu", temp);		
+			switch( temp )
+			{
+				case ATCMD_ERR_BLOCK:
+				break;
+				case ATCMD_ERR_NULL:
+				case ATCMD_ERR_ERR:
+				#ifdef _MOBILE_GPRS
+					ZhkGprsStatus	  = GPRS_STATUS_HANGUP;				
+					ZhkGprsLastErr    = GPRS_ERR_NULL;		
+				#endif
+					InitStatus        = MOBILE_BEGIN;
+				return MOBILE_FINISH;
+				case ATCMD_ERR_TIMEOUT:
+				#ifdef _MOBILE_GPRS
+					ZhkAtCmd( "AT+CIPSHUT" );
+				#endif
+				break;
+			}
+		break;
+	}
+	return 0;
+}
+
+//公共函数
+///循环监控手机模块
+uchar ZhkMobileProcess( void )
+{	
+	ZhkMobileSignalIn();
+	switch( ZhkMobileCurrentTask )
+	{
+		case MOBILE_INIT:			
+			switch( MobileInitProcess() ) 
+			{
+				Trace( "\n MobileInitProcess end" );
+				case MOBILE_FINISH:					
+				case MOBILE_TIMEOUT:			
+				case MOBILE_ERROR:
+					ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+			}
+		break;
+		case MOBILE_NULL:
+			ZhkMobileNullProcess();
+		break;
+	#ifdef _MOBILE_GPRS
+		case MOBILE_DIALUP:
+			switch( ZhkMobileDialUpProcess() )
+			{
+				case MOBILE_FINISH:			
+				case MOBILE_TIMEOUT:			
+				case MOBILE_ERROR:
+					ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+			}
+		break;
+		case MOBILE_HANGUP:
+			switch( ZhkMobileHangUpProcess() ) 
+			{
+				case MOBILE_FINISH:			
+				case MOBILE_TIMEOUT:			
+				case MOBILE_ERROR:
+					ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+			}
+		break;
+		case MOBILE_TCP_CONNECT:
+			switch( ZhkMobileGprsConnectProcess() ) 
+			{
+				case MOBILE_FINISH:			
+				case MOBILE_TIMEOUT:			
+				case MOBILE_ERROR:
+					ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+			}
+		break;
+		case MOBILE_TCP_SHUT:
+			switch( ZhkMobileGprsShutProcess() ) 
+			{
+				case MOBILE_FINISH:			
+				case MOBILE_TIMEOUT:			
+				case MOBILE_ERROR:
+					ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+			}
+		break;		
+		case MOBILE_TXTCPMSG:
+			switch( ZhkMobileGprsTxProcess() ) 
+			{
+				case MOBILE_FINISH:			
+				case MOBILE_TIMEOUT:			
+				case MOBILE_ERROR:
+					ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+			}
+		break;
+		case MOBILE_RXTCPMSG:
+			switch( ZhkMobileGprsRxProcess() ) 
+			{
+				case MOBILE_FINISH:			
+				case MOBILE_TIMEOUT:			
+				case MOBILE_ERROR:
+					ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+			}
+		break;	
+	#endif
+	#ifdef _MOBILE_SMS_1
+		case MOBILE_TXSHORTMSG:
+			switch( ZhkMobileSmsTxProcess() ) 
+			{			
+				case MOBILE_FINISH:
+					ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+				case MOBILE_TIMEOUT:			
+			//		Trace("\n MOBILE_TIMEOUT");
+				case MOBILE_ERROR:
+			//		Trace("\n MOBILE_ERROR");
+					ZhkSerialPutCh( 0x1A );
+					ZhkSerialPutCh( 0x0D );
+					ZhkSerialPutCh( 0x0A );
+					ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+			}
+		break;
+		case MOBILE_RXSHORTMSG:
+			switch( ZhkMobileSmsRxProcess() ) 
+			{
+				case MOBILE_FINISH:			
+				case MOBILE_TIMEOUT:			
+				case MOBILE_ERROR:
+					ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+			}
+		break;
+	#endif
+		default:
+			ZhkMobileCurrentTask = MOBILE_NULL;
+		return MOBILE_ERROR;
+	}
+	return 0;
+}
+
+//公共函数
+///串口的信号进行，然后判断是什么信号
+void ZhkMobileSignalIn( void )
+{
+#ifdef	_MOBILE_SMS_1
+	#define SMSHEAD  "+CMTI"			
+#endif
+#ifdef	_MOBILE_GPRS
+	#define GPRSHEAD "+IPD"
+	#define GPRSCLOSE "CLOSED"
+#endif
+	
+	static uint  xdata CommingMsglen      = 0;
+	static uchar xdata CommingMsgAccepter = 0;
+	// 0 表示无
+	// 1 表示即将受到信息为gprs信息 
+	
+	static uchar MobileMsgTemp[ 1024 ];
+	static uint  i = 0;
+	uchar data j;
+	uchar data num;
+	if ( CommingMsgAccepter == 0 )
+	{
+		while( ! ZhkSerialIsRxBufNull() )
+		{
+			if ( i >= sizeof( MobileMsgTemp ) )
+		 		i = 0;
+			MobileMsgTemp[ i ++ ] = ZhkSerialGetCh();
+			MobileMsgTemp[ i ] = '\0';
+			if ( MobileMsgTemp[ i - 2 ] == '\r' && MobileMsgTemp[ i - 1 ] == '\n' )
+			{
+				i -= 2;
+			#ifdef _MOBILE_GPRS
+				if ( i >= strlen( GPRSCLOSE ) && memcmp( MobileMsgTemp , GPRSCLOSE , strlen( GPRSCLOSE ) ) == 0 )
+				{
+					ZhkGprsStatus  = GPRS_STATUS_BREAK;
+					ZhkGprsLastErr = GPRS_ERR_CONNECTBREAK;
+					ZhkAtCmdBufWr = 0;
+					i = 0;
+					return;
+				}
+			#endif
+			#ifdef	_MOBILE_SMS_1
+				if ( i > strlen( SMSHEAD ) &&  memcmp( MobileMsgTemp , SMSHEAD , strlen( SMSHEAD ) ) == 0 )
+				{
+					for( j = sizeof( SMSHEAD ) ; j < i ; j ++ )
+						if ( isdigit( MobileMsgTemp[ j ] ) ) break;
+					num = 0;
+					for( ; j < i ; j ++ )
+					{
+						if ( ! isdigit( MobileMsgTemp[ j ] ) ) break;					
+						num = num * 10 + MobileMsgTemp[ j ] - '0';
+					}
+					for( j = 0 ; j < sizeof( NewCommingSmsSit ) ; j ++ ) 
+						if ( NewCommingSmsSit[ j ] == -1 )
+				 			break;
+					if ( j < sizeof( NewCommingSmsSit ) )
+						NewCommingSmsSit[ j ] = num;
+					
+				}
+			 #endif
+				memcpy( ZhkAtCmdBuffer , MobileMsgTemp , i );
+				ZhkAtCmdBuffer[ i ] = '\0';
+				ZhkAtCmdBufWr = i;
+				i = 0;
+				Trace( "\n rx1:%s" , MobileMsgTemp );
+				return;
+			}
+			if ( MobileMsgTemp[ i - 1 ] == ':' )
+			{
+			#ifdef	_MOBILE_GPRS
+				if ( memcmp( MobileMsgTemp , GPRSHEAD , strlen( GPRSHEAD ) ) == 0 )
+				{
+					MobileMsgTemp[ i ] = '\0';
+					for( j = 0 ; j < i ; j ++ )
+						if ( isdigit( MobileMsgTemp[ j ] ) ) break;
+					CommingMsglen = 0;
+					for( ; j < i ; j ++ )
+					{
+						if ( ! isdigit( MobileMsgTemp[ j ] ) ) break;					
+						CommingMsglen = CommingMsglen * 10 + MobileMsgTemp[ j ] - '0';
+					}
+					CommingMsgAccepter = 1;
+					i = 0;
+		//			Trace( "\n rx2: GprsMsg:%d" , CommingMsglen );
+					Trace( "\n rx2: GprsMsg len = :%u" , CommingMsglen );
+		//			Trace( "\n rx2: GprsMsg = " );
+		//			for( i = 0; i < CommingMsglen; i++ )
+		//				Trace( " %bu", MobileMsgTemp[i] );
+		//			Trace("\n");
+					return;
+				}
+			#endif
+			} 
+			if ( MobileMsgTemp[ i - 1 ] == '>' && i == 1 )
+			{
+				
+				ZhkAtCmdBuffer[ 0 ] = '>';
+				ZhkAtCmdBuffer[ 1 ] = '\0';
+				ZhkAtCmdBufWr = 1;
+				i = 0;
+				Trace( "\n rx3: %s" , ZhkAtCmdBuffer );
+				return;
+			} 
+		}
+	}
+	else 
+	{
+		if ( ! ZhkSerialIsRxBufNull() )
+		{
+			CommingMsglen --;
+		#ifdef	_MOBILE_GPRS
+			if ( ZhkGprsMsgRxBufWr < sizeof( ZhkGprsMsgRxBuf ) )
+			{
+				ZhkGprsMsgRxBuf[ ZhkGprsMsgRxBufWr ++ ] = ZhkSerialGetCh();
+				//Trace( "%c", ZhkGprsMsgRxBuf[ ZhkGprsMsgRxBufWr -1 ]  );
+			}
+	    #endif
+			if ( CommingMsglen == 0 ) 
+			{
+		//		Trace( "\nGprsRecOver" );
+				ZhkAtCmdBufWr = 0;
+				CommingMsgAccepter = 0;
+			#ifdef	_MOBILE_GPRS
+				ZhkGprsMsgRxBuf[ ZhkGprsMsgRxBufWr ] = '\0';
+			#endif
+				i = 0;
+			}
+		}
+	}
+}
+
+//控制模块代码初始化
+uchar ZhkMobileInit( void )
+{	
+	memset( ZhkAtCmdBuffer, 0, sizeof( ZhkAtCmdBuffer ) );
+	ZhkAtCmdBufWr = 0;
+#ifdef _MOBILE_SMS_1
+	memset( NewCommingSmsSit , -1 , sizeof( NewCommingSmsSit ) );	
+	ZhkTaskClaim      	= 0;
+	// 短信接收缓冲区
+	memset( &ZhkSmsRxBuf, 0, sizeof( struct SHORTMSG ) );
+	ZhkSmsRxNum = 0;
+	
+	// 短信发送缓冲区
+	memset( &ZhkSmsTxBuf, 0, sizeof( struct SHORTMSG ) );
+	ZhkSmsTxNum = 0;
+	GPRSModuleDeadFlag = 0;
+	GPRSDeadTimer = 0;
+#endif
+#ifdef _MOBILE_GPRS
+	memset( ZhkGprsMsgRxBuf, 0, sizeof( ZhkGprsMsgRxBuf ) );
+	ZhkGprsMsgRxBufWr = 0;
+	memset( ZhkGprsMsgTxBuf, 0, sizeof( ZhkGprsMsgTxBuf ) );
+	ZhkGprsMsgTxBufWr = 0;
+	memset( ZhkGprsVPN, 0, sizeof( ZhkGprsVPN ) );
+	memset( ZhkGprsIP, 0, sizeof( ZhkGprsIP ) );
+	ZhkGprsPort = 0;
+	GprsInit();
+#endif
+	if( ZhkMobileCurrentTask == MOBILE_NULL )
+	{	
+		ZhkMobileCurrentTask = MOBILE_INIT;
+	 #ifdef _MOBILE_GPRS
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+	 #endif
+	}
+	return 0;
+}
+
+#ifdef _MOBILE_SMS_1
+	
+	bit IsShortMsgIn( void )
+	{
+		return ! ( ZhkSmsRxNum == 0 );
+	}
+	bit IsMessagerBuzy( void )
+	{
+		return ZhkSmsTxNum;
+	}
+	
+	bit	SMSMobileStatus()
+	{
+		if( SMSMobileStatus == SMS_MOBILE_STATUS_OK )
+			return 1;
+		else
+			return 0;
+	}
+
+	uchar GetShortMsg( struct SHORTMSG* Msg )
+	{
+		uchar data i = 0;
+	
+	//	Trace("\n GetShortMsg");	
+		if( ZhkSmsRxNum == 0 )
+		{
+	//		Trace("\n GetShortMsg fail");
+			return 1;
+		}
+		memcpy( Msg , &ZhkSmsRxBuf, sizeof( struct SHORTMSG ) );
+		ZhkSmsRxNum--;
+		memset( &ZhkSmsRxBuf, 0, sizeof( struct SHORTMSG ) );
+	/*	Trace("\n Have Msg In" );
+		Trace("\n Msg->phone = " ); 
+		for( i = 0; i < 8; i++ )		
+			Trace(" %02bx",Msg->phone[i] ); 
+		Trace("\n Msg->msg = " ); 
+		for( i = 0; i < Msg->len; i++ )		
+			Trace(" %02bx",Msg->msg[i] ); */
+		return 0;	
+	}
+	
+	uchar PutShortMsg( struct SHORTMSG* Msg )
+	{
+		ZhkTaskClaim |= ZHKTASKCLAIM_TXSMSG;
+	//	Trace( "\n PutShortMsg( %d )" , (int)Msg->len );
+	//	Trace( "\n ZhkSmsTxNum = %bu" , ZhkSmsTxNum );
+		if ( ZhkSmsTxNum > 0 ) 
+			return 1;
+		memcpy( &ZhkSmsTxBuf, Msg , sizeof( struct SHORTMSG ) );
+		ZhkSmsTxNum ++;
+		if ( ZhkSmsTxBuf.len > MAX_SMS_LEN ) 
+			ZhkSmsTxBuf.len = MAX_SMS_LEN;	
+		return ZhkSmsTxBuf.len;
+	}
+
+	void SMSSelectModuleState( )
+	{
+		#define GPRSMDeadJValue  3        //无应答次数
+#define GPRSMResetValue  150      //掉电时长 
+bit data GPRSModuleDeadFlag = 0;	//是否死机标志
+uchar xdata GPRSDeadTimer = 0;	  	//无回应次数
+		if( ( !GPRSModuleDeadFlag ) && ( !GPRSModuleResetTimer ) )//手机模块是正常状态
+		{
+			ZhkTaskClaim |= ZHKTASKCLAIM_TXSMSG;
+	//	Trace( "\n PutShortMsg( %d )" , (int)Msg->len );
+	//	Trace( "\n ZhkSmsTxNum = %bu" , ZhkSmsTxNum );		
+	}
+	
+	uchar ZhkMobileSmsTxProcess( void )
+	{
+		// AT+CMGS=<length><cr><lf>
+		// waitfor '>'
+		// SendMsg
+		// <^Z><cr><lf>
+		// waitfor OK
+		
+		static uchar xdata MsgTxStatus = MOBILE_BEGIN;
+		static uchar xdata DataTemp[ 512 ];
+		
+		struct SHORTMSG xdata SmsTemp;
+		uchar xdata CmdStr[ 128 ];
+		
+		uchar data temp;
+		uchar data len;
+		switch( MsgTxStatus )
+		{
+		case MOBILE_BEGIN:
+			if ( ZhkMobileSmsGetTxMsg( &SmsTemp ) )
+			{
+				ZhkMobileCurrentTask = MOBILE_NULL;
+				return MOBILE_FINISH;
+			}
+			len = ZhkMobileSmsPack( &SmsTemp , DataTemp );	
+			if ( len == 0 )
+			{
+				ZhkMobileCurrentTask = MOBILE_NULL;
+				return MOBILE_FINISH;
+			}
+			// 发送“发送短信”指令
+			len = sprintf( CmdStr , "AT+CMGS=%d" , ( int )len );
+			ZhkAtCmd( CmdStr );
+			MsgTxStatus       = MOBILE_STEP1;
+			break;	
+		case MOBILE_STEP1:			// 等待提示符	
+			// 阻塞状态直接返回
+		//	ZhkAtCmdGetErr();
+		//	Trace("\n ZhkAtCmdBufWr = %d", ZhkAtCmdBufWr );	
+		//	Trace("\n ZhkMobileSecTimer = %bu", ZhkMobileSecTimer );
+			if ( ZhkAtCmdBufWr == 0 )
+			{
+				if ( ZhkMobileSecTimer == 0 ) 
+				{
+					MsgTxStatus       = MOBILE_BEGIN;
+					return MOBILE_TIMEOUT;
+				}
+				 break;
+			}
+			ZhkAtCmdBufWr = 0;
+			// 手机模块正确接受到指令准备接收数据
+			if ( strcmp( ZhkAtCmdBuffer , ">" ) == 0 )
+			{
+				// 收到提示符，发送短信内容
+				Trace( "\n  YGP Send MSG");
+				ZhkAtCmd( DataTemp );
+				ZhkMobileSecTimer = ZHKMOBILE_ACKTIMEOUT;
+				MsgTxStatus       = MOBILE_STEP2;
+				break;
+			}
+			// 指令接受错误
+			if ( strstr( ZhkAtCmdBuffer , "ERROR" ) != NULL )
+			{
+				MsgTxStatus       = MOBILE_BEGIN;
+				return MOBILE_ERROR;
+				
+			}
+			// 超时
+			break;	
+		case MOBILE_STEP2:			// 等待OK
+			temp = ZhkAtCmdGetErr();
+			switch( temp )
+			{
+			case ATCMD_ERR_NULL:
+				// 发送成功
+				MsgTxStatus       = MOBILE_BEGIN;
+				ZhkMobileCurrentTask = MOBILE_NULL;
+				return MOBILE_FINISH;
+			case ATCMD_ERR_BLOCK:
+				// 阻塞状态直接返回
+				break;						
+			case ATCMD_ERR_TIMEOUT:
+				// 短信超时处理
+				ZhkMobileCurrentTask = MOBILE_NULL;
+				MsgTxStatus       = MOBILE_BEGIN;
+				return MOBILE_TIMEOUT;
+			case ATCMD_ERR_ERR:
+				// 发送失败
+				ZhkMobileCurrentTask = MOBILE_NULL;
+				MsgTxStatus       = MOBILE_BEGIN;
+				return MOBILE_ERROR;
+			}
+			break;	
+		default:
+			MsgTxStatus       = MOBILE_BEGIN;
+			return MOBILE_ERROR;
+		}
+		return MsgTxStatus;
+	}
+	uchar ZhkMobileSmsRxProcess( void )
+	{
+		// AT+CMGR=n
+		// getline index "+cgml" and 编号n
+		// getline unpack
+		// waitfor ok
+		// AT+CMGD=n
+		// waitfor ok
+		static uchar xdata MsgRxStatus = MOBILE_BEGIN;
+		static uchar xdata DataTemp[ 512 ];
+		static uchar xdata MsgNum;
+		struct SHORTMSG xdata SmsTemp;
+		uchar xdata CmdStr[ 128 ];
+		uchar data i;
+		uchar data temp;
+		uint  data len;
+		switch( MsgRxStatus )
+		{
+		case MOBILE_BEGIN:
+			// 已经有新的短信，准备接收			
+			if ( NewCommingSmsSit[ 0 ] == -1 ) 
+				break;
+			MsgNum = NewCommingSmsSit[ 0 ];
+			for( i = 0 ; i < sizeof( NewCommingSmsSit ) - 1 ; i ++ )
+			{
+				NewCommingSmsSit[ i ] = NewCommingSmsSit[ i + 1 ];
+			}
+			NewCommingSmsSit[ sizeof( NewCommingSmsSit ) - 1 ] = -1;
+			sprintf( CmdStr , "AT+CMGR=%bd\0" , MsgNum );			// AT+CMGR=n
+			ZhkAtCmd( CmdStr );
+			ZhkMobileSecTimer = ZHKMOBILE_ACKTIMEOUT;
+			MsgRxStatus       = MOBILE_STEP1;		
+			break;
+		case MOBILE_STEP1:
+			// 阻塞状态直接返回
+			if ( ZhkAtCmdBufWr == 0 )
+			{
+				if ( ZhkMobileSecTimer == 0 ) 
+				{
+					MsgRxStatus       = MOBILE_BEGIN;
+					return MOBILE_TIMEOUT;
+				}
+				break;
+			}		
+			ZhkAtCmdBufWr = 0;
+			// 指令正确接收,进入下一步工作	收到 “+CMGR”
+	//		Trace( "ZhkMobileSmsRxProcess1:\n%s\n" , ZhkAtCmdBuffer );
+			if ( memcmp( ZhkAtCmdBuffer , "+CMGR" , strlen( "+CMGR" ) ) == 0 )
+			{
+				ZhkMobileSecTimer = ZHKMOBILE_ACKTIMEOUT;
+				MsgRxStatus       = MOBILE_STEP2;
+				break;
+			}
+			// 指令错误接收,返回
+			if ( strstr( ZhkAtCmdBuffer , "ERROR" ) != NULL )
+			{
+				MsgRxStatus       = MOBILE_BEGIN;
+				return MOBILE_ERROR;
+			}
+			// 操作超时
+	//		Trace("\n ZhkMobileSmsRxProcess31 \n" );
+			break;
+		case MOBILE_STEP2:
+			// 阻塞状态直接返回
+			if ( ZhkAtCmdBufWr == 0 ) 
+			{
+				// 操作超时
+				if ( ZhkMobileSecTimer == 0 ) 
+				{
+					MsgRxStatus       = MOBILE_BEGIN;
+					return MOBILE_TIMEOUT;
+				}
+				break;
+			}		
+			// 接收到短信,解析处理,并且进入下一步工作
+	//		Trace( "\n ZhkMobileSmsRxProcess2:%s" , ZhkAtCmdBuffer );
+			memcpy( DataTemp , ZhkAtCmdBuffer , ZhkAtCmdBufWr );
+			len = ZhkMobileSmsUnpack( &SmsTemp , DataTemp , ZhkAtCmdBufWr );
+	//		Trace("\n len = %d \n", len );
+			ZhkAtCmdBufWr = 0;
+			if ( len )
+			{
+				
+				//ZhkMobileSmsPutRxMsg( &SmsTemp );
+				//保存短信息			
+				if( ZhkSmsRxNum != 0 )
+				{
+					//接收区已满
+					Trace("\n RxBuffer is over" );			
+				}
+				memcpy( &ZhkSmsRxBuf, &SmsTemp , sizeof( struct SHORTMSG ) );
+				{
+					ZhkSmsRxNum ++;
+				//	Trace("\n RxBuffer is NULL" );
+				//	Trace("\n ZhkSmsRxNum = %bu", ZhkSmsRxNum );				
+				}			
+				Trace( "\n MSG = " );
+				for( i = 0; i < SmsTemp.len; i++ )
+					Trace( " %02bx", SmsTemp.msg[i] );
+				Trace( "\n" );
+			}
+			MsgRxStatus       = MOBILE_STEP3;
+		//	ZhkMobileSecTimer = ZHKMOBILE_ACKTIMEOUT;			
+			break;
+		case MOBILE_STEP3:					// 等待OK		
+			//删除短讯
+			if( MsgNum > 0 )
+			{
+				sprintf( CmdStr , "AT+CMGD=%d" , (int)MsgNum );
+				ZhkAtCmd( CmdStr );		
+				MsgRxStatus       = MOBILE_STEP4;
+				MsgNum--;
+				break;
+			}
+			else
+			{
+				MsgRxStatus        = MOBILE_BEGIN;
+				return MOBILE_FINISH;
+			}
+		case MOBILE_STEP4:		
+			temp = ZhkAtCmdGetErr();
+		//	Trace("\n ZhkMobileSmsRxProcess6 \n" );
+		//	Trace( "\n temp = %bu", temp );
+			switch( temp )
+			{
+			case ATCMD_ERR_NULL://0					
+			case ATCMD_ERR_TIMEOUT://2			
+			case ATCMD_ERR_ERR:
+				if( MsgNum > 0 )
+				{
+					sprintf( CmdStr , "AT+CMGD=%d" , (int)MsgNum );
+					ZhkAtCmd( CmdStr );						
+					MsgNum--;				
+				}
+				else
+				{
+					MsgRxStatus        = MOBILE_BEGIN;
+					return MOBILE_FINISH;
+				}
+				break;
+			case ATCMD_ERR_BLOCK://1
+				// 阻塞状态直接返回
+				break;						
+			}		
+		}
+	}
+
+	// 返回值等于0表示操作成功从发送缓冲区取到短信
+	// 返回值非零表示操作失败
+	uchar ZhkMobileSmsGetTxMsg( struct SHORTMSG* Msg )
+	{
+		if ( ZhkSmsTxNum == 0) 
+			return 1;
+		memcpy( Msg , &ZhkSmsTxBuf, sizeof( struct SHORTMSG ) );
+		ZhkSmsTxNum --;
+		return 0;
+	}
+	
+	//////////////////////////
+	/////如果进来的短信是7位编码，则要用此函数转化为8位编码
+	// GSM字符串(每个字符7位)转化为Asc字符串(每个字符8位)
+	// GSMCode：GSM字符串(每个字符7位)，
+	// AscCode：Asc字符串(每个字符8位)
+	// len: 字符串长度，即字符个数为
+	uchar ZhkGSMToAsc( uchar xdata* GSMCode , uchar xdata* AscCode , uchar len )
+	{
+		uchar data lentemp;
+		uchar data i;
+		uchar xdata GSMTemp[7];
+		uchar xdata AscTemp[8];
+	
+		// 如需考虑西欧字母和符号应在此处未进行查表处理.	
+		lentemp = len;
+		while( lentemp )
+		{
+			for( i = 0 ; i < 7 ; i ++ ) 
+				GSMTemp[ i ] = GSMCode[ i ];
+			AscTemp[ 0 ] =   GSMTemp[ 0 ] & 0x7F;
+			AscTemp[ 1 ] = ( GSMTemp[ 0 ] >> 7 ) | ( ( GSMTemp[ 1 ] << 1 ) & 0x7F );
+			AscTemp[ 2 ] = ( GSMTemp[ 1 ] >> 6 ) | ( ( GSMTemp[ 2 ] << 2 ) & 0x7F );
+			AscTemp[ 3 ] = ( GSMTemp[ 2 ] >> 5 ) | ( ( GSMTemp[ 3 ] << 3 ) & 0x7F );
+			AscTemp[ 4 ] = ( GSMTemp[ 3 ] >> 4 ) | ( ( GSMTemp[ 4 ] << 4 ) & 0x7F );
+			AscTemp[ 5 ] = ( GSMTemp[ 4 ] >> 3 ) | ( ( GSMTemp[ 5 ] << 5 ) & 0x7F );
+			AscTemp[ 6 ] = ( GSMTemp[ 5 ] >> 2 ) | ( ( GSMTemp[ 6 ] << 6 ) & 0x7F );
+			AscTemp[ 7 ] =   GSMTemp[ 6 ] >> 1;
+		//	Trace("\n AscCode = ");
+			for( i = 0 ; i < 8 && i < lentemp ; i ++ )
+			{
+				AscCode[ i ] = AscTemp[ i ];
+		//		Trace(" %02bx", AscCode[i] );
+			}
+		//	Trace("\n");
+			AscCode += 8;
+			GSMCode += 7;
+			lentemp -= i;
+		}
+		return len;
+	}
+		
+	// GSMCode：GSM字符串(每个字符8位)，
+	// MessageCode：消息字符串(每个字符8位)
+	// len: 字符串长度，即字符个数为
+	// 返回转换结果的长度
+	//此函数是把短信内容变为7位码的函，现在不用了
+	/*
+	uchar ZhkMessageToGSM( uchar xdata* GSMCode , uchar xdata* MessageCode , uchar len )
+	{
+		uchar lentemp;
+		uchar data i;
+		uchar xdata GSMTemp[7];
+		uchar xdata AscTemp[8];
+		
+		for( i = 0; i < len; i++ )		
+			sprintf( GSMCode+2*i,"%02bx", MessageCode[i] );
+
+		lentemp = len;
+		while( lentemp )
+		{
+			for( i = 0 ; i < 8  ; i ++ ) AscTemp[ i ] = 0;
+			for( i = 0 ; i < 8 && i < lentemp; i ++ ) AscTemp[ i ] = AscCode[ i ] & 0x7F;
+			
+			GSMTemp[ 0 ] =   AscTemp[ 0 ]        | ( AscTemp[ 1 ] << 7 );
+			GSMTemp[ 1 ] = ( AscTemp[ 1 ] >> 1 ) | ( AscTemp[ 2 ] << 6 );
+			GSMTemp[ 2 ] = ( AscTemp[ 2 ] >> 2 ) | ( AscTemp[ 3 ] << 5 );
+			GSMTemp[ 3 ] = ( AscTemp[ 3 ] >> 3 ) | ( AscTemp[ 4 ] << 4 );
+			GSMTemp[ 4 ] = ( AscTemp[ 4 ] >> 4 ) | ( AscTemp[ 5 ] << 3 );
+			GSMTemp[ 5 ] = ( AscTemp[ 5 ] >> 5 ) | ( AscTemp[ 6 ] << 2 );
+			GSMTemp[ 6 ] = ( AscTemp[ 6 ] >> 6 ) | ( AscTemp[ 7 ] << 1 );
+			
+			for( i = 0 ; i < 7 && i < ( ( uint )len * 7 + 7 ) / 8 ; i ++ )
+				GSMCode[ i ] = GSMTemp[ i ];
+			if ( lentemp < 8 ) lentemp = 8;
+			AscCode += 8;
+			GSMCode += 7;
+			lentemp -= 8;
+		}
+		// 如需考虑西欧字母和符号应在此处未进行查表处理.
+		return ( ( int )len * 7 + 7 ) / 8;
+	}*/
+
+	// 手机短信编码
+	// 返回编码后去掉短信中心号码剩下部分的字符长度
+	uint ZhkMobileSmsPack( struct SHORTMSG xdata* Msg, uchar xdata* DataBuf )
+	{
+		uchar code HexStr[] = "0123456789ABCDEF";
+		uint data len;
+		uint data i;
+		uchar xdata TempBuf[ 256 ];
+		len = 0;
+			
+		memset( TempBuf, 0, sizeof( TempBuf ) );
+	
+		// 使用缺省短信中心号码
+		TempBuf[ len ++ ] = 00;
+		
+		// PDU类型,
+		TempBuf[ len ++ ] = 0x11;
+		
+		// MR
+		TempBuf[ len ++ ] = 0x00;
+		
+		
+		// 对方手机号码	
+		//取对方手机号码长度		
+		for( i = 0 ; i < sizeof( Msg->phone ) ; i ++ )	
+		{
+			if ( Msg->phone[ i ] == 0xff )
+			{
+				if ( ( Msg->phone[ i - 1 ] & 0x0F ) == 0x0F ) 				
+				{
+					TempBuf[ len++ ] = i*2 - 1;					
+					break;
+				}
+				else
+				{
+					TempBuf[ len++ ] = i*2;
+					break;
+				}
+			}
+		}
+	//	if( i == sizeof( Msg->phone ) )
+	//		TempBuf[ len++ ] = strlen( Msg->phone );
+	
+		TempBuf[ len ++ ] = 0x91;	// 0x81本地手机,0x91国标的
+	//	TempBuf[ len ++ ] = 0x68;	// 本地手机
+		for( i = 0 ; i < sizeof(Msg->phone ) ; i ++ )
+		{
+			if ( Msg->phone[ i ] == 0xFF ) 
+				break;
+			TempBuf[ len ++ ] = Msg->phone[ i ] / 16 + Msg->phone[ i ] * 16;
+		}
+		
+		// PID
+		TempBuf[ len ++ ] = 0x00;
+		
+		// DCS 编码类型为7位GSM编码(0x00),0x04为8位编号
+		TempBuf[ len ++ ] = 0x04;
+		
+		// VP = 63weeks,有效期为5分钟
+		TempBuf[ len ++ ] = 0x00;
+		
+		// 
+		TempBuf[ len ++ ] = Msg->len;	
+		memcpy( TempBuf + len, Msg->msg, Msg->len );		
+		len += Msg->len;
+		for( i = 0 ; i < len ; i ++ )
+		{
+			DataBuf[ 2 * i + 0 ] = HexStr[ TempBuf[ i ] / 16 ];
+			DataBuf[ 2 * i + 1 ] = HexStr[ TempBuf[ i ] % 16 ];				
+		}	
+		i *= 2;
+		DataBuf[ i ++ ] = 0x1A;
+		DataBuf[ i ++ ] = '\0';
+		return len - 1;
+	}
+	
+	// 返回值
+	// 短信的信息长度
+	uint ZhkMobileSmsUnpack( struct SHORTMSG xdata* Msg, uchar xdata* DataBuf , uint DataLen ) 
+	{
+	
+		uchar code HexNum[] = { 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 ,
+			                      0 , 0 , 0 , 0 , 0 , 0 , 0 , 
+			                      10, 11, 12, 13,14 ,15 };
+		uchar xdata TempBuf[ 256 ];
+		uint data i;
+		uchar data ch;
+		uchar xdata* data p;
+		uchar VpfTemp;
+	
+		for( i = 0 ; i < DataLen / 2 ; i ++ )
+		{
+			TempBuf[ i ] = HexNum[ DataBuf[ 2 * i ] - '0' ] * 16 + 
+				HexNum[ DataBuf[ 2 * i + 1 ] - '0' ];
+	//		Trace( " %02bx", TempBuf[ i ] );
+		}
+		// 取手机号码长度
+		p  = TempBuf + TempBuf[ 0 ] + 1;	
+		VpfTemp = ( *p / 0x08 ) & 0x03;	
+		p += 1;
+		ch = *p;
+		
+		// 取手机号码
+		p += 2;	
+		for( i = 0 ; i < ( ch + 1 ) / 2 ; i ++ )
+		{
+			Msg->phone[ i ] = p[ i ] / 16 + p[ i ] % 16 * 16;	
+		}	
+	
+		p += i + 1;	
+		for( ; i < sizeof( Msg->phone ) ; i ++ )
+	 		Msg->phone[ i ] = -1;
+		// 取DCS
+		ch = *p;	
+		// 不是7位gsm编码不作处理
+		if ( ch & 0x04 == 0 )
+		{ 	
+		//7位编号
+			// 取短信长度
+			switch( VpfTemp )
+			{
+			case 3:
+				p += 6;
+			case 2:
+				p ++;
+			case 0:
+				p += 8;
+			}
+			Msg->len = *p;
+		
+			// 取短信
+			p ++;
+			return ZhkGSMToAsc( p , Msg->msg , Msg->len );
+		}
+		else if( ch & 0x04 == 0x04 )
+		{
+			//8位编码
+			// 取短信长度
+			switch( VpfTemp )
+			{
+			case 3:
+				p += 6;
+			case 2:
+				p ++;
+			case 0:
+				p += 8;
+			}
+			Msg->len = *p;
+		
+			// 取短信
+			p ++;		
+			memcpy( Msg->msg, p, Msg->len );
+			
+			if( Msg->len > 0 )
+			{
+				//转化为8位ASC码
+				for( i = 0; i < ( Msg->len / 2 ); i++ )
+					Msg->msg[i] = Msg->msg[2*i + 1];
+				for( ; i < Msg->len; i++ )
+					Msg->msg[i] = 0;			
+				Msg->len = Msg->len / 2 ;
+			}		
+			return Msg->len/2;
+		}
+	}	
+#endif
+
+#ifdef _MOBILE_GPRS
+
+	uchar GprsInit( void )
+	{
+	//	Trace("Init1 GPRS" );
+		if( ZhkMobileCurrentTask == MOBILE_NULL )
+		{
+	//		Trace("Init2 GPRS" );
+			ZhkMobileCurrentTask = MOBILE_INIT;
+			ZhkGprsLastErr = GPRS_ERR_BLOCK;
+			return 1;
+		}
+		return 0;
+	}
+	void GprsDailUp( uchar* VPN )
+	{
+	//	Trace("GprsDailUp" );
+		ZhkTaskClaim |= ZHKTASKCLAIM_DIAL;
+		memcpy( ZhkGprsVPN , VPN , sizeof( ZhkGprsVPN ) );
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+		
+	}
+	void GprsHangUp( void )
+	{
+	//	Trace("GprsHangUp" );
+		ZhkTaskClaim |= ZHKTASKCLAIM_HANG;
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+	}
+	void GprsConnect( uchar* IP , uint Port )
+	{
+	//	Trace("GprsConnect" );
+		ZhkTaskClaim |= ZHKTASKCLAIM_CONNECT;
+		memcpy( ZhkGprsIP , IP , sizeof( ZhkGprsIP ) );
+		ZhkGprsPort = Port;
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+		ZhkGprsMsgRxBufWr = 0;
+	}
+	void GprsShut( void )
+	{
+	//	Trace("GprsShut" );
+		ZhkTaskClaim |= ZHKTASKCLAIM_SHUT;
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+		ZhkGprsMsgRxBufWr = 0;
+	}
+	int GprsSendMsg( uchar* GprsMsg , int len )
+	{
+		if ( len > sizeof( ZhkGprsMsgTxBuf ) - ZhkGprsMsgTxBufWr ) len = sizeof( ZhkGprsMsgTxBuf ) - ZhkGprsMsgTxBufWr;
+		if ( ZhkGprsStatus != GPRS_STATUS_CONNECTED )
+		{
+			ZhkGprsLastErr = GPRS_ERR_CONNECTING;
+			return -1;
+		}
+		memcpy( ZhkGprsMsgTxBuf + ZhkGprsMsgTxBufWr , GprsMsg , len );
+		ZhkGprsMsgTxBufWr += len;
+		ZhkGprsLastErr = GPRS_ERR_BLOCK;
+		return len;
+	}
+	int GprsRecvMsg( uchar *GprsMsg , int len )
+	{
+		if ( len > ZhkGprsMsgRxBufWr ) len = ZhkGprsMsgRxBufWr;
+		memcpy( GprsMsg , ZhkGprsMsgRxBuf , len );
+		memcpy( ZhkGprsMsgRxBuf , ZhkGprsMsgRxBuf + len , ZhkGprsMsgRxBufWr - len );
+		ZhkGprsMsgRxBufWr -= len;
+		return len;
+	}
+	uchar GprsSelect( void )
+	{
+		uchar data temp;
+		temp = 0;
+		if ( ZhkGprsMsgTxBufWr < sizeof( ZhkGprsMsgTxBuf )/*ZhkMobileGprsIsTxBufFull()*/ ) 
+			temp |= GPRS_WRITEABLE;
+		if ( ZhkGprsMsgRxBufWr != 0 /*! ZhkMobileGprsIsRxBufNull()*/ ) 
+			temp |= GPRS_READABLE;
+		if ( GprsGetLastErr() )
+			temp |= GPRS_ERROR;
+		return temp;
+	}
+	
+	uchar GprsGetLastErr( void )
+	{
+		switch( ZhkGprsLastErr )
+		{
+		case GPRS_ERR_NULL:
+		case GPRS_ERR_BLOCK:
+		case GPRS_ERR_TIMEOUT:
+		case GPRS_ERR_SENDFAIL:
+			return ZhkGprsLastErr;
+			break; 
+		case GPRS_ERR_HANGUP:
+		case GPRS_ERR_CONNECTBREAK:
+		case GPRS_ERR_CONNECTING:
+			switch( ZhkGprsStatus )
+			{
+			case GPRS_STATUS_BREAK:
+				return GPRS_ERR_CONNECTBREAK;
+			case GPRS_STATUS_DIALUP:
+				return GPRS_ERR_HANGUP;
+			case GPRS_STATUS_CONNECTING:
+				return GPRS_ERR_CONNECTING;
+			}
+		}
+		return ZhkGprsLastErr;
+	}
+
+	uchar ZhkMobileDialUpProcess( void )
+	{
+		static uchar xdata DialUpStatus = MOBILE_BEGIN;
+		uchar data temp;
+		
+		// at+cgatt=1
+		// waitfor ok
+		
+		switch( DialUpStatus )
+		{
+		case MOBILE_BEGIN:
+			ZhkAtCmd( "AT+CGATT=1" );//GPRS附着或分离指令,此时是附着
+			DialUpStatus = MOBILE_STEP1;
+			break;
+		case MOBILE_STEP1:
+			temp = ZhkAtCmdGetErr();
+			switch( temp )
+			{
+			case ATCMD_ERR_NULL:
+				// 拨号成功处理
+				ZhkMobileSecTimer = ZHKMOBILE_ACKTIMEOUT;
+				ZhkGprsStatus	  = GPRS_STATUS_DIALUP;
+				DialUpStatus      = MOBILE_BEGIN;
+				ZhkGprsLastErr     = GPRS_ERR_NULL;
+				ZhkMobileCurrentTask = MOBILE_NULL;
+				return MOBILE_FINISH;
+			case ATCMD_ERR_BLOCK:
+				// 阻塞状态直接返回
+				break;						
+			case ATCMD_ERR_TIMEOUT:
+				// 拨号超时处理
+				DialUpStatus      = MOBILE_BEGIN;
+				ZhkGprsLastErr     = GPRS_ERR_TIMEOUT;
+				ZhkMobileCurrentTask = MOBILE_NULL;
+				return MOBILE_TIMEOUT;
+			case ATCMD_ERR_ERR:
+				// 拨号失败处理
+				DialUpStatus      = MOBILE_BEGIN;
+				ZhkGprsStatus	  = GPRS_STATUS_BREAK;
+				ZhkGprsLastErr     = GPRS_ERR_HANGUP;
+				ZhkMobileCurrentTask = MOBILE_NULL;
+				return MOBILE_ERROR;
+			}
+			break;
+		default:
+			DialUpStatus      = MOBILE_BEGIN;
+			return MOBILE_ERROR;
+		}
+		return DialUpStatus;
+	}
+	
+	uchar ZhkMobileHangUpProcess( void )
+	{
+		// at+cgatt=0
+		// waitforok
+		static uchar xdata HangUpStatus = MOBILE_BEGIN;
+		uchar data temp;
+		switch( HangUpStatus )
+		{
+		case MOBILE_BEGIN:
+			ZhkAtCmd( "AT+CGATT=0" );//GPRS附着或分离指令,此时是分离
+			HangUpStatus = MOBILE_STEP1;
+			break;
+		case MOBILE_STEP1:
+			temp = ZhkAtCmdGetErr();
+			switch( temp )
+			{
+			case ATCMD_ERR_NULL:
+				// 挂断成功处理
+				ZhkMobileSecTimer = ZHKMOBILE_ACKTIMEOUT;
+				ZhkGprsStatus     = GPRS_STATUS_BREAK;
+				HangUpStatus      = MOBILE_BEGIN;
+				ZhkGprsLastErr     = GPRS_ERR_NULL;
+				ZhkMobileCurrentTask = MOBILE_NULL;
+				break;
+			case ATCMD_ERR_BLOCK:
+				// 阻塞状态直接返回
+				break;						
+			case ATCMD_ERR_TIMEOUT:
+				// 挂断超时处理
+				HangUpStatus      = MOBILE_BEGIN;
+				ZhkGprsStatus     = GPRS_STATUS_BREAK;
+				ZhkGprsLastErr     = GPRS_ERR_TIMEOUT;
+				return MOBILE_TIMEOUT;
+			case ATCMD_ERR_ERR:
+				// 挂断失败处理
+				HangUpStatus      = MOBILE_BEGIN;
+				ZhkGprsStatus     = GPRS_STATUS_BREAK;
+				ZhkGprsLastErr     = GPRS_ERR_HANGUP;
+				return MOBILE_ERROR;
+			}
+			break;
+		default:
+			HangUpStatus      = MOBILE_BEGIN;
+			return MOBILE_ERROR;
+		}
+		
+		return HangUpStatus;
+	}
+	
+	uchar ZhkMobileGprsConnectProcess( void )
+	{
+		// AT+CIPSTART="TCP","IP","PORT"
+		// waitfor ok
+		// waitfor connect ok
+		static uchar xdata ConnectStatus = MOBILE_BEGIN;
+		uchar xdata CmdStr[ 128 ];
+		uchar  data len;
+		uchar  data temp;
+		switch( ConnectStatus )
+		{
+		case MOBILE_BEGIN:	
+			len = sprintf( CmdStr , "AT+CIPSTART=\"TCP\",\"%d.%d.%d.%d\",\"%ld\"\0" ,  
+				( int )ZhkGprsIP[ 0 ] , ( int )ZhkGprsIP[ 1 ] , 
+				( int )ZhkGprsIP[ 2 ] , ( int )ZhkGprsIP[ 3 ] , (long)ZhkGprsPort );
+			ZhkAtCmd( CmdStr );
+			ConnectStatus     = MOBILE_STEP1;
+			break;
+		case MOBILE_STEP1:			// waitfor OK
+			temp = ZhkAtCmdGetErr();
+			switch( temp )
+			{
+			case ATCMD_ERR_NULL:
+				// 手机模块正确接收指令，
+				ZhkMobileSecTimer = ZHKMOBILE_CONNECTTIMEOUT;
+				ConnectStatus     = MOBILE_STEP2;
+				break;
+			case ATCMD_ERR_BLOCK:
+				// 阻塞状态直接返回
+				break;						
+			case ATCMD_ERR_TIMEOUT:
+				// 手机模块接收指令超时，
+				ConnectStatus     = MOBILE_BEGIN;
+				ZhkGprsStatus     = GPRS_STATUS_CONNECTING;
+				ZhkGprsLastErr    = GPRS_ERR_CONNECTING;
+				return MOBILE_TIMEOUT;
+			case ATCMD_ERR_ERR:
+				// 手机模块接收指令出错，
+				ConnectStatus     = MOBILE_BEGIN;
+				ZhkGprsStatus     = GPRS_STATUS_CONNECTING;
+				ZhkGprsLastErr    = GPRS_ERR_CONNECTING;
+				return MOBILE_ERROR;
+			}
+			break;	
+		case MOBILE_STEP2:  			// wait for connectok
+			// 阻塞状态直接返回
+			if ( ZhkAtCmdBufWr == 0 )
+			{
+				if ( ZhkMobileSecTimer == 0 )
+				{
+					ConnectStatus     = MOBILE_BEGIN;
+					ZhkGprsStatus     = GPRS_STATUS_CONNECTING;
+					ZhkGprsLastErr    = GPRS_ERR_CONNECTING;
+					return MOBILE_TIMEOUT;
+				}
+				 break;	
+			}
+			ZhkAtCmdBufWr = 0;
+			// 连接成功
+			if ( strcmp( ZhkAtCmdBuffer , "CONNECT OK" ) == 0 )
+			{
+				ConnectStatus     = MOBILE_BEGIN;
+				ZhkGprsStatus     = GPRS_STATUS_CONNECTED;
+				ZhkGprsLastErr    = GPRS_ERR_NULL;
+				return MOBILE_FINISH;
+			}
+			if ( strcmp( ZhkAtCmdBuffer , "CONNECT FAIL" ) == 0 )
+			{
+				ConnectStatus     = MOBILE_BEGIN;
+				ZhkGprsStatus     = GPRS_STATUS_CONNECTING;
+				ZhkGprsLastErr    = GPRS_ERR_CONNECTING;
+				return MOBILE_ERROR;
+			}
+			break;
+		default:
+			ConnectStatus = MOBILE_BEGIN;
+			return MOBILE_ERROR;
+		}
+		return ConnectStatus;
+	}
+	
+	uchar ZhkMobileGprsShutProcess( void )
+	{
+		// AT+CIPSHUT
+		// waitfor shut ok or error
+		static uchar xdata ShutStatus = MOBILE_BEGIN;
+		uchar  data temp;
+		
+		switch( ShutStatus )
+		{
+		case MOBILE_BEGIN:	
+			ZhkAtCmd( "AT+CIPSHUT" );
+			ShutStatus        = MOBILE_STEP1;
+			break;
+		case MOBILE_STEP1:			// waitfor OK
+			temp = ZhkAtCmdGetErr();
+			ZhkGprsMsgRxBufWr = 0;
+			switch( temp )
+			{
+			case ATCMD_ERR_NULL:
+				// 断链成功的标志
+				ShutStatus        = MOBILE_BEGIN;
+				ZhkGprsStatus     = GPRS_STATUS_DIALUP;
+				ZhkGprsLastErr    = GPRS_ERR_NULL;
+				return MOBILE_FINISH;
+			case ATCMD_ERR_BLOCK:
+				// 阻塞状态直接返回
+				break;						
+			case ATCMD_ERR_TIMEOUT:
+				// 挂断超时处理
+				// 超时处理
+				ShutStatus        = MOBILE_BEGIN;
+				ZhkGprsLastErr    = GPRS_ERR_TIMEOUT;
+				return MOBILE_TIMEOUT;
+			case ATCMD_ERR_ERR:
+				// 断链成功的标志
+				ShutStatus        = MOBILE_BEGIN;
+				ZhkGprsStatus     = GPRS_STATUS_DIALUP;
+				ZhkGprsLastErr    = GPRS_ERR_NULL;
+				return MOBILE_FINISH;
+			}
+			break;
+		default:
+			ShutStatus        = MOBILE_BEGIN;
+			return MOBILE_ERROR;
+		}
+		return ShutStatus;
+	}
+
+	uchar ZhkMobileGprsTxProcess( void )
+	{
+		// AT+CIPSEND
+		// waitfor >
+		// sendmsg
+		// ^Z<cr><lf>
+		// waitfor send ok
+		static uchar xdata GprsTxStatus = MOBILE_BEGIN;
+		static  int xdata GprsMsgLen;
+		uchar xdata CmdStr[ 128 ];
+	//	uchar data i;
+	//	uchar data temp;
+		
+		switch( GprsTxStatus )
+		{
+		case MOBILE_BEGIN:
+			if ( ZhkGprsStatus != GPRS_STATUS_CONNECTED ) return MOBILE_ERROR;
+			GprsMsgLen = ZhkGprsMsgTxBufWr;
+			sprintf( CmdStr , "AT+CIPSEND=%d",(int)GprsMsgLen );//通过TCP或UDP发送数据
+			ZhkAtCmd( CmdStr );
+			GprsTxStatus      = MOBILE_STEP1;
+			break;
+		case MOBILE_STEP1:					// WAIT FOR >
+			// 阻塞状态直接返回
+			if ( ZhkAtCmdBufWr == 0 )
+			{
+				// 超时
+				if ( ZhkMobileSecTimer == 0 ) 
+				{
+				GprsTxStatus       = MOBILE_BEGIN;
+				ZhkGprsStatus  	   = GPRS_STATUS_CONNECTING;
+				ZhkGprsLastErr     = GPRS_ERR_TIMEOUT;
+					return MOBILE_TIMEOUT;
+				}
+				 break;
+			}
+			ZhkAtCmdBufWr = 0;
+			// 手机模块正确接受到指令准备发送数据
+			if ( strcmp( ZhkAtCmdBuffer , ">" ) == 0 )
+			{
+				// 收到提示符，发送短信内容
+				ZhkSerialTxMsg( ZhkGprsMsgTxBuf , GprsMsgLen );
+				ZhkGprsMsgTxBufWr -= GprsMsgLen;
+				memmove( ZhkGprsMsgTxBuf , ZhkGprsMsgTxBuf + GprsMsgLen , ZhkGprsMsgTxBufWr );
+				GprsMsgLen = 0;
+				ZhkMobileSecTimer = ZHKMOBILE_ACKTIMEOUT;
+				GprsTxStatus      = MOBILE_STEP2;
+				break;
+			}
+			// 指令接受错误
+			if ( strstr( ZhkAtCmdBuffer , "ERROR" ) != NULL )
+			{
+				GprsTxStatus       = MOBILE_BEGIN;
+				ZhkGprsStatus	     = GPRS_STATUS_CONNECTING;
+				ZhkGprsLastErr     = GPRS_ERR_SENDFAIL;
+				return MOBILE_ERROR;
+			}
+			break;	
+		case MOBILE_STEP2:						// WAIT FOR Ok
+			// 阻塞状态直接返回
+			if ( ZhkAtCmdBufWr == 0 )
+			{
+				// 超时
+				if ( ZhkMobileSecTimer == 0 ) 
+				{
+				GprsTxStatus       = MOBILE_BEGIN;
+				ZhkGprsStatus  	   = GPRS_STATUS_CONNECTING;
+				ZhkGprsLastErr     = GPRS_ERR_TIMEOUT;
+					return MOBILE_TIMEOUT;
+				}
+				 break;
+			}
+			ZhkAtCmdBufWr = 0;
+			if ( strcmp( ZhkAtCmdBuffer , "SEND OK" ) == 0 )
+			{
+				// 手机模块正确接收指令，
+				GprsTxStatus      = MOBILE_BEGIN;
+				ZhkGprsLastErr    = GPRS_ERR_NULL;
+				return MOBILE_FINISH;
+			}
+			if ( strstr( ZhkAtCmdBuffer , "ERROR" ) != NULL )
+			{
+				// 手机模块接收指令出错，
+				GprsTxStatus      = MOBILE_BEGIN;
+				ZhkGprsStatus     = GPRS_STATUS_CONNECTING;
+				ZhkAtCmdErr       = ATCMD_ERR_ERR;
+				return MOBILE_ERROR;
+			}
+			break;	
+		default:
+			GprsTxStatus        = MOBILE_BEGIN;
+			return MOBILE_ERROR;
+		}
+		return GprsTxStatus;
+	}
+	
+	uchar ZhkMobileGprsRxProcess( void )
+	{
+		return 0;
+	}
+
+#endif
+
+uchar ZhkAtCmd( uchar* AtCmd )
+{
+	uchar DataTemp[ 512 ];
+	uint data len;
+
+	len = strlen( AtCmd );
+	memcpy( DataTemp , AtCmd , len );
+	DataTemp[ len ] = '\r';	
+	len++;
+//	DataTemp[ len ]    = '\0';//ygp change
+	
+	ZhkMobileSecTimer = ZHKMOBILE_ACKTIMEOUT;
+	ZhkAtCmdErr    	= ATCMD_ERR_BLOCK;
+	ZhkSerialTxMsg( DataTemp , len );	
+//	Trace( "Cmd: %s", AtCmd );
+	return 0;
+}
+uchar ZhkAtCmdGetErr( void )
+{
+	ZhkMobileSignalIn();
+	if ( ! ZhkMobileSecTimer )  
+	{
+		return ZhkAtCmdErr = ATCMD_ERR_TIMEOUT;
+	}
+	if ( ZhkAtCmdBufWr > 0 )
+	{
+		ZhkAtCmdBufWr = 0;
+		if ( strstr( ZhkAtCmdBuffer , "OK" ) != NULL )
+		{
+			return ZhkAtCmdErr = ATCMD_ERR_NULL;
+		}
+		if ( strstr( ZhkAtCmdBuffer , "ERROR" ) != NULL )
+		{
+			return ZhkAtCmdErr = ATCMD_ERR_ERR;
+		}
+	}
+	return ATCMD_ERR_BLOCK;
+}
+

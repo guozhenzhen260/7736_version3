@@ -1,0 +1,206 @@
+CX51 COMPILER V7.50   CASHER                                                               10/23/2014 09:48:29 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE CASHER
+OBJECT MODULE PLACED IN casher.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE casher.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #undef _DEBUG_TRACE
+   2          #undef _DEBUG_MOBIL_DEVICE_TRACE
+   3          #define CASHER_C
+   4          #include "device.h"
+   5          #include "casher.h"
+   6          #include "serial1.h"
+   7          #include "common.h"
+   8          #include "global.h"   //Added by Andy on Oct 9,2008
+   9          #include "debug.h" 
+  10          
+  11          /*
+  12          SERAIL1PARAM  code ZhkVtiSerialParam =
+  13          {
+  14                  7 , VERIFY_EVEN , 1 , 0x00 , 0x96 , 0x00
+  15          };
+  16          
+  17          unsigned  int code CashAccept[ 8 ] =
+  18          {
+  19             #ifdef _CHINA_       
+  20                          1, 2, 5, 10, 20, 50, 100, 0
+  21             #else
+  22                          10, 20, 50, 100, 0, 0, 0, 0
+  23             #endif
+  24             
+  25          };
+  26          
+  27          unsigned  char code CashAcceptEnableTable[ 8 ] =
+  28          {
+  29             #ifdef _CHINA_       
+  30                          0, 0, 1, 1, 1, 0, 0, 0
+  31             #else
+  32                          1, 1, 1, 1, 0, 0, 0, 0   
+  33             #endif
+  34             
+  35          };
+  36          
+  37          unsigned char bdata CasherBit;
+  38          sbit CBit0 = CasherBit^0;
+  39          sbit CBit1 = CasherBit^1;
+  40          sbit CBit2 = CasherBit^2;
+  41          sbit CBit3 = CasherBit^3;
+  42          sbit CBit4 = CasherBit^4;
+  43          sbit CBit5 = CasherBit^5;
+  44          sbit CBit6 = CasherBit^6;
+  45          sbit CBit7 = CasherBit^7;
+  46          
+  47          void ZhkVtiSendCmd( unsigned char idata* buf , unsigned char style )
+  48          {
+  49                  static unsigned char data state = 0x10;
+  50                  unsigned char xdata i,sum;
+  51          
+  52                  if ( style > 1 ) 
+  53                          return;
+  54                  if ( state != 0x10 ) 
+  55                          state = 0x11;   
+CX51 COMPILER V7.50   CASHER                                                               10/23/2014 09:48:29 PAGE 2   
+
+  56                  if ( style == 1 ) 
+  57                          state ^= 0x01;
+  58          
+  59                  Trace("\n Send date to casher ");
+  60                  // 发送帧头
+  61                  ZhkSerial1PutCh( VTISERIAL_FRAMEHEAD );
+  62                  Trace(" 0x%02bx", VTISERIAL_FRAMEHEAD );
+  63                  // 发送数据长度
+  64                  sum = 0x08;
+  65                  ZhkSerial1PutCh( sum );
+  66                  Trace(" 0x%02bx", sum );
+  67          
+  68                  // 发送状态字
+  69                  sum ^= state;
+  70                  ZhkSerial1PutCh( state );
+  71                  Trace(" 0x%02bx", state );
+  72                  for( i = 0 ; i < 3 ; i ++ )
+  73                  {
+  74                          ZhkSerial1PutCh( buf[ i ] );            
+  75                          Trace(" 0x%02bx", buf[ i ] );
+  76                          sum ^= buf[ i ];
+  77                  }
+  78                  ZhkSerial1PutCh( VTISERIAL_FRAMETAIL ); 
+  79                  Trace(" 0x%02bx", VTISERIAL_FRAMETAIL );
+  80                  ZhkSerial1PutCh( sum );
+  81                  Trace(" 0x%02bx \n", sum );
+  82          }
+  83          
+  84          void ZhkCasherSerialInit( void )
+  85          {       
+  86                  unsigned char xdata i;
+  87          
+  88                  for( i = 0 ; i < sizeof( SERAIL1PARAM ) ; i ++ )
+  89                          ZhkSerial1Param[ i ] = ZhkVtiSerialParam[ i ];
+  90                  ZhkSerial1Init();
+  91              
+  92             
+  93              
+  94              if( SystemParameter.billValue[0] != 0   )
+  95                  {
+  96                          CBit0 = 1;
+  97                  }
+  98                  if( SystemParameter.billValue[1] != 0   )
+  99                  {
+ 100                          CBit1 = 1;
+ 101                  }
+ 102                  if( SystemParameter.billValue[2] != 0   )
+ 103                  {
+ 104                          CBit2 = 1;
+ 105                  }
+ 106                  if( SystemParameter.billValue[3] != 0   )
+ 107                  {
+ 108                          CBit3 = 1;
+ 109                  }
+ 110                  if( SystemParameter.billValue[4] != 0   )
+ 111                  {
+ 112                          CBit4 = 1;
+ 113                  }
+ 114                  if( SystemParameter.billValue[5] != 0   )
+ 115                  {
+ 116                          CBit5 = 1;
+ 117                  }
+CX51 COMPILER V7.50   CASHER                                                               10/23/2014 09:48:29 PAGE 3   
+
+ 118                  if( SystemParameter.billValue[6] != 0   )
+ 119                  {
+ 120                          CBit6 = 1;
+ 121                  }
+ 122                  if( SystemParameter.billValue[7] != 0   )
+ 123                  {
+ 124                          CBit7 = 1;
+ 125                  }
+ 126          
+ 127          }
+ 128          
+ 129          void ZhkCasherAcceptCash( void )
+ 130          {       
+ 131                  unsigned char data buf[ 3 ];
+ 132                  
+ 133                  buf[ 0 ] = CasherBit;
+ 134              buf[ 1 ] = 0x30;              //0x34, 0x30
+ 135              buf[ 2 ] = 0x00;
+ 136          
+ 137                  ZhkVtiSendCmd( buf , 1 );
+ 138          }
+ 139          
+ 140          void ZhkCasherRejectCash( void )
+ 141          {       
+ 142                  unsigned char data buf[ 3 ];
+ 143          
+ 144                  buf[ 0 ] = 0x00;
+ 145              buf[ 1 ] = 0x50;             //0x54, 0x50 
+ 146              buf[ 2 ] = 0x00;
+ 147          
+ 148                  ZhkVtiSendCmd( buf , 1 );
+ 149          }
+ 150          
+ 151          void ZhkCasherGetState( unsigned char Flag )
+ 152          {       
+ 153                  unsigned char data buf[ 3 ];
+ 154          
+ 155                  buf[ 0 ] = CasherBit;
+ 156              buf[ 1 ] = 0x14;
+ 157              buf[ 2 ] = 0x00; 
+ 158          
+ 159                  ZhkVtiSendCmd( buf , Flag );
+ 160          }
+ 161          
+ 162          //禁能纸币器就是不让它收任何币种即可
+ 163          void CasherDisableCasher( void )
+ 164          {
+ 165                  unsigned char data buf[ 3 ];
+ 166          
+ 167                  buf[ 0 ] = 0x00;
+ 168              buf[ 1 ] = 0x14;
+ 169              buf[ 2 ] = 0x00; 
+ 170          
+ 171                  ZhkVtiSendCmd( buf , 1 );
+ 172          }
+ 173          */
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =     24    ----
+   XDATA SIZE       =   ----    ----
+CX51 COMPILER V7.50   CASHER                                                               10/23/2014 09:48:29 PAGE 4   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

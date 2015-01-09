@@ -1,0 +1,36 @@
+"mainflow.obj",
+"START_MX.obj",
+"maintmenu.obj",
+"devicecheck.obj",
+"CommonFunction.obj",
+"GoodsWaySet.obj",
+"SysParamSet.obj",
+"countermaint.obj",
+"RackSet.obj",
+"common.obj",
+"DataExchange.obj",
+"SstFlash.obj",
+"timer.obj",
+"clock.obj",
+"scheduler.obj",
+"IOInput.obj",
+"key.obj",
+"casher.obj",
+"Ds12887.obj",
+"device.obj",
+"Serial1.obj",
+"serial.obj",
+"initialization.obj",
+"debug.obj",
+"procotol.obj",
+"CommModule.obj",
+"communication.obj",
+"mobile.obj",
+"ShortMsg.obj" 
+TO "EV7636Main_SMS_V3_3" 
+
+CODE 
+REMOVEUNUSED 
+CLASSES (HDATA (0x0-0xFFFF), 
+EDATA(0x7F0000-0x7F04FF), 
+ECODE (0x800000-0x817FFF), HCONST (0x800000-0x817FFF)) 

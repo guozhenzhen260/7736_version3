@@ -1,0 +1,1170 @@
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE LIFTERAPI
+OBJECT MODULE PLACED IN lifterApi.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE lifterApi.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #include "device.h"
+   2          #include "global.h"
+   3          #include "common.h"
+   4          #include "CommonFunction.h"
+   5          #include "key.h"
+   6          #include "STRING.H"
+   7          #include "DataExChange.h"
+   8          #include "mainflow.h"
+   9          #include "timer.h"
+  10          #include "SstFlash.h"
+  11          #include "procotol.h"
+  12          #include "casher.h"
+  13          #include "IOInput.h"
+  14          #include "communication.h"
+  15          
+  16          #include "Serial1.h"
+  17          #include "scheduler.h"
+  18          
+  19          #include "stdio.h"
+  20          #include "stdlib.h"
+  21          #include "string.h"
+  22          #include "stdarg.h"
+  23          
+  24          
+  25          
+  26          //VMCÍ¨ÖªGCC¸´Î»³õÊ¼»¯
+  27          #define VMC_RESET_REQ                           (0x80)
+  28          //VMCÍ¨ÖªGCC±¨¸æGCC×´Ì¬
+  29          #define VMC_STATUS_REQ                          (0x81)
+  30          //VMCÍ¨ÖªGCC³ö»õ
+  31          #define VMC_VENDING_REQ                         (0x82)
+  32          //VMCÍ¨ÖªGCC±¨¸æ³ö»õÇé¿ö
+  33          #define VMC_VENDINGRESULT_REQ           (0x83)
+  34          
+  35          
+  36          //GCCÍ¨ÖªVMC¸´Î»³õÊ¼»¯
+  37          #define GCC_RESET_ACK                           (0x00)
+  38          //GCCÍ¨ÖªVMC±¨¸æGCC×´Ì¬
+  39          #define GCC_STATUS_ACK                          (0x01)
+  40          //GCCÍ¨ÖªVMC³ö»õ
+  41          #define GCC_VENDING_ACK                         (0x02)
+  42          //GCCÍ¨ÖªVMC±¨¸æ³ö»õÇé¿ö
+  43          #define GCC_VENDINGRESULT_ACK           (0x03)
+  44          //GCCÍ¨ÖªVMC¿ªÃÅ
+  45          #define GCC_OPENDOOR_ACK                        (0x04)
+  46          //GCCÍ¨ÖªVMC¹ØÃÅ
+  47          #define GCC_CLOSEDOOR_ACK                       (0x05)
+  48          //GCCÍ¨ÖªVMC´ò¿ªÕÕÃ÷µÆ
+  49          #define GCC_OPENLIGHT_ACK                       (0x06)
+  50          //GCCÍ¨ÖªVMC¹Ø±ÕÕÕÃ÷µÆ
+  51          #define GCC_CLOSELIGHT_ACK                      (0x07)
+  52          //GCCÍ¨ÖªVMC±¨¸æÅäÖÃ²ÎÊý
+  53          #define GCC_GETINFO_ACK                         (0x08)
+  54          
+  55          
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 2   
+
+  56          
+  57          
+  58          //³ö»õ²Ù×÷
+  59          #define CHANNEL_OUTGOODS                (1)
+  60          //¼ì²â»õµÀµ±Ç°×´Ì¬                      
+  61          #define CHANNEL_CHECKSTATE              (2)
+  62          //¼ì²â»õµÀÉÏ´ÎµÄ³ö»õ½á¹û                        
+  63          #define CHANNEL_CHECKOUTRESULT  (3)     
+  64          //Çå³þsn
+  65          #define CHANNEL_CLEARSN                 (4)
+  66          
+  67          
+  68          
+  69          static struct COMMTASK xdata lifterTask,ackTask;
+  70          uchar lifterSendMsg(unsigned char type,uchar binNo,uchar rowNo,uchar columNo);
+  71          uchar LifterVendoutTask(struct COMMTASK xdata*liftPtr);
+  72          uint LifterCheckStateTask(uchar binNo,uchar *errNo);
+  73          uchar LifterVendout(uchar binNum,uchar logicNo);
+  74          
+  75          
+  76          
+  77          
+  78          
+  79          
+  80          
+  81          
+  82          
+  83          
+  84          
+  85          
+  86          
+  87                  
+  88          
+  89          
+  90          void lifterDelay(unsigned long timeout)
+  91          {
+  92   1              lifterTimer = timeout / 10;
+  93   1              while(lifterTimer);
+  94   1      }
+  95          
+  96          
+  97          
+  98          /*****************************************************************************
+  99          ** Function name:       ZhkLifterRxMsg  
+ 100          ** Descriptions:              ½ÓÊÕ´®¿Ú»ØÓ¦°ü                                                                                                                            
+ 101          ** parameters:          ÎÞ
+ 102          ** Returned value:      0:ÎÞÊý¾Ý½ÓÊÕ 1:½ÓÊÕÍê±Ï 2:Êý¾Ý½ÓÊÕ´íÎó
+ 103          *****************************************************************************/
+ 104          u_char ZhkLifterRxMsg( void )
+ 105          {
+ 106   1              
+ 107   1              uchar i,index = 0,rcx = 50;
+ 108   1              uint crc;
+ 109   1              memcpy( &ackTask, &CurrentTask, sizeof( struct COMMTASK ) );
+ 110   1              while(rcx)
+ 111   1              {
+ 112   2                      if(ZhkSerial1IsRxBufNull())//ÎÞÊý¾Ý ÐèÒªÑÓÊ±µÈ´ýÒ»ÏÂ
+ 113   2                      {
+ 114   3                              for(i = 0;i < 10;i++)
+ 115   3                              {
+ 116   4                                      i = i;
+ 117   4                              }
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 3   
+
+ 118   3                              rcx--;
+ 119   3                      }
+ 120   2                      else
+ 121   2                      {
+ 122   3                              ackTask.Param[index] = ZhkSerial1GetCh();
+ 123   3                              if(index == 0)
+ 124   3                              {
+ 125   4                                      //ÅÐ¶Ï°üÍ·
+ 126   4                                      if(ackTask.Param[0] != 0xC8)//head err
+ 127   4                                              continue;
+ 128   4                              }
+ 129   3                              else if(index == 1)
+ 130   3                                      ackTask.ParamLen = ackTask.Param[index];
+ 131   3                              index++;
+ 132   3                              if(index >= 7)
+ 133   3                              {
+ 134   4                                      crc = CrcCheck(ackTask.Param,ackTask.ParamLen);
+ 135   4                                      return 1;
+ 136   4      #if 0
+                                              if(ackTask.Param[index - 2] == crc / 256 && ackTask.Param[index-1] == crc % 256)
+                                                      return 1;
+                                              else
+                                                      return 2;
+              #endif
+ 142   4                              }
+ 143   3                              
+ 144   3                      }
+ 145   2              }
+ 146   1              
+ 147   1              if(index)
+ 148   1                      return 2;
+ 149   1              else
+ 150   1                      return 0;
+ 151   1              
+ 152   1              
+ 153   1      }
+ 154          
+ 155          
+ 156          
+ 157          
+ 158          /*********************************************************************************************************
+ 159          ** Function name:       ZhkLifterTxMsg
+ 160          ** Descriptions:               Éý½µ»ú·¢ËÍ´®¿Ú
+ 161          ** input parameters:    
+ 162          ** output parameters:   ÎÞ
+ 163          ** Returned value:      CRC¼ìÑé½á¹û
+ 164          *********************************************************************************************************/
+ 165          bit ZhkLifterTxMsg( struct COMMTASK xdata* NewTask )
+ 166          {
+ 167   1              uchar i,len;
+ 168   1              uint  crc;
+ 169   1              len = NewTask->Param[1];
+ 170   1              crc     = CrcCheck(NewTask->Param,len);//¼ÓÐ£Ñé
+ 171   1              NewTask->Param[len] = (uchar)(crc >> 8);
+ 172   1              NewTask->Param[len + 1] = (uchar)(crc & 0xFF);
+ 173   1              for(i = 0;i < len + 2;i++)
+ 174   1              {       
+ 175   2                      ZhkSerial1PutCh( NewTask->Param[i]);
+ 176   2              }
+ 177   1              
+ 178   1              return 1;       
+ 179   1      }
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 4   
+
+ 180          
+ 181          //////////////////////////////////////////////////////////
+ 182          ///»õµÀ´¦Àí1±íÊ¾
+ 183          //////////////////////////////////////////////////////////
+ 184          bit  ZhkLifterTask( struct COMMTASK xdata* TaskTemp )
+ 185          {
+ 186   1              switch( ZhkSchedulerState )
+ 187   1              {
+ 188   2              case TASK_NULL:
+ 189   2                      break;
+ 190   2              case TASK_REDAY:        //·¢ËÍ´®¿ÚÇëÇó
+ 191   2                      ZhkChannelSwitch( EQUIP_CHANNEL );      
+ 192   2                      if(TaskTemp->Cmd == VMC_VENDING_REQ)//³ö»õ×ßÁíÒ»¸öÃüÁî
+ 193   2                      {
+ 194   3                              Channel.State = LifterVendoutTask(TaskTemp);
+ 195   3                              ZhkSchedulerState = TASK_FINISH;
+ 196   3                      }
+ 197   2                      else
+ 198   2                      {
+ 199   3                              ZhkLifterTxMsg( TaskTemp );
+ 200   3                              ZhkSchedulerState = TASK_WAIT;
+ 201   3                              ZhkDownMsgAckTimer  = 500;//15Ãë µÈ´ý
+ 202   3                              Channel.CommState = COMM_BUZY;
+ 203   3                              Channel.ExtState[2] = 0;
+ 204   3                      }
+ 205   2                      
+ 206   2                      break;  
+ 207   2              case TASK_WAIT:
+ 208   2                      if(!ZhkSerial1IsRxBufNull())//ÓÐÊý¾Ý
+ 209   2                      {
+ 210   3                              ZhkSchedulerState = TASK_FINISH;
+ 211   3                              Channel.State = ZhkLifterRxMsg();
+ 212   3                              break;
+ 213   3                      }
+ 214   2                      
+ 215   2                      if ( ZhkDownMsgAckTimer == 0 )//³¬Ê±
+ 216   2                      {
+ 217   3                              ZhkSchedulerState = TASK_ERROR;                                 
+ 218   3                      }               
+ 219   2                      break;                  
+ 220   2              case TASK_FINISH:
+ 221   2                      ZhkSchedulerState = TASK_NULL;          
+ 222   2                      Channel.CommState   = COMM_COMMOK;
+ 223   2                      memset( &CurrentTask, 0, sizeof( struct COMMTASK ) );
+ 224   2                      ZhkDownMsgAckTimer = 0;
+ 225   2                      break;
+ 226   2              case TASK_ERROR:
+ 227   2                      Channel.CommState = COMM_TIMEOUT;
+ 228   2                      ZhkSchedulerState   = TASK_NULL; 
+ 229   2                      memset( &CurrentTask, 0, sizeof( struct COMMTASK ) );
+ 230   2                      break;
+ 231   2              default:
+ 232   2                      ZhkSchedulerState = TASK_NULL;
+ 233   2                      
+ 234   2              }
+ 235   1              return 1;
+ 236   1      }
+ 237          
+ 238          /*****************************************************************************
+ 239          ** Function name:       LifterSendVendout       
+ 240          ** Descriptions:                ·¢ËÍ³ö»õ²éÑ¯½á¹ûÃüÁî                                                                                                                            
+ 241          ** parameters:          binNo:¹ñºÅ
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 5   
+
+ 242          ** Returned value:      µÍ°ËÎ»  0:²éÑ¯Ê§°Ü 1:³ö»õÍê³É 2:ÕýÔÚ³ö»õ
+ 243                                                                          0xFF:Í¨ÐÅ¹ÊÕÏ 
+ 244                                                  
+ 245          
+ 246                                                  ¸ß°ËÎ» ½ö"³ö»õÊ§°Ü ÒÔÏÂ×Ö¶ÎÓÐÐ§"
+ 247                                                  0:³ö»õ³É¹¦
+ 248                                                  1:Êý¾Ý´íÎó
+ 249                                                  2:ÎÞ»õ                          3:¿¨»õ
+ 250                                                  4:È¡»õÃÅÃ»¿ªÆô
+ 251                                                  5:»õÎïÎ´È¡×ß            6:»õ¹ñ´óÃÅ±»´ò¿ªÉý
+ 252                                                  7:½µ»ú¹¹¹ÊÕÏ    other:ÆäËû¹ÊÕÏ
+ 253          *****************************************************************************/
+ 254          uint LifterSendCheckRst(uchar binNo)
+ 255          {
+ 256   1              uchar rst = 0;
+ 257   1              rst = lifterSendMsg(VMC_VENDINGRESULT_REQ,binNo,0,0);
+ 258   1              if(rst == 0)
+ 259   1                      return 0xFF;
+ 260   1              if(ackTask.Param[4] == GCC_VENDINGRESULT_ACK)//³É¹¦ÊÕµ½ACK
+ 261   1              {       
+ 262   2                      if(ackTask.Param[5] == 0x01)//ÕýÔÚ³ö»õ
+ 263   2                              return 2;
+ 264   2                      else
+ 265   2                      {
+ 266   3                              if(ackTask.Param[6] == 0x00)//³ö»õ³É¹¦
+ 267   3                                      return 1;
+ 268   3                              else
+ 269   3                                      return (((uint)ackTask.Param[7] << 8)| (0x01));
+ 270   3                      }
+ 271   2              }
+ 272   1              return 0;
+ 273   1              
+ 274   1      }
+ 275          
+ 276          
+ 277          
+ 278          /*****************************************************************************
+ 279          ** Function name:       LifterSendCheckState    
+ 280          ** Descriptions:                ·¢ËÍ²éÑ¯×´Ì¬ÃüÁî                                                                                                                                
+ 281          ** parameters:          binNo:¹ñºÅ
+ 282          ** Returned value:      µÍ°ËÎ»0Õû»ú¿ÕÏÐ 1Õû»úÃ¦2²éÑ¯Ê§°Ü0xFFÍ¨ÐÅÊ§°Ü
+ 283                                                  ¸ß°ËÎ»(°´Î»ËãÖÃ1±íÊ¾ÓÐ¹ÊÕÏ)
+ 284                                                  bit0 Õû»ú×´Ì¬¹ÊÕÏ
+ 285                                                  bit1Éý½µ»ú¹ÊÕÏ
+ 286                                                  bit2È¡»õµç»ú¹ÊÕÏ
+ 287                                                  bit3ÓÃ»§µç¶¯ÃÅ¹ÊÕÏ
+ 288                                                  bit4µ¯±Ò»ú¹¹¹ÊÕÏ
+ 289                                                  bit5·ÀµÁÄ£¿é¹ÊÕÏ
+ 290                                                  bit6»õµ½¿ØÖÆÆ÷¹ÊÕÏ
+ 291                                                  bit7»õµÀ´óÃÅ¹ÊÕÏ
+ 292          *****************************************************************************/
+ 293          uint LifterSendCheckState(uchar binNo)
+ 294          {
+ 295   1              uchar rst = 0,state,errNo = 0,rcx = 2;
+ 296   1              while(rcx--)
+ 297   1              {
+ 298   2                      rst = lifterSendMsg(VMC_STATUS_REQ,binNo,0,0);
+ 299   2                      if(rst == 0)
+ 300   2                              continue;               
+ 301   2                      if(ackTask.Param[4] == GCC_STATUS_ACK)//³É¹¦ÊÕµ½ACK
+ 302   2                      {       
+ 303   3                              state = (ackTask.Param[5] == 0x01) ? 1 : 0;//Õû»ú±êÖ¾ 0¿ÕÏÐ 1Ã¦
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 6   
+
+ 304   3                              errNo |= (ackTask.Param[6] & 0x01) << 0;//Õû»ú×´Ì¬
+ 305   3                              errNo |= (ackTask.Param[7] & 0x01) << 1;//Éý½µ»ú
+ 306   3                              errNo |= (ackTask.Param[8] & 0x01) << 2;//È¡»õµç»ú
+ 307   3                              errNo |= (ackTask.Param[9] & 0x01) << 3;//ÓÃ»§µç¶¯ÃÅ
+ 308   3                              errNo |= (ackTask.Param[10] & 0x01) << 4;//µ¯±Ò»ú¹¹
+ 309   3                              errNo |= (ackTask.Param[11] & 0x01) << 5;//·ÀµÁÄ£¿é
+ 310   3                              errNo |= (ackTask.Param[12] & 0x01) << 6;//»õµ½¿ØÖÆÆ÷
+ 311   3                              errNo |= (ackTask.Param[13] & 0x01) << 6;//»õµÀ´óÃÅ     
+ 312   3                              
+ 313   3                              return (((uint)errNo << 8) | state);
+ 314   3                              
+ 315   3                      }
+ 316   2                      return 2;
+ 317   2              }
+ 318   1      
+ 319   1              return 0xFF;
+ 320   1              
+ 321   1      }
+ 322          
+ 323          
+ 324          
+ 325          /*****************************************************************************
+ 326          ** Function name:       LifterSendVendout       
+ 327          ** Descriptions:                ·¢ËÍ³ö»õÃüÁî                                                                                                                            
+ 328          ** parameters:          binNo:¹ñºÅ
+ 329                                                  rowNo:²ãºÅ
+ 330                                                  columnNo:µÀºÅ
+ 331          ** Returned value:      0:·¢ËÍÊ§°Ü; 1:·¢ËÍ³É¹¦;0xFF Í¨ÐÅÊ§°Ü
+ 332          *****************************************************************************/
+ 333          uchar LifterSendVendout(uchar binNo,uchar rowNo,uchar columnNo)
+ 334          {
+ 335   1              uchar rst = 0,rcx = 2;
+ 336   1              while(rcx--)
+ 337   1              {
+ 338   2                      rst = lifterSendMsg(VMC_VENDING_REQ,binNo,rowNo,columnNo);
+ 339   2                      if(rst == 0)
+ 340   2                              return 0xFF;
+ 341   2                      if(ackTask.Param[4] == GCC_VENDING_ACK)//³É¹¦ÊÕµ½ACK
+ 342   2                      {
+ 343   3                              return 1;
+ 344   3                      }
+ 345   2                      //Èç¹ûÃ»ÓÐÊÕµ½ACKÔòÐèÒªÔÚ·¢ËÍÒ»´Î²éÑ¯ÃüÁî
+ 346   2                      //È·±£³ö»õÃüÁî·¢ËÍ³É¹¦±ÜÃâÖØ¸´·¢ËÍ³ö»õÃüÁî
+ 347   2                      if(LifterSendCheckRst(binNo) == 2)//±íÊ¾»úÆ÷·±Ã¦ Í¬ÑùÒâÎ¶×Å³ö»õÃüÁî·¢ËÍ³É¹¦
+ 348   2                              return 1;
+ 349   2              }
+ 350   1              return 0;
+ 351   1      }
+ 352          
+ 353          
+ 354          /*****************************************************************************
+ 355          ** Function name:       lifterSendMsg   
+ 356          ** Descriptions:                                                                                                                                
+ 357          ** parameters:          type:²Ù×÷ÀàÐÍ
+ 358                                                  binNo:Ïä¹ñ±àºÅ
+ 359                                                  rowNo:²ã±àºÅ
+ 360                                                  columNo:»õµÀºÅ                                  
+ 361          ** Returned value:      0:Í¨ÐÅÊ§°Ü; 1:Í¨ÐÅ³É¹¦;
+ 362          *****************************************************************************/
+ 363          uchar lifterSendMsg(unsigned char type,uchar binNo,uchar rowNo,uchar columNo)
+ 364          {
+ 365   1              uchar timeout = 0,comOK = 0,index = 0;
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 7   
+
+ 366   1              uchar devType = 0x40;//ÆÕÍ¨µ¯»ÉÐÍ 
+ 367   1              binNo = binNo;
+ 368   1              memset( &lifterTask, 0, sizeof( struct COMMTASK ) );
+ 369   1              Channel.CommState   = COMM_BUZY;
+ 370   1              lifterTask.Id           = ID_CHANNEL;
+ 371   1              lifterTask.Cmd          = type;
+ 372   1              lifterTask.Priority = PRIORITY_NORMAL; 
+ 373   1      
+ 374   1              lifterTask.Param[index++] = 0xC7;
+ 375   1              lifterTask.Param[index++] = 0x05;//³¤¶È
+ 376   1              lifterTask.Param[index++] = devType;
+ 377   1              lifterTask.Param[index++] = 0x00;//°æ±¾¹Ì¶¨0
+ 378   1              lifterTask.Param[index++] = type;
+ 379   1              if(rowNo != 0x00)
+ 380   1                      lifterTask.Param[index++] = rowNo;
+ 381   1              if(columNo != 0x00)
+ 382   1                      lifterTask.Param[index++] = columNo;
+ 383   1      
+ 384   1              lifterTask.ParamLen     = index;
+ 385   1              lifterTask.Param[1] = index;//³¤¶ÈÖØ¶¨Î»
+ 386   1      
+ 387   1              ZhkSchedulerAddTask( &lifterTask );
+ 388   1              while(! ( timeout || comOK ))
+ 389   1              {
+ 390   2                      WaitForWork( 50, NULL );
+ 391   2                      timeout = TestDeviceTimeOut( &Channel );
+ 392   2                      comOK = TestDeviceCommOK( &Channel );   
+ 393   2              }
+ 394   1      
+ 395   1              if(timeout)
+ 396   1                      return 0;
+ 397   1              if(comOK)
+ 398   1                      return (Channel.State == 1);    
+ 399   1              return 0;
+ 400   1      
+ 401   1      
+ 402   1      }
+ 403          
+ 404          
+ 405          
+ 406          /*****************************************************************************
+ 407          ** Function name:       LifTerProcess   
+ 408          ** Descriptions:                                                                                                                                        
+ 409          ** parameters:          ÎÞ                              
+ 410          ** Returned value:      01:³É¹¦
+ 411                                                  11:Êý¾Ý´íÎó 
+ 412                                                  12:ÎÞ»õ
+ 413                                                  13:¿¨»õ           
+ 414                                                  14:È¡»õÃÅÃ»¿ªÆô
+ 415                                                  15:»õÎïÎ´È¡×ß
+ 416                                                  16:»õ¹ñ´óÃÅ±»´ò¿ª
+ 417                                                  17:Éý½µ»ú¹¹¹ÊÕÏ
+ 418                                                  21:Õû»ú¹ÊÕÏ
+ 419                                                  22:Éý½µ»ú¹ÊÕÏ
+ 420                                                  23:È¡»õµç»ú¹ÊÕÏ
+ 421                                                  24:ÓÃ»§µç¶¯ÃÅ¹ÊÕÏ
+ 422                                                  25:µ¯±Ò»ú¹¹¹ÊÕÏ
+ 423                                                  26:·ÀµÁÄ£¿é¹ÊÕÏ
+ 424                                                  27:»õµ½¿ØÖÆÆ÷¹ÊÕÏ
+ 425                                                  28:»õµÀ´óÃÅ¹ÊÕ
+ 426                                                  51:×´Ì¬²éÑ¯³¬Ê±
+ 427                                                  52:³ö»õÃüÁî·¢ËÍÊ§°Ü
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 8   
+
+ 428                                                  53:³ö»õ½á¹û²éÑ¯³¬Ê±
+ 429                                                  99:ÆäËû¹ÊÕÏ
+ 430                                                  255(0xFF):Í¨ÐÅÊ§°Ü
+ 431          *******************************************************************************/
+ 432          uchar LifTerProcess(uchar binNum,uchar logicNo)
+ 433          {
+ 434   1              uchar Result[36]={0},res = 0,rcx = 5;
+ 435   1              uchar rowNo = 0,columnNo = 0,stateH,stateL;
+ 436   1              unsigned short takeTimeOut = 10,vendoutTimeout;
+ 437   1              uint liftState;
+ 438   1              if(logicNo == 0x00)
+ 439   1                      return 0xff;
+ 440   1              rowNo = logicNo / 10 ;
+ 441   1              columnNo = logicNo % 10;
+ 442   1              
+ 443   1              //¿ªÊ¼³ö»õ //²éÑ¯×´Ì¬ÊÇ·ñÕý³££¬Õý³£³ö»õ
+ 444   1              rcx = 10;
+ 445   1              while(rcx--)
+ 446   1              {
+ 447   2                      liftState = LifterSendCheckState(binNum); 
+ 448   2                      stateL = liftState & 0xFF;
+ 449   2                      stateH = (liftState >> 8) & 0xFF;
+ 450   2                      if(stateL == 0)//Õý³£¾ÍÌø¿ª
+ 451   2                              break;
+ 452   2                      else if(stateL == 0xFF)//Í¨ÐÅÊ§°Ü
+ 453   2                      {
+ 454   3                              return 0xFF;
+ 455   3                      }
+ 456   2                      else 
+ 457   2                      {
+ 458   3                              if(stateH & 0xFF)//ÓÐ¹ÊÕÏ
+ 459   3                              {
+ 460   4                                      if(stateH & 0x01) return 21;
+ 461   4                                      if(stateH & 0x02) return 22;
+ 462   4                                      if(stateH & 0x04) return 23;
+ 463   4                                      if(stateH & 0x08) return 24;
+ 464   4                                      if(stateH & 0x10) return 25;
+ 465   4                                      if(stateH & 0x20) return 26;
+ 466   4                                      if(stateH & 0x40) return 27;
+ 467   4                                      if(stateH & 0x80) return 28;
+ 468   4                                      return 99;
+ 469   4                                              
+ 470   4                              }
+ 471   3                      }
+ 472   2                      WaitForWork( 1000, NULL );
+ 473   2              }
+ 474   1      
+ 475   1              if(liftState != 0)//³¬Ê±²éÑ¯ÈÎÈ»²»Õý³£
+ 476   1                      return 51;
+ 477   1              
+ 478   1              while(1)
+ 479   1              {
+ 480   2                      //½øÐÐ³ö»õ²Ù×÷
+ 481   2                      res = LifterSendVendout(binNum,rowNo,columnNo);
+ 482   2                      if(res == 0 || res == 0xFF)
+ 483   2                              return 52;
+ 484   2                      
+ 485   2                      WaitForWork(50, NULL );
+ 486   2                      //5000 * 10  = 50000 
+ 487   2                      vendoutTimeout = 100 +(8 - rowNo) * 10;//¼ì²â³ö»õ½á¹û³¬Ê±
+ 488   2                      while(vendoutTimeout--)
+ 489   2                      {       
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 9   
+
+ 490   3                              liftState = LifterSendCheckRst(binNum);//¼ì²â³ö»õ½á¹û
+ 491   3                              if((liftState & 0xFF) == 0x01)//³ö»õÍê³É
+ 492   3                              {
+ 493   4                                      break;
+ 494   4                              }
+ 495   3                              WaitForWork( 1000, NULL );
+ 496   3                      }
+ 497   2                      
+ 498   2                      if(vendoutTimeout)
+ 499   2                      {
+ 500   3                              if((liftState & 0xFF00))//³ö»õÊ§°Ü
+ 501   3                              {
+ 502   4                                      if((((liftState >> 8) & 0xFF) == 5) && takeTimeOut)//»õÎ´È¡×ß
+ 503   4                                      {
+ 504   5                                              WaitForWork( 2000, NULL );
+ 505   5                                              takeTimeOut--;
+ 506   5                                              continue;
+ 507   5                                      }
+ 508   4                                      stateH = (liftState >> 8) & 0xFF ;
+ 509   4                                      return ((stateH > 7) ? (stateH + 10) : 99);
+ 510   4                              }       
+ 511   3                              else//³ö»õ³É¹¦
+ 512   3                                      return 1;
+ 513   3                      }
+ 514   2                      else                                                                                    
+ 515   2                              return 53;              
+ 516   2              }
+ 517   1      //      return 0xFF;
+ 518   1      }
+ 519          
+ 520          
+ 521          
+ 522          uchar LifterVendoutReturn(uchar res,uchar flag)
+ 523          {
+ 524   1              uchar val = 0;
+ 525   1              switch(res)
+ 526   1              {
+ 527   2                      case 1:
+ 528   2      #ifdef _CHINA_
+ 529   2                              if(flag == 1)
+ 530   2                              DisplayStr( 0, 1, 1, "³ö»õ³É¹¦", sizeof("³ö»õ³É¹¦") );
+ 531   2      #endif
+ 532   2                              val = 0;
+ 533   2                              break;
+ 534   2                      case 11:
+ 535   2      #ifdef _CHINA_
+ 536   2                              if(flag == 1)
+ 537   2                              DisplayStr( 0, 1, 1, "Êý¾Ý´íÎó", sizeof("Êý¾Ý´íÎó") );
+ 538   2      #endif
+ 539   2                              //DisplayStr( 0, 1, 1, "Err data", sizeof("Err data") );
+ 540   2                              
+ 541   2                              val = 11;
+ 542   2                              break;
+ 543   2                      case 12:
+ 544   2      #ifdef _CHINA_  
+ 545   2                              if(flag == 1)
+ 546   2                              DisplayStr( 0, 1, 1, "»õµÀÎÞ»õ", sizeof("»õµÀÎÞ»õ") );
+ 547   2                              //DisplayStr( 0, 1, 1, "No goods", sizeof("No goods") );
+ 548   2      #endif
+ 549   2                              val = 3;
+ 550   2                              break;
+ 551   2                      case 13:
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 10  
+
+ 552   2                              #ifdef _CHINA_
+ 553   2                              if(flag == 1)
+ 554   2                              DisplayStr( 0, 1, 1, "»õµÀ¿¨»õ", sizeof("»õµÀ¿¨»õ") );
+ 555   2                              //DisplayStr( 0, 1, 1, "Ka Huo", sizeof("Ka Huo") );
+ 556   2                              #endif
+ 557   2                              val = 13;
+ 558   2                              break;
+ 559   2                      case 14:
+ 560   2                              #ifdef _CHINA_
+ 561   2                              if(flag == 1)
+ 562   2                              DisplayStr( 0, 1, 1, "È¡»õÃÅÃ»¿ªÆô", sizeof("È¡»õÃÅÃ»¿ªÆô") );
+ 563   2                              //DisplayStr( 0, 1, 1, "Ka Huo", sizeof("Ka Huo") );
+ 564   2                              #endif
+ 565   2                              val = 14;
+ 566   2                              break;
+ 567   2                      case 15:
+ 568   2                              #ifdef _CHINA_
+ 569   2                              if(flag == 1)
+ 570   2                              DisplayStr( 0, 1, 1, "»õÎïÎ´È¡×ß", sizeof("»õÎïÎ´È¡×ß") );
+ 571   2                              //DisplayStr( 0, 1, 1, "Mei Qu zou", sizeof("Mei Qu zou") );
+ 572   2                              #endif
+ 573   2                              val = 15;
+ 574   2                              break;
+ 575   2                      case 16:
+ 576   2                              #ifdef _CHINA_
+ 577   2                              if(flag == 1)
+ 578   2                              DisplayStr( 0, 1, 1, "»õ¹ñ´óÃÅ±»´ò¿ª", sizeof("»õ¹ñ´óÃÅ±»´ò¿ª") );
+ 579   2                              #endif
+ 580   2                              val = 16;
+ 581   2                              break;
+ 582   2                      case 17:
+ 583   2                              #ifdef _CHINA_
+ 584   2                              if(flag == 1)
+ 585   2                              DisplayStr( 0, 1, 1, "Éý½µ»ú¹¹¹ÊÕÏ", sizeof("Éý½µ»ú¹¹¹ÊÕÏ") );
+ 586   2                              //DisplayStr( 0, 1, 1, "Err Lift", sizeof("Err Lift") );
+ 587   2                              #endif
+ 588   2                              val = 17;
+ 589   2                              break;
+ 590   2                      case 21:
+ 591   2                              #ifdef _CHINA_
+ 592   2                              if(flag == 1)
+ 593   2                              DisplayStr( 0, 1, 1, "Õû»ú¹ÊÕÏ", sizeof("Õû»ú¹ÊÕÏ") );
+ 594   2                              #endif
+ 595   2                              val = 21;
+ 596   2                              break;
+ 597   2                      case 22:
+ 598   2                              #ifdef _CHINA_
+ 599   2                              if(flag == 1)
+ 600   2                              DisplayStr( 0, 1, 1, "Éý½µ»ú¹ÊÕÏ", sizeof("Éý½µ»ú¹ÊÕÏ") );
+ 601   2                              #endif
+ 602   2                              val = 22;
+ 603   2                              break;
+ 604   2                      case 23:
+ 605   2                              #ifdef _CHINA_
+ 606   2                              if(flag == 1)
+ 607   2                              DisplayStr( 0, 1, 1, "È¡»õµç»ú¹ÊÕÏ", sizeof("È¡»õµç»ú¹ÊÕÏ") );
+ 608   2                              #endif
+ 609   2                              val = 23;
+ 610   2                              break;
+ 611   2                      case 24:
+ 612   2                              #ifdef _CHINA_
+ 613   2                              if(flag == 1)
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 11  
+
+ 614   2                              DisplayStr( 0, 1, 1, "ÓÃ»§µç¶¯ÃÅ¹ÊÕÏ", sizeof("ÓÃ»§µç¶¯ÃÅ¹ÊÕÏ") );
+ 615   2                              #endif
+ 616   2                              val = 24;
+ 617   2                              break;
+ 618   2                      case 25:
+ 619   2                              #ifdef _CHINA_
+ 620   2                              if(flag == 1)
+ 621   2                              DisplayStr( 0, 1, 1, "µ¯±Ò»ú¹¹¹ÊÕÏ", sizeof("µ¯±Ò»ú¹¹¹ÊÕÏ") );
+ 622   2                              #endif
+ 623   2                              val = 25;
+ 624   2                              break;
+ 625   2                      case 26:
+ 626   2                              #ifdef _CHINA_
+ 627   2                              if(flag == 1)
+ 628   2                              DisplayStr( 0, 1, 1, "·ÀµÁÄ£¿é¹ÊÕÏ", sizeof("·ÀµÁÄ£¿é¹ÊÕÏ") );
+ 629   2                              #endif
+ 630   2                              val = 26;
+ 631   2                              break;
+ 632   2                      case 27:
+ 633   2                              #ifdef _CHINA_
+ 634   2                              if(flag == 1)
+ 635   2                              DisplayStr( 0, 1, 1, "»õµ½¿ØÖÆÆ÷¹ÊÕÏ", sizeof("»õµ½¿ØÖÆÆ÷¹ÊÕÏ") );
+ 636   2                              #endif
+ 637   2                              val = 27;
+ 638   2                              break;
+ 639   2                      case 28:
+ 640   2                              #ifdef _CHINA_
+ 641   2                              if(flag == 1)
+ 642   2                              DisplayStr( 0, 1, 1, "»õµÀ´óÃÅ¹ÊÕÏ", sizeof("»õµÀ´óÃÅ¹ÊÕÏ") );
+ 643   2                              #endif
+ 644   2                              val = 28;
+ 645   2                              break;
+ 646   2                      case 51:
+ 647   2                              #ifdef _CHINA_
+ 648   2                              if(flag == 1)
+ 649   2                              DisplayStr( 0, 1, 1, "×´Ì¬²éÑ¯³¬Ê±", sizeof("×´Ì¬²éÑ¯³¬Ê±") );
+ 650   2                              #endif
+ 651   2                              //DisplayStr( 0, 1, 1, "Err State Check", sizeof("Err State Check") );
+ 652   2                              val = 2;
+ 653   2                              break;
+ 654   2                      case 52:
+ 655   2                              #ifdef _CHINA_
+ 656   2                              if(flag == 1)
+ 657   2                              DisplayStr( 0, 1, 1, "³ö»õÃüÁî·¢ËÍÊ§°Ü", sizeof("³ö»õÃüÁî·¢ËÍÊ§°Ü") );
+ 658   2                              #endif
+ 659   2                              val = 2;
+ 660   2                              //DisplayStr( 0, 1, 1, "Err Send Vendout", sizeof("Err Send Vendout") );
+ 661   2                              break;
+ 662   2                      case 53:
+ 663   2                              #ifdef _CHINA_
+ 664   2                              if(flag == 1)
+ 665   2                              DisplayStr( 0, 1, 1, "³ö»õ½á¹û²éÑ¯³¬Ê±", sizeof("³ö»õ½á¹û²éÑ¯³¬Ê±") );
+ 666   2                              #endif
+ 667   2                              //DisplayStr( 0, 1, 1, "Err Vendout Check", sizeof("Err Vendout Check") );
+ 668   2                              val = 1;
+ 669   2                              break;
+ 670   2                      case 99:
+ 671   2      #ifdef _CHINA_
+ 672   2                              if(flag == 1)
+ 673   2                              DisplayStr( 0, 1, 1, "ÆäËû¹ÊÕÏ", sizeof("ÆäËû¹ÊÕÏ") );
+ 674   2      #endif
+ 675   2                              ///DisplayStr( 0, 1, 1, "Err Other", sizeof("Err Other") );
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 12  
+
+ 676   2                              val = 99;
+ 677   2                              break;
+ 678   2                      case 0xFF:
+ 679   2      #ifdef _CHINA_
+ 680   2                              if(flag == 1)
+ 681   2                              DisplayStr( 0, 1, 1, "Í¨ÐÅ¹ÊÕÏ", sizeof("Í¨ÐÅ¹ÊÕÏ") );
+ 682   2      #endif
+ 683   2                              //DisplayStr( 0, 1, 1, "Err Com", sizeof("Err Com") );
+ 684   2                              val = 0xFF;
+ 685   2                              break;
+ 686   2                      default:
+ 687   2      #ifdef _CHINA_
+ 688   2                              if(flag == 1)
+ 689   2                              DisplayStr( 0, 1, 1, "ÆäËû¹ÊÕÏ", sizeof("ÆäËû¹ÊÕÏ") );
+ 690   2      #endif
+ 691   2                              val = 99;
+ 692   2                              break;
+ 693   2              }
+ 694   1      
+ 695   1              WaitForWork( 2000, NULL );
+ 696   1              return val;
+ 697   1      }
+ 698          
+ 699          
+ 700          /*****************************************************************************
+ 701          ** Function name:       ChannelLifterTask       
+ 702          ** Descriptions:                Éý½µ»ú+´«ËÍ´ø³ö»õº¯Êý                                                                                                                   
+ 703          ** parameters:          ÎÞ                              
+ 704          ** Returned value:      0:ÕýÈ·Ö´ÐÐµÄÃüÁî1:³ö»õ·µ»ØÊ§°Ü
+ 705          **                                      2:Ö´ÐÐÃüÁî³¬Ê±     3:»õµÀÎÞ»õ
+ 706          **                                      4:»õµÀ¹ÊÕÏ                5:ÔÚÏÞ¶¨µÄÊ±¼äÄÚµç»ú²»ÄÜµ½Î»
+ 707          
+ 708          **                                       6:                                             7: CMD ERR  8: GOC check error 
+ 709          *******************************************************************************/
+ 710          u_char ChannelLifterTask( u_char ChannelNum, u_char TaskId )
+ 711          {
+ 712   1              u_char xdata res = 0;
+ 713   1              uint temp = 0;
+ 714   1              switch(TaskId)
+ 715   1              {
+ 716   2                      case CHANNEL_EXEC:
+ 717   2                      case CHANNEL_TEST:
+ 718   2                              //res = LifTerProcess(1,ChannelNum);
+ 719   2                              res = LifterVendout(1,ChannelNum);
+ 720   2                              res = LifterVendoutReturn(res,TaskId == CHANNEL_TEST);
+ 721   2                              break;
+ 722   2                      case CHANNEL_CLEAR: 
+ 723   2                      case CHANNEL_QUERY:
+ 724   2                              temp = LifterSendCheckState(1);
+ 725   2                              if((temp & 0x00FF) == 2)
+ 726   2                                      res = 2;
+ 727   2                              else
+ 728   2                                      res = 0;
+ 729   2                              break;
+ 730   2                      default:
+ 731   2                              res = 7;
+ 732   2                              break;
+ 733   2              }               
+ 734   1              return res;
+ 735   1      
+ 736   1              
+ 737   1      }
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 13  
+
+ 738          
+ 739          
+ 740          
+ 741          /*****************************************************************************
+ 742          **ÈÎÎñ´¦Àí³ö»õ¶¯×÷
+ 743          *******************************************************************************/
+ 744          
+ 745          /*****************************************************************************
+ 746          ** Function name:       LifterRecv      
+ 747          ** Descriptions:              ½ÓÊÕ´®¿Ú»ØÓ¦°ü                                                                                                                            
+ 748          ** parameters:          ÎÞ
+ 749          ** Returned value:      0:ÎÞÊý¾Ý½ÓÊÕ 1:½ÓÊÕÍê±Ï 2:Êý¾Ý½ÓÊÕ´íÎó
+ 750          *****************************************************************************/
+ 751          uchar LifterRecv(uint timeout)
+ 752          {
+ 753   1              uchar index = 0;
+ 754   1              uint crc;
+ 755   1              timeout = timeout;
+ 756   1              memset( &ackTask, 0, sizeof( struct COMMTASK ) );
+ 757   1              ZhkDownMsgAckTimer = 1500;
+ 758   1              while(ZhkDownMsgAckTimer)
+ 759   1              {
+ 760   2                      if(!ZhkSerial1IsRxBufNull())
+ 761   2                      {
+ 762   3                              ackTask.Param[index++] = ZhkSerial1GetCh();
+ 763   3                              if(index == 1)//first byte 
+ 764   3                              {
+ 765   4                                      if(ackTask.Param[0] != 0xC8)//head err
+ 766   4                                              continue;
+ 767   4                              }
+ 768   3                              else if(index == 2) //2th byte
+ 769   3                                      ackTask.ParamLen = ackTask.Param[1];
+ 770   3                              else if(index >= (ackTask.ParamLen + 2)) //recv over
+ 771   3                              {
+ 772   4                                      crc = CrcCheck(ackTask.Param,ackTask.ParamLen);
+ 773   4                                      return 1;
+ 774   4      #if 0
+                                              if(ackTask.Param[index - 2] == crc / 256 && ackTask.Param[index-1] == crc % 256)
+                                                      return 1;
+                                              else
+                                                      return 2;
+              #endif
+ 780   4                              }
+ 781   3                              
+ 782   3                      }
+ 783   2              }
+ 784   1              
+ 785   1              if(index)
+ 786   1                      return 2;
+ 787   1              else
+ 788   1                      return 0;
+ 789   1      }
+ 790          
+ 791          /*****************************************************************************
+ 792          ** Function name:       LifterSend      
+ 793          ** Descriptions:              ½ÓÊÕ·¢ËÍ²¢½ÓÊÜ                                                                                                                            
+ 794          ** parameters:          ÎÞ
+ 795          ** Returned value:      0:ÎÞÊý¾Ý½ÓÊÕ 1:½ÓÊÕÍê±Ï 2:Êý¾Ý½ÓÊÕ´íÎó
+ 796          *****************************************************************************/
+ 797          
+ 798          uchar LifterSend(unsigned char type,uchar binNo,uchar rowNo,uchar columNo)
+ 799          {
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 14  
+
+ 800   1              uchar timeout = 0,comOK = 0,index = 0,i,buf[12] = {0};
+ 801   1              uint crc;
+ 802   1              binNo = binNo;
+ 803   1              Channel.CommState       = COMM_BUZY;
+ 804   1              buf[index++] = 0xC7;
+ 805   1              buf[index++] = 0x05;//³¤¶È
+ 806   1              buf[index++] = 0x40;
+ 807   1              buf[index++] = 0x00;//°æ±¾¹Ì¶¨0
+ 808   1              buf[index++] = type;
+ 809   1              if(rowNo != 0x00)
+ 810   1                      buf[index++] = rowNo;
+ 811   1              if(columNo != 0x00)
+ 812   1                      buf[index++] = columNo;
+ 813   1              
+ 814   1              buf[1] = index;//³¤¶ÈÖØ¶¨Î»
+ 815   1              crc     = CrcCheck(buf,index);//¼ÓÐ£Ñé
+ 816   1              buf[index++] = (uchar)(crc >> 8);
+ 817   1              buf[index++] = (uchar)(crc & 0xFF);
+ 818   1              for(i = 0;i < index;i++)
+ 819   1              {       
+ 820   2                      ZhkSerial1PutCh( buf[i]);
+ 821   2              }
+ 822   1              
+ 823   1              return LifterRecv(500);
+ 824   1      
+ 825   1      
+ 826   1      }
+ 827                  
+ 828          
+ 829          /*****************************************************************************
+ 830          ** Function name:       LifterCheckRstTask      
+ 831          ** Descriptions:                ·¢ËÍ³ö»õ²éÑ¯½á¹ûÃüÁî                                                                                                                            
+ 832          ** parameters:          binNo:¹ñºÅ
+ 833          ** Outputparameters: errNo   ½ö³ö»õÍê³ÉºóÒ»ÏÂ×Ö¶ÎÓÐÐ§
+ 834                                                  0:³ö»õ³É¹¦
+ 835                                                  1:Êý¾Ý´íÎó
+ 836                                                  2:ÎÞ»õ                          3:¿¨»õ
+ 837                                                  4:È¡»õÃÅÃ»¿ªÆô
+ 838                                                  5:»õÎïÎ´È¡×ß            6:»õ¹ñ´óÃÅ±»´ò¿ªÉý
+ 839                                                  7:½µ»ú¹¹¹ÊÕÏ    other:ÆäËû¹ÊÕÏ
+ 840          ** Returned value:       0:²éÑ¯Ê§°Ü 1:³ö»õÍê³É 
+ 841                                                   2:ÕýÔÚ³ö»õ0xFF:Í¨ÐÅ¹ÊÕÏ 
+ 842          *****************************************************************************/
+ 843          uint LifterCheckRstTask(uchar binNo,uchar *errNo)
+ 844          {
+ 845   1              uchar rst = 0;
+ 846   1              rst = LifterSend(VMC_VENDINGRESULT_REQ,binNo,0,0);
+ 847   1              if(rst == 0)
+ 848   1                      return 0xFF;
+ 849   1              if(rst == 2)
+ 850   1                      return 0;
+ 851   1              if(ackTask.Param[4] == GCC_VENDINGRESULT_ACK)//³É¹¦ÊÕµ½ACK
+ 852   1              {       
+ 853   2                      if(ackTask.Param[5] == 0x01)//ÕýÔÚ³ö»õ
+ 854   2                              return 2;
+ 855   2                      else
+ 856   2                      {
+ 857   3                              if(ackTask.Param[6] == 0x00)//³ö»õ³É¹¦
+ 858   3                              {
+ 859   4                                      *errNo = 0;
+ 860   4                                      return 1;
+ 861   4                              }
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 15  
+
+ 862   3                              else
+ 863   3                              {
+ 864   4                                      *errNo = ackTask.Param[7];
+ 865   4                                      return 1;
+ 866   4                              }
+ 867   3                                      
+ 868   3                      }
+ 869   2              }
+ 870   1              return 0;
+ 871   1              
+ 872   1      }
+ 873          
+ 874          
+ 875          
+ 876          /*****************************************************************************
+ 877          ** Function name:       LifterSendCheckState    
+ 878          ** Descriptions:                ·¢ËÍ²éÑ¯×´Ì¬ÃüÁî                                                                                                                                
+ 879          ** parameters:          binNo:¹ñºÅ
+ 880          ** outparameters:      0:ÎÞ¹ÊÕÏ
+ 881                                                  1:Õû»ú×´Ì¬¹ÊÕÏ
+ 882                                                  2:Éý½µ»ú¹ÊÕÏ
+ 883                                                  3:È¡»õµç»ú¹ÊÕÏ
+ 884                                                  4:ÓÃ»§µç¶¯ÃÅ¹ÊÕÏ
+ 885                                                  5:µ¯±Ò»ú¹¹¹ÊÕÏ
+ 886                                                  6:·ÀµÁÄ£¿é¹ÊÕÏ
+ 887                                                  7:»õµ½¿ØÖÆÆ÷¹ÊÕÏ
+ 888                                                  8:»õµÀ´óÃÅ¹ÊÕÏ
+ 889          ** Returned value:      0Õû»ú¿ÕÏÐ 1Õû»úÃ¦2²éÑ¯Ê§°Ü0xFFÍ¨ÐÅÊ§°Ü
+ 890          *****************************************************************************/
+ 891          uint LifterCheckStateTask(uchar binNo,uchar *errNo)
+ 892          {
+ 893   1              uchar rst = 0;
+ 894   1              rst = LifterSend(VMC_STATUS_REQ,binNo,0,0);
+ 895   1              if(rst == 0)
+ 896   1                      return 0xFF;
+ 897   1              if(rst == 2)
+ 898   1                      return 2;
+ 899   1              
+ 900   1              if(ackTask.Param[4] == GCC_STATUS_ACK)//³É¹¦ÊÕµ½ACK
+ 901   1              {       
+ 902   2                      if(ackTask.Param[5] == 0)//Õû»ú±êÖ¾ 0¿ÕÏÐ 1Ã¦
+ 903   2                      {
+ 904   3                              *errNo = 0;
+ 905   3                              return 0;
+ 906   3                      }
+ 907   2                      else
+ 908   2                      {
+ 909   3                              *errNo = 1;
+ 910   3                              if(ackTask.Param[6] & 0x01) *errNo = 1;//Õû»ú×´Ì¬
+ 911   3                              if(ackTask.Param[7] & 0x01) *errNo = 2;//Éý½µ»ú
+ 912   3                              if(ackTask.Param[8] & 0x01) *errNo = 3;//È¡»õµç»ú
+ 913   3                              if(ackTask.Param[9] & 0x01) *errNo = 4;//ÓÃ»§µç¶¯ÃÅ
+ 914   3                              if(ackTask.Param[10] & 0x01) *errNo = 5;//µ¯±Ò»ú¹¹
+ 915   3                              if(ackTask.Param[11] & 0x01) *errNo = 6;//·ÀµÁÄ£¿é
+ 916   3                              if(ackTask.Param[12] & 0x01) *errNo = 7;//»õµ½¿ØÖÆÆ÷
+ 917   3                              if(ackTask.Param[13] & 0x01) *errNo = 8;//»õµÀ´óÃÅ      
+ 918   3                              return 1;
+ 919   3                      }
+ 920   2                      
+ 921   2              }
+ 922   1              return 2;
+ 923   1              
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 16  
+
+ 924   1      }
+ 925          
+ 926          /*****************************************************************************
+ 927          ** Function name:       LifterSendVendout       
+ 928          ** Descriptions:                ·¢ËÍ³ö»õÃüÁî                                                                                                                            
+ 929          ** parameters:          binNo:¹ñºÅ
+ 930                                                  rowNo:²ãºÅ
+ 931                                                  columnNo:µÀºÅ
+ 932          ** Returned value:      0:·¢ËÍÊ§°Ü; 1:·¢ËÍ³É¹¦;0xFF Í¨ÐÅÊ§°Ü
+ 933          *****************************************************************************/
+ 934          uchar LifterSendVendoutTask(uchar binNo,uchar rowNo,uchar columnNo)
+ 935          {
+ 936   1              uchar rst = 0,rcx = 2,errNo;
+ 937   1              while(rcx--)
+ 938   1              {
+ 939   2                      rst = LifterSend(VMC_VENDING_REQ,binNo,rowNo,columnNo);
+ 940   2                      if(rst == 0 || rst == 2)
+ 941   2                              return 0xFF;
+ 942   2                      if(ackTask.Param[4] == GCC_VENDING_ACK)//³É¹¦ÊÕµ½ACK
+ 943   2                      {
+ 944   3                              return 1;
+ 945   3                      }
+ 946   2                      
+ 947   2                      //Èç¹ûÃ»ÓÐÊÕµ½ACKÔòÐèÒªÔÚ·¢ËÍÒ»´Î²éÑ¯ÃüÁî
+ 948   2                      //È·±£³ö»õÃüÁî·¢ËÍ³É¹¦±ÜÃâÖØ¸´·¢ËÍ³ö»õÃüÁî
+ 949   2                      rst = LifterCheckRstTask(binNo,&errNo);
+ 950   2                      if(rst == 2 || rst == 1)//±íÊ¾»úÆ÷·±Ã¦ Í¬ÑùÒâÎ¶×Å³ö»õÃüÁî·¢ËÍ³É¹¦
+ 951   2                              return 1;
+ 952   2              }
+ 953   1              return 0;
+ 954   1      }
+ 955          
+ 956          
+ 957          
+ 958          /*****************************************************************************
+ 959          ** Function name:       LifterVendoutTask       
+ 960          ** Descriptions:                                                                                                                                        
+ 961          ** parameters:          ÎÞ                              
+ 962          ** Returned value:      01:³É¹¦
+ 963                                                  11:Êý¾Ý´íÎó 
+ 964                                                  12:ÎÞ»õ
+ 965                                                  13:¿¨»õ           
+ 966                                                  14:È¡»õÃÅÃ»¿ªÆô
+ 967                                                  15:»õÎïÎ´È¡×ß
+ 968                                                  16:»õ¹ñ´óÃÅ±»´ò¿ª
+ 969                                                  17:Éý½µ»ú¹¹¹ÊÕÏ
+ 970                                                  21:Õû»ú¹ÊÕÏ
+ 971                                                  22:Éý½µ»ú¹ÊÕÏ
+ 972                                                  23:È¡»õµç»ú¹ÊÕÏ
+ 973                                                  24:ÓÃ»§µç¶¯ÃÅ¹ÊÕÏ
+ 974                                                  25:µ¯±Ò»ú¹¹¹ÊÕÏ
+ 975                                                  26:·ÀµÁÄ£¿é¹ÊÕÏ
+ 976                                                  27:»õµ½¿ØÖÆÆ÷¹ÊÕÏ
+ 977                                                  28:»õµÀ´óÃÅ¹ÊÕ
+ 978                                                  51:×´Ì¬²éÑ¯³¬Ê±
+ 979                                                  52:³ö»õÃüÁî·¢ËÍÊ§°Ü
+ 980                                                  53:³ö»õ½á¹û²éÑ¯³¬Ê±
+ 981                                                  99:ÆäËû¹ÊÕÏ
+ 982                                                  255(0xFF):Í¨ÐÅÊ§°Ü
+ 983          *******************************************************************************/
+ 984          
+ 985          uchar LifterVendoutTask(struct COMMTASK xdata*liftPtr)
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 17  
+
+ 986          {
+ 987   1              uchar res = 0,rcx = 5;
+ 988   1              uchar rowNo = 0,columnNo = 0,binNum,errNo,state;
+ 989   1              unsigned short takeTimeOut = 10,vendoutTimeout;
+ 990   1              binNum = liftPtr->Param[0];
+ 991   1              rowNo = liftPtr->Param[1] / 10 ;
+ 992   1              columnNo = liftPtr->Param[1] % 10;
+ 993   1              
+ 994   1              //¿ªÊ¼³ö»õ //²éÑ¯×´Ì¬ÊÇ·ñÕý³££¬Õý³£³ö»õ
+ 995   1              rcx = 10;
+ 996   1              while(rcx--)
+ 997   1              {
+ 998   2                      state = LifterCheckStateTask(binNum,&errNo);    
+ 999   2                      if(state == 0)//Õý³£¾ÍÌø¿ª
+1000   2                              break;
+1001   2                      else if(state == 1)//»úÆ÷Ã¦
+1002   2                      {
+1003   3                              if(errNo & 0xFF)//ÓÐ¹ÊÕÏ
+1004   3                              {
+1005   4                                      if(errNo == 1) return 21;
+1006   4                                      if(errNo == 2) return 22;
+1007   4                                      if(errNo == 3) return 23;
+1008   4                                      if(errNo == 4) return 24;
+1009   4                                      if(errNo == 5) return 25;
+1010   4                                      if(errNo == 6) return 26;
+1011   4                                      if(errNo == 7) return 27;
+1012   4                                      if(errNo == 8) return 28;
+1013   4                                      return 99;
+1014   4                                              
+1015   4                              }
+1016   3                      }
+1017   2                      else if(state == 0xFF)
+1018   2                      {
+1019   3                              rcx = 1;
+1020   3                      }
+1021   2                      lifterDelay(2000);
+1022   2              }
+1023   1      
+1024   1              if(state != 0)//³¬Ê±²éÑ¯Éý½µ»úÈÔÈ»²»Õý³£
+1025   1              {
+1026   2                      if(state == 0xFF)
+1027   2                              return 0xFF;
+1028   2                      else
+1029   2                              return 51;
+1030   2              }
+1031   1                      
+1032   1              while(1)
+1033   1              {
+1034   2                      //½øÐÐ³ö»õ²Ù×÷
+1035   2                      res = LifterSendVendoutTask(binNum,rowNo,columnNo);
+1036   2                      if(res == 0 || res == 0xFF)
+1037   2                              return 52;
+1038   2                      
+1039   2                      lifterDelay(500);
+1040   2                      //5000 * 10  = 50000 
+1041   2                      vendoutTimeout = 100 +(8 - rowNo) * 10;//¼ì²â³ö»õ½á¹û³¬Ê±
+1042   2                      while(vendoutTimeout--)
+1043   2                      {       
+1044   3                              state = LifterCheckRstTask(binNum,&errNo);//¼ì²â³ö»õ½á¹û
+1045   3                              if(state == 0x01)//³ö»õÍê³É
+1046   3                              {
+1047   4                                      break;
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 18  
+
+1048   4                              }
+1049   3                              lifterDelay(1000);
+1050   3                      }
+1051   2                      
+1052   2                      if(vendoutTimeout)
+1053   2                      {
+1054   3                              if(errNo != 0)//³ö»õÊ§°Ü
+1055   3                              {
+1056   4                                      if((errNo == 5) && takeTimeOut)//»õÎ´È¡×ß
+1057   4                                      {
+1058   5                                              lifterDelay(2000);
+1059   5                                              takeTimeOut--;
+1060   5                                              continue;
+1061   5                                      }
+1062   4                                      //return ((stateH > 7) ? (stateH + 10) : 99);
+1063   4                                      return (errNo + 10);
+1064   4                              }       
+1065   3                              else//³ö»õ³É¹¦
+1066   3                                      return 1;
+1067   3                      }
+1068   2                      else                                                                                    
+1069   2                              return 53;              
+1070   2              }
+1071   1      
+1072   1      }
+1073          
+1074          uchar LifterVendout(uchar binNum,uchar logicNo)
+1075          {
+1076   1              uchar timeout = 0,comOK = 0,index = 0;
+1077   1      
+1078   1              memset( &lifterTask, 0, sizeof( struct COMMTASK ) );
+1079   1              Channel.CommState       = COMM_BUZY;
+1080   1              lifterTask.Id           = ID_CHANNEL;
+1081   1              lifterTask.Cmd          = VMC_VENDING_REQ;
+1082   1              lifterTask.Priority = PRIORITY_NORMAL;
+1083   1              lifterTask.Param[0] = binNum;
+1084   1              lifterTask.Param[1] = logicNo;
+1085   1              ZhkSchedulerAddTask( &lifterTask );
+1086   1              
+1087   1              while(! ( timeout || comOK ))
+1088   1              {
+1089   2                      WaitForWork( 100, NULL );
+1090   2                      timeout = TestDeviceTimeOut( &Channel );
+1091   2                      comOK = TestDeviceCommOK( &Channel );   
+1092   2              }
+1093   1      
+1094   1              if(timeout)
+1095   1                      return 0xFF;
+1096   1              if(comOK)
+1097   1                      return Channel.State;   
+1098   1              return 0xFF;
+1099   1      }
+1100          
+1101          
+1102          
+1103          
+1104          
+1105          
+1106          
+1107          
+
+
+CX51 COMPILER V7.50   LIFTERAPI                                                            10/23/2014 09:48:35 PAGE 19  
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   4960    ----
+   CONSTANT SIZE    =    300    ----
+   XDATA SIZE       =     76     131
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

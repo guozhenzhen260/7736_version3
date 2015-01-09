@@ -1,0 +1,21 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+E:\VMCSource\7736_version3\zhangshiwei\test\7736_V1_7\EV7736.uvproj
+Project File Date:  09/30/2014
+
+<h2>Output:</h2>
+Build target 'Target 1'
+compiling mainflow.c...
+linking...
+Program Size: data=125.1 xdata=12730 const=144 code=97915
+creating hex file from "EV7736_UB_VX_X"...
+"EV7736_UB_VX_X" - 0 Error(s), 0 Warning(s).
+Build target 'Target 1'
+compiling mainflow.c...
+linking...
+Program Size: data=125.1 xdata=12730 const=144 code=97900
+creating hex file from "EV7736_UB_VX_X"...
+"EV7736_UB_VX_X" - 0 Error(s), 0 Warning(s).

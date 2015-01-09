@@ -1,0 +1,291 @@
+CX51 COMPILER V7.50   KEY                                                                  10/23/2014 09:48:28 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE KEY
+OBJECT MODULE PLACED IN key.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE key.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define KEY_C
+   2          #include "device.h"
+   3          #include "string.h"
+   4          #include "key.h"
+   5          #include "IOInput.h"
+   6          #include "global.h"
+   7          #include "scheduler.h"
+   8          #include "CommonFunction.h"
+   9          #include "VMC_PC.h"
+  10          
+  11          #define KEYBOARD11 KEY_5
+  12          #define KEYBOARD12 KEY_4
+  13          #define KEYBOARD13 KEY_8
+  14          #define KEYBOARD14 KEY_7
+  15          
+  16          #define KEYBOARD21 KEY_1
+  17          #define KEYBOARD22 KEY_2
+  18          #define KEYBOARD23 KEY_3
+  19          #define KEYBOARD24 KEY_6
+  20          
+  21          #define KEYBOARD31 KEY_DOWN
+  22          #define KEYBOARD32 KEY_CANCEL
+  23          #define KEYBOARD33 KEY_SUBMIT
+  24          #define KEYBOARD34 KEY_BACK
+  25          
+  26          #define KEYBOARD41 KEY_9
+  27          #define KEYBOARD42 KEY_DOT
+  28          #define KEYBOARD43 KEY_0
+  29          #define KEYBOARD44 KEY_UP
+  30          
+  31          //                      0            1            2            3            4            5            6   
+             -         7            8           9            a            b            c            d           e            f                           
+             -         
+  32          uchar code Key1[] = { KEYBOARD11 , KEYBOARD11 , KEYBOARD11 , KEYBOARD11 , KEYBOARD11 , KEYBOARD11 , KEYBOA
+             -RD11 , KEYBOARD11 , KEYBOARD12 , KEYBOARD12 , KEYBOARD12 , KEYBOARD12 , KEYBOARD13 , KEYBOARD13 , KEYBOARD14 , KEY_NULL 
+             -};
+  33          uchar code Key2[] = { KEYBOARD21 , KEYBOARD21 , KEYBOARD21 , KEYBOARD21 , KEYBOARD21 , KEYBOARD21 , KEYBOA
+             -RD21 , KEYBOARD21 , KEYBOARD22 , KEYBOARD22 , KEYBOARD22 , KEYBOARD22 , KEYBOARD23 , KEYBOARD23 , KEYBOARD24 , KEY_NULL 
+             -};
+  34          uchar code Key3[] = { KEYBOARD31 , KEYBOARD31 , KEYBOARD31 , KEYBOARD31 , KEYBOARD31 , KEYBOARD31 , KEYBOA
+             -RD31 , KEYBOARD31 , KEYBOARD32 , KEYBOARD32 , KEYBOARD32 , KEYBOARD32 , KEYBOARD33 , KEYBOARD33 , KEYBOARD34 , KEY_NULL 
+             -};
+  35          uchar code Key4[] = { KEYBOARD41 , KEYBOARD41 , KEYBOARD41 , KEYBOARD41 , KEYBOARD41 , KEYBOARD41 , KEYBOA
+             -RD41 , KEYBOARD41 , KEYBOARD42 , KEYBOARD42 , KEYBOARD42 , KEYBOARD42 , KEYBOARD43 , KEYBOARD43 , KEYBOARD44 , KEY_NULL 
+             -};
+  36          
+  37          uchar xdata ZhkKeyPermission;
+  38          uchar xdata ZhkKeyBuf[ 1 ];
+  39          uchar xdata ZhkKeyBufPtr;
+  40          
+  41          void KeyboardInit( void )
+  42          {
+  43   1              //uchar data i;
+  44   1              memset( ZhkKeyBuf , KEY_NULL , sizeof( ZhkKeyBuf ));
+  45   1              ZhkKeyPermission = 1;
+CX51 COMPILER V7.50   KEY                                                                  10/23/2014 09:48:28 PAGE 2   
+
+  46   1              ZhkKeyBufPtr = 0;
+  47   1      }
+  48          bit KeyLock( void )
+  49          {
+  50   1              ZhkKeyPermission = 0;
+  51   1              return 1;
+  52   1      }
+  53          bit KeyUnLock( void )
+  54          {
+  55   1              ZhkKeyPermission = 1;
+  56   1              KeyboardInit();
+  57   1              return 1;
+  58   1      }
+  59          
+  60          uchar GetKey_M2( void )
+  61          {
+  62   1          uchar data i=0;
+  63   1              uchar data ch;
+  64   1              uchar data key = KEY_NULL;
+  65   1          
+  66   1          //---------------------------------------------------------
+  67   1          if( IfGameKeyOn() )
+  68   1              {
+  69   2                      VPMission_Button_RPT( VP_BUT_GAME, VP_BUT_NUMBER );
+  70   2              //Beep();
+  71   2              }
+  72   1          //=========================================================
+  73   1          sysVPMission.VPMode_Key = 1;
+  74   1          //Scan selection 1
+  75   1              if( DeviceStatus.Selection[0] == 0 )
+  76   1              {
+  77   2                      ch = GetSelectionState( 1, &Selection1 );
+  78   2                  if( ch == 0 )
+  79   2                      {
+  80   3                          DeviceStatus.Selection[0] &= 0xfe;
+  81   3                      key = Selection1.ExtState[0];
+  82   3                      if( key != KEY_NULL )
+  83   3                          {
+  84   4                                  Beep();
+  85   4                                      return key;
+  86   4                              }
+  87   3                      }
+  88   2                      else
+  89   2                      {
+  90   3                              DeviceStatus.Selection[0] |= 0x01;
+  91   3                      }
+  92   2              }
+  93   1          //---------------------------------------------------------
+  94   1          if( IfGameKeyOn() )
+  95   1              {
+  96   2                      VPMission_Button_RPT( VP_BUT_GAME, VP_BUT_NUMBER );
+  97   2              //Beep();
+  98   2              }
+  99   1          //=========================================================
+ 100   1              //Scan selection 2
+ 101   1              if( DeviceStatus.Selection[1] == 0 )
+ 102   1              {
+ 103   2                      ch = GetSelectionState( 2, &Selection2 );
+ 104   2                  if( ch == 0 )
+ 105   2                      {
+ 106   3                          DeviceStatus.Selection[1] &= 0xfe; 
+ 107   3                      key = Selection2.ExtState[0];
+CX51 COMPILER V7.50   KEY                                                                  10/23/2014 09:48:28 PAGE 3   
+
+ 108   3                      if( key != KEY_NULL )
+ 109   3                          {
+ 110   4                                  Beep();
+ 111   4                                      return (key+KEYEXTRAVAL);
+ 112   4                              }
+ 113   3                      }
+ 114   2                      else
+ 115   2                      {
+ 116   3                              DeviceStatus.Selection[1] |= 0x01;
+ 117   3                      }
+ 118   2              }
+ 119   1          //---------------------------------------------------------
+ 120   1          if( IfGameKeyOn() )
+ 121   1              {
+ 122   2                      VPMission_Button_RPT( VP_BUT_GAME, VP_BUT_NUMBER );
+ 123   2              //Beep();
+ 124   2              }
+ 125   1          //=========================================================
+ 126   1              //Scan selection 3
+ 127   1          if( DeviceStatus.Selection[2] == 0 )
+ 128   1              {
+ 129   2                      ch = GetSelectionState( 3, &Selection3 );
+ 130   2                  if( ch == 0 )
+ 131   2                      {
+ 132   3                          DeviceStatus.Selection[2] &= 0xfe; 
+ 133   3                      key = Selection3.ExtState[0];
+ 134   3                      if( key != KEY_NULL )
+ 135   3                          {
+ 136   4                                  Beep();
+ 137   4                                      return (key+KEYEXTRAVAL*2);
+ 138   4                              }       
+ 139   3                      }
+ 140   2                      else
+ 141   2                      {
+ 142   3                              DeviceStatus.Selection[2] |= 0x01;
+ 143   3                      }
+ 144   2              }
+ 145   1          sysVPMission.VPMode_Key = 0;
+ 146   1          return key;
+ 147   1      
+ 148   1      }
+ 149          
+ 150          uchar GetKey( void )
+ 151          {
+ 152   1              uchar data i;
+ 153   1              uchar data ch;
+ 154   1              uchar data key = KEY_NULL;
+ 155   1      
+ 156   1          if( sysVPMission.VPMode == 1 )
+ 157   1              {
+ 158   2                      #ifdef   _SHUPING_
+ 159   2                              if ( ! ZhkKeyPermission ) return KEY_NULL;
+ 160   2                              ch = ZhkKeyBuf[ 0 ];
+ 161   2                              for( i = 0 ; i < sizeof( ZhkKeyBuf ) - 1 ; i ++ )
+ 162   2                                      ZhkKeyBuf[ i ] = ZhkKeyBuf[ i + 1 ];
+ 163   2                              ZhkKeyBuf[ i ] = KEY_NULL;
+ 164   2                              if ( ZhkKeyBufPtr > 0 ) ZhkKeyBufPtr --;
+ 165   2                              if ( ch != KEY_NULL ) Beep();
+ 166   2                              return ch;
+ 167   2                      #else
+                                  key = GetKey_M2();
+                              if( key != KEY_NULL )
+CX51 COMPILER V7.50   KEY                                                                  10/23/2014 09:48:28 PAGE 4   
+
+                              {
+                                      //VPMission_Button_RPT( VP_BUT_GOODS, key+1 );
+                              }
+                              return key;   //2011.1.21
+                      #endif
+ 175   2              }
+ 176   1              else
+ 177   1              {
+ 178   2                      if ( ! ZhkKeyPermission ) return KEY_NULL;
+ 179   2                      ch = ZhkKeyBuf[ 0 ];
+ 180   2                      for( i = 0 ; i < sizeof( ZhkKeyBuf ) - 1 ; i ++ )
+ 181   2                              ZhkKeyBuf[ i ] = ZhkKeyBuf[ i + 1 ];
+ 182   2                      ZhkKeyBuf[ i ] = KEY_NULL;
+ 183   2                      if ( ZhkKeyBufPtr > 0 ) ZhkKeyBufPtr --;
+ 184   2                      if ( ch != KEY_NULL ) Beep();
+ 185   2                      return ch;
+ 186   2              }
+ 187   1      }
+ 188          
+ 189          
+ 190          uchar ScanfKeyFun( void )       using   1
+ 191          {
+ 192   1              uchar data key = KEY_NULL;
+ 193   1              uchar data KeyIOTemp;
+ 194   1      
+ 195   1              ZhkHardKeyBoardLine1Select();
+ 196   1              P0 = 0xFF;
+ 197   1              _nop_();
+ 198   1              _nop_();
+ 199   1              _nop_();
+ 200   1              KeyIOTemp = P0;
+ 201   1              ZhkHardSramSelect();
+ 202   1              key = Key1[ KeyIOTemp / 0x10 ];if ( key != KEY_NULL ) return( key );
+ 203   1              key = Key2[ KeyIOTemp % 0x10 ];if ( key != KEY_NULL ) return( key );
+ 204   1      
+ 205   1              ZhkHardKeyBoardLine2Select();
+ 206   1              P0 = 0xFF;
+ 207   1              _nop_();
+ 208   1              _nop_();
+ 209   1              _nop_();
+ 210   1              KeyIOTemp = P0;
+ 211   1              ZhkHardSramSelect();
+ 212   1              key = Key3[ KeyIOTemp / 0x10 ];if ( key != KEY_NULL ) return( key );
+ 213   1              key = Key4[ KeyIOTemp % 0x10 ];if ( key != KEY_NULL ) return( key );
+ 214   1              return( key );
+ 215   1      }
+ 216          
+ 217          void ZhkKeyScanIsr( void ) using 1
+ 218          {
+ 219   1              static uchar data KeyValue,KeyDownTime;
+ 220   1              static bit NewKey;
+ 221   1              uchar data key;
+ 222   1      
+ 223   1              key = ScanfKeyFun();
+ 224   1              if ( KeyValue != key )
+ 225   1              {
+ 226   2                      KeyValue    = key;
+ 227   2                      KeyDownTime = 0;
+ 228   2                      NewKey      = 0;
+ 229   2              }
+ 230   1              else if ( key != KEY_NULL )
+ 231   1              {
+CX51 COMPILER V7.50   KEY                                                                  10/23/2014 09:48:28 PAGE 5   
+
+ 232   2                      KeyDownTime ++;
+ 233   2                      if ( KeyDownTime % 8 == 2 ) 
+ 234   2                      {
+ 235   3                              NewKey = 1;
+ 236   3                              if ( ZhkKeyBufPtr >= sizeof( ZhkKeyBuf ) )
+ 237   3                                      ZhkKeyBufPtr = sizeof( ZhkKeyBuf );
+ 238   3                              else
+ 239   3                                      ZhkKeyBuf[ ZhkKeyBufPtr ++ ] = KeyValue;
+ 240   3                      }
+ 241   2              }
+ 242   1              
+ 243   1      }
+ 244          
+ 245          
+ 246          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    752    ----
+   CONSTANT SIZE    =     64    ----
+   XDATA SIZE       =      3    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2       9
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

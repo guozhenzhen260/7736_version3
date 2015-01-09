@@ -1,0 +1,159 @@
+CX51 COMPILER V7.50   DEBUG                                                                09/30/2014 13:53:10 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE DEBUG
+OBJECT MODULE PLACED IN debug.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE debug.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #include "device.h"
+   2          #include "stdio.h"
+   3          #include "stdarg.h"
+   4          #include "serial1.h"
+   5          #include "serial.h"
+   6          #include "string.h"
+   7          /*
+   8          void debug_output ( int level, int category, char *fmt, ...)  
+   9          {
+  10            va_list arg_ptr;
+  11          
+  12            if((level <= _DEBUG_TRACE_LEVEL) || (category & _DEBUG_TRACE_CAT == 0))
+  13                  return;
+  14          
+  15            va_start (arg_ptr, fmt);           // format string 
+  16            vprintf (fmt, arg_ptr);
+  17            va_end (arg_ptr);
+  18          }
+  19          void debug_output_category (int category, char *fmt, ...)
+  20          {
+  21            va_list arg_ptr;
+  22          
+  23            if(category & _DEBUG_TRACE_CAT == 0)
+  24                  return;
+  25          
+  26            va_start(arg_ptr, fmt);           // format string 
+  27            vprintf (fmt, arg_ptr);
+  28            va_end(arg_ptr);
+  29          }
+  30          */
+  31          /*#ifdef _DEBUG_TRACE
+  32          void Trace( uchar *format , ... )
+  33          {
+  34                  va_list arg_ptr;
+  35                  char xdata StringTemp[40];
+  36                  char xdata format2[ 20 ];
+  37                  int xdata i;
+  38                  int xdata len;
+  39          
+  40                  strncpy(format2, format, 20);
+  41          
+  42                  va_start(arg_ptr, format);
+  43                  len = vsprintf( StringTemp , format2 , arg_ptr );
+  44                  va_end(arg_ptr);        
+  45          
+  46                  for(i = 0; i < len; ++i)
+  47                    putchar(StringTemp[i]);
+  48          }
+  49          #endif
+  50          */
+  51          #ifdef _DEBUG_MOBIL_DEVICE_TRACE
+              void Trace( uchar *format , ... )
+              {
+                      va_list arg_ptr;
+                      uchar xdata StringTemp[ 256 ];
+CX51 COMPILER V7.50   DEBUG                                                                09/30/2014 13:53:10 PAGE 2   
+
+                      uint  xdata i;
+                      uint  xdata len;
+                      while( ZhkSerialPutCh( 0x1D ) );
+                      ZhkSerialPutCh( 0x12 );
+                      va_start(arg_ptr, format);
+                      len = vsprintf( StringTemp , format , arg_ptr );
+                      va_end(arg_ptr);
+                      for( i = 0 ; i < len ; i ++ )
+                      {
+                              ZhkSerialPutCh( StringTemp[ i ] );
+                      }
+                      ZhkSerialPutCh( 0x12 );
+                      ZhkSerialPutCh( 0x1D );
+                      
+              }
+              #endif // _DEBUG_MOBIL_DEVICE_TRACE
+  72          uint ZhkSerial1Printf( uchar *format , ... )
+  73          {
+  74   1              va_list arg_ptr;
+  75   1              uchar StringTemp[ 256 ];
+  76   1              uint  i;
+  77   1              uint  len;
+  78   1              va_start(arg_ptr, format);
+  79   1              len = vsprintf( StringTemp , format , arg_ptr );
+  80   1              va_end(arg_ptr);
+  81   1              for( i = 0 ; i < len ; i ++ )
+  82   1              {
+  83   2                      ZhkSerial1PutCh( StringTemp[ i ] );
+  84   2              }
+  85   1              return 0;
+  86   1      }
+  87          
+  88          void PrintTest( uchar *format , ... )
+  89          {
+  90   1              va_list arg_ptr;
+  91   1              uchar xdata StringTemp[ 1024 ];
+  92   1              uint  xdata i;
+  93   1              uint  xdata len;
+  94   1              while( ZhkSerialPutCh( 0x1D ) );
+  95   1              ZhkSerialPutCh( 0x12 );
+  96   1              va_start(arg_ptr, format);
+  97   1              len = vsprintf( StringTemp , format , arg_ptr );
+  98   1              va_end(arg_ptr);
+  99   1              for( i = 0 ; i < len ; i ++ )
+ 100   1              {
+ 101   2                      ZhkSerialPutCh( StringTemp[ i ] );
+ 102   2              }
+ 103   1              ZhkSerialPutCh( 0x12 );
+ 104   1              ZhkSerialPutCh( 0x1D );
+ 105   1              
+ 106   1      }
+ 107          
+ 108          uchar getPcCmd(uchar xdata *MsgTemp)
+ 109          {
+ 110   1              uchar xdata MobileMsgTemp[ 20 ];
+ 111   1              uchar xdata i=0;
+ 112   1              while( ! ZhkSerialIsRxBufNull() )
+ 113   1              {
+ 114   2                      if ( i >= sizeof( MobileMsgTemp ) )
+ 115   2                              i = 0;
+ 116   2                      MobileMsgTemp[ i ++ ] = ZhkSerialGetCh();
+ 117   2                      MobileMsgTemp[ i ] = '\0';
+CX51 COMPILER V7.50   DEBUG                                                                09/30/2014 13:53:10 PAGE 3   
+
+ 118   2                      
+ 119   2                      if ( ( i >= 2 ) && ( MobileMsgTemp[ i - 2 ] == 'E') && ( MobileMsgTemp[ i - 1 ] == 'T' ) )
+ 120   2                      {                               
+ 121   3                              i-=2;
+ 122   3                              memcpy( MsgTemp , &MobileMsgTemp[0], i );                       
+ 123   3                              //clearReadSerial();                                                                    
+ 124   3                      }
+ 125   2              }       
+ 126   1              return i;
+ 127   1      }
+ 128          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    433    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    1403
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

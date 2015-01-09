@@ -1,0 +1,74 @@
+CX51 COMPILER V7.50   DS12887                                                              09/30/2014 13:53:06 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE DS12887
+OBJECT MODULE PLACED IN Ds12887.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE Ds12887.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define DS12887_C
+   2          #include "device.h"
+   3          #include "clock.h"
+   4          #include "Ds12887.h"
+   5          bit Ds12887Init( void )         small
+   6          {
+   7   1              XBYTE[ 0x32 ]  = 0x14;
+   8   1              XBYTE[ 0x0B ] |= 0x80;
+   9   1              XBYTE[ 0x01 ]  = 0x00;
+  10   1              XBYTE[ 0x03 ]  = 0xEF;
+  11   1              XBYTE[ 0x05 ]  = 0xEF;
+  12   1              XBYTE[ 0x0B ] &= 0x7F;
+  13   1              XBYTE[ 0x0A ]  = 0x20;
+  14   1              XBYTE[ 0x0B ]  = 0x2A;
+  15   1              return XBYTE[ 0x0D ] & 0x80;
+  16   1              
+  17   1      }
+  18          /*
+  19          bit Ds12887WriteTime( struct time idata* TimeCache )            small
+  20          {
+  21                  XBYTE[ 0x0B ] |= 0x80;
+  22                  XBYTE[ 0x09 ]  = TimeCache->year ;
+  23                  XBYTE[ 0x08 ]  = TimeCache->mon;
+  24                  XBYTE[ 0x07 ]  = TimeCache->date;
+  25                  XBYTE[ 0x04 ]  = TimeCache->hour;
+  26                  XBYTE[ 0x02 ]  = TimeCache->min;
+  27                  XBYTE[ 0x00 ]  = TimeCache->sec;
+  28                  XBYTE[ 0x0B ] &= 0x7F;
+  29                  return 1;
+  30          }
+  31          bit Ds12887ReadTime( struct time idata* TimeCache )             small
+  32          {
+  33                  XBYTE[ 0x0B ] |= 0x80;
+  34                  TimeCache->year = XBYTE[ 9 ];
+  35                  TimeCache->mon  = XBYTE[ 8 ];
+  36                  TimeCache->date = XBYTE[ 7 ];
+  37                  TimeCache->hour = XBYTE[ 4 ];
+  38                  TimeCache->min  = XBYTE[ 2 ];
+  39                  TimeCache->sec  = XBYTE[ 0 ];
+  40                  XBYTE[ 0x0B ] &= 0x7F;
+  41                  return 1;
+  42          }
+  43          */
+  44          
+  45          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     52    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+CX51 COMPILER V7.50   DS12887                                                              09/30/2014 13:53:06 PAGE 2   
+
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

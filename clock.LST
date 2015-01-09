@@ -1,0 +1,64 @@
+CX51 COMPILER V7.50   CLOCK                                                                09/30/2014 13:53:03 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE CLOCK
+OBJECT MODULE PLACED IN clock.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE clock.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define CLOCK_C
+   2          #include "device.h" 
+   3          #include "clock.h"
+   4          #include "ds12887.h"
+   5          //#include "DataExchange.h"
+   6          bit ClockInit( void )                   small
+   7          {
+   8   1              bit c;
+   9   1              ZhkHardDs12887Select(); 
+  10   1              c = Ds12887Init();
+  11   1              ZhkHardSramSelect();
+  12   1              return c;
+  13   1      }
+  14          /*
+  15          bit GetCurrentTime( struct time xdata* CurrentTime )            small
+  16          {
+  17                  struct time idata TempTime;
+  18          
+  19                  ZhkHardDs12887Select(); 
+  20                  Ds12887ReadTime( &TempTime );
+  21                  ZhkHardSramSelect();
+  22                  MovDataToSram( ( unsigned char xdata* )CurrentTime , ( unsigned char idata* )&TempTime , sizeof( struct t
+             -ime ) );
+  23                  return 1;
+  24          }
+  25          bit SetCurrentTime( struct time xdata* CurrentTime )            small
+  26          {
+  27                  struct time idata TempTime;
+  28                  
+  29                  ZhkHardSramSelect();
+  30                  MovDataFromSram( ( unsigned char xdata* )CurrentTime , ( unsigned char idata* )&TempTime , sizeof( struct
+             - time ) );
+  31                  ZhkHardDs12887Select(); 
+  32                  Ds12887WriteTime( &TempTime );
+  33                  ZhkHardSramSelect();
+  34                  return 1;
+  35          }*/
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     15    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

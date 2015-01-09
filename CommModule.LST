@@ -1,0 +1,245 @@
+CX51 COMPILER V7.50   COMMMODULE                                                           10/23/2014 09:48:31 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE COMMMODULE
+OBJECT MODULE PLACED IN CommModule.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE CommModule.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          //#undef _DEBUG_MOBIL_DEVICE_TRACE
+   2          #include "debug.h"
+   3          #include "CommModule.h"
+   4          #include "mainflow.h"
+   5          #include "ShortMsg.h"
+   6          
+   7          unsigned char data g_byCommRunningStatus = STA_COMM_MODULE_INIT;
+   8          
+   9          #ifdef _MOBILE_SMS_1
+                      struct SMSModuleInfo xdata g_SMSCommModuleInfo;
+              #endif
+  12          
+  13          //uchar ReTryTime = 0;
+  14          
+  15          //运行标志，用bit位指示相关的运行状态
+  16          //bit0:为1表示正在进行发送短信测试
+  17          uchar xdata RunFlag = 0;
+  18          
+  19          void DoCommunication()
+  20          {               
+  21   1      
+  22   1      }
+  23          
+  24          //Init
+  25          unsigned char staCommModuleInit()
+  26          {
+  27   1              Trace("\n staCommModuleInit " );
+  28   1      #ifdef _MOBILE_SMS_1
+                      memset( &g_SMSCommModuleInfo, 0, sizeof(g_SMSCommModuleInfo) );
+                      ReTryTime = 0;
+                      g_SMSCommModuleInfo.m_byCommStatus = COMM_STATUS_INITING;
+              #endif          
+  33   1              return STA_CHECK_COMM_STATUS;
+  34   1      }
+  35          
+  36          void commInitGPRS()
+  37          {
+  38   1              
+  39   1      }
+  40          
+  41          //检查通讯状态
+  42          unsigned char staCheckCommStatus()
+  43          {
+  44   1          return 0;
+  45   1      }
+  46          /*
+  47          unsigned char ScanSMSErrorCode()
+  48          {
+  49          //      Trace( "\n staCheckCommStatus" );
+  50                  switch( SMSErrorCode )
+  51                  {       
+  52                          case 0 :
+  53                                  Trace( "\n staCheckCommStatus SMS_ERR_NULL " );
+  54                          case SMS_ERR_SEND_SUCCEED:
+  55                                  Trace( "\n staCheckCommStatus SMS_ERR_SEND_SUCCEED " );
+CX51 COMPILER V7.50   COMMMODULE                                                           10/23/2014 09:48:31 PAGE 2   
+
+  56                          case SMS_ERR_SENDFAIL:
+  57                                  Trace( "\n staCheckCommStatus SMS_ERR_SENDFAIL " );
+  58                          case SMS_ERR_READFAIL:          
+  59                                  g_SMSCommModuleInfo.m_byCommStatus = COMM_STATUS_OK;                    
+  60                                  return  STA_SMS_NULL;
+  61                                  break;
+  62                          case SMS_ERR_BLOCK:             
+  63                                  Trace( "\n staCheckCommStatus SMS_ERR_BLOCK" );                 
+  64                                  return STA_CHECK_COMM_STATUS;   
+  65                                  break;
+  66                          case SMS_ERR_TIMEOUT:           
+  67                          default:
+  68                                  Trace( "\n staCheckCommStatus  SMS_ERR_TIMEOUT " );
+  69                                  commInitGPRS(); 
+  70                                  return STA_CHECK_COMM_STATUS;   
+  71                          break;
+  72                  }       
+  73          }
+  74          */
+  75          #ifdef  _MOBILE_SMS_1
+              
+                      void commResetAlarmFlag()
+                      {
+                              g_SMSCommModuleInfo.m_byAlarm = 0;
+                      }
+                      
+                      unsigned char TestSMSSend( struct SHORTMSG* Msg )
+                      {               
+                              if( g_SMSCommModuleInfo.m_byCommStatus != COMM_STATUS_OK )
+                                      return 1;
+                              Trace("\n TestSMSSend");
+                              if( PutShortMsg( Msg) == 1 )
+                                      return 1;
+                              Trace("\n TestSMSSend Sending");
+                              g_SMSCommModuleInfo.m_byCommStatus = COMM_STATUS_SMS_SENDING;
+                              g_byCommRunningStatus = STA_CHECK_SMS_SEND_RESULT;
+                              RunFlag |= 0x01;
+                              return 0;
+                      }
+              
+                      ///取短信发送结果
+                      //0－OK,1－fail,2-continue
+                      unsigned char GetTestSMSSendResult(  )
+                      {
+                              Trace("\n GetTestSMSSendResult RunFlag = %bu", RunFlag );
+                              if( ( RunFlag & 0x01 ) == 0x01 )
+                                      return 2; 
+                              if( ( RunFlag & 0x02 ) == 0x02 )
+                              { 
+                                      RunFlag &= 0xfb; //清除bit0和bit1，置为0
+                                      return 1;
+                              }
+                              else
+                              {
+                                      RunFlag &= 0xfb; //清除bit0和bit1，置为0
+                                      return 0;
+                              }
+                      }
+              
+                      ///取AT指令故障码
+                      unsigned int  GetATCMDResult()
+                      {
+CX51 COMPILER V7.50   COMMMODULE                                                           10/23/2014 09:48:31 PAGE 3   
+
+                              return SMSErrorCode;
+                      }
+              
+                      //检查短信发送结果
+                      unsigned char staCheckSMSSendResult()
+                      {       
+                              return 0;
+                      }
+              
+                      //将SMS放入发送缓冲
+                      //pSMS必须已经是经过切割处理，保证长度不大于MAX_SMS_LEN（使用PDU模式下的8位编码方式，最大是140个字符）
+                      void commAdd2SMSSendBuffer( unsigned char* pSMS, unsigned char byLen )
+                      {
+                              unsigned char data byEndIndex = g_SMSCommModuleInfo.m_SMSBuffer.m_byBeginIndex
+                                      + g_SMSCommModuleInfo.m_SMSBuffer.m_byCount;
+                              if( byEndIndex >= MAX_BUFFERED_SMS_COUNT )
+                              {
+                                      byEndIndex -= MAX_BUFFERED_SMS_COUNT;
+                              }
+                              
+                              if( byLen > MAX_SMS_LEN )
+                              {
+                                      byLen = MAX_SMS_LEN;                            
+                              }
+                              Trace("\n commAdd2SMSSendBuffer");
+                              memcpy( g_SMSCommModuleInfo.m_SMSBuffer.m_bySMSs[ byEndIndex ]
+                                      , pSMS, byLen );
+                              g_SMSCommModuleInfo.m_SMSBuffer.m_byLens[ byEndIndex ] = byLen;         
+                              
+                              if( g_SMSCommModuleInfo.m_SMSBuffer.m_byCount == MAX_BUFFERED_SMS_COUNT )       //drop first one
+                              {
+                                      if( ++g_SMSCommModuleInfo.m_SMSBuffer.m_byBeginIndex == MAX_BUFFERED_SMS_COUNT )
+                                      {
+                                              g_SMSCommModuleInfo.m_SMSBuffer.m_byBeginIndex = 0;
+                                      }
+                              }
+                              else
+                              {
+                                      ++g_SMSCommModuleInfo.m_SMSBuffer.m_byCount;
+                              }
+                      }
+                      
+                      //从SMS缓冲中提取SMS进行真正发送
+                      void commDoSendSMS()
+                      {
+                              struct SHORTMSG xdata struSMS;  
+              
+                              if( g_SMSCommModuleInfo.m_byCommStatus != COMM_STATUS_OK )
+                              {
+                              //      Trace("\n commDoSendSMS SENDING");
+                                      return;
+                              }       
+              
+                              if( !g_SMSCommModuleInfo.m_SMSBuffer.m_byCount || !SystemParameter.GSMNO[ 0 ] )         
+                                      return;         
+                              
+                              if( IsMessagerBuzy() )          
+                                      return ;                
+              
+                              if( SendSMSTimer != 0 )
+                                      return;
+              
+CX51 COMPILER V7.50   COMMMODULE                                                           10/23/2014 09:48:31 PAGE 4   
+
+                              Trace("\n commDoSendSMS Add Msg To Send ");
+                              memcpy( struSMS.phone, SystemParameter.GSMNO, sizeof(struSMS.phone) );
+                              struSMS.len = g_SMSCommModuleInfo.m_SMSBuffer.m_byLens[ g_SMSCommModuleInfo.m_SMSBuffer.m_byBeginIndex ]
+             -;
+                              memcpy( struSMS.msg
+                                      , g_SMSCommModuleInfo.m_SMSBuffer.m_bySMSs[ g_SMSCommModuleInfo.m_SMSBuffer.m_byBeginIndex ]
+                                      , struSMS.len );                
+                              PutShortMsg( &struSMS );
+                              g_SMSCommModuleInfo.m_byCommStatus = COMM_STATUS_SMS_SENDING;
+              
+                              g_byCommRunningStatus = STA_CHECK_SMS_SEND_RESULT;
+              
+                              return ;
+                      }
+              
+                      //检查发送报警请求
+              /*      unsigned char staCheckAlarm()
+                      {
+                      #ifdef PRINT_TRACE
+                              ZhkSerial1Printf( "%s:%d:staCheckAlarm\n", __FILE__, __INT_LINE__ );
+                      #endif
+                              if( g_SMSCommModuleInfo.m_byAlarm )
+                              {
+                      #ifdef PRINT_DEBUG
+                              ZhkSerial1Printf( "%s:%d:g_CommModuleInfo.m_byAlarm\n", __FILE__, __INT_LINE__ );
+                      #endif
+                                      return STA_PACK_STATUS_PACKET;
+                              }
+                              
+                              return STA_CHECK_COMM_HEARTBEAT;
+                      }
+              */
+              #endif
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     12    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      1    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

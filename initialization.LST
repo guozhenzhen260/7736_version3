@@ -1,0 +1,57 @@
+CX51 COMPILER V7.50   INITIALIZATION                                                       09/30/2014 13:53:09 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE INITIALIZATION
+OBJECT MODULE PLACED IN initialization.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE initialization.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBU
+                    -G
+
+line level    source
+
+   1          #define INITIALIZATION_C
+   2          #include "device.h"
+   3          #include "serial.h"
+   4          #include "serial1.h"
+   5          #include "timer.h"
+   6          #include "SstFlash.h"
+   7          #include "Clock.h"
+   8          #include "scheduler.h"
+   9          #include "key.h"
+  10          #include "IOInput.h"
+  11          #include "DataExchange.h"
+  12          
+  13          
+  14          uchar ZhkInit( void )
+  15          {
+  16   1              ZhkHardSramSelect();
+  17   1              ZhkIOInit();
+  18   1              ZhkTimerInit();
+  19   1      //      SstFlashSelfCheck();
+  20   1              ClockInit();
+  21   1              ZhkSerialInit();
+  22   1              ZhkSerial1Init();
+  23   1              EA = 1;
+  24   1              SchedulerInit();        
+  25   1              KeyboardInit();
+  26   1              KeyUnLock();
+  27   1              ZhkHardSramSelect();
+  28   1              return 0;
+  29   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     36    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,466 @@
+CX51 COMPILER V7.50   BUSCARD                                                              10/23/2014 09:48:34 PAGE 1   
+
+
+CX51 COMPILER V7.50, COMPILATION OF MODULE BUSCARD
+OBJECT MODULE PLACED IN BusCard.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE BusCard.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define  __BUSCARD_C__
+   2          #include "BusCard.h"
+   3          #include "Serial1.h"
+   4          #include "global.h"
+   5          #include "debug.h" 
+   6          #include "device.h"
+   7          #include "string.h"
+   8          #include "common.h"
+   9          #include "scheduler.h"
+  10          
+  11          
+  12          unsigned char xdata BCMsgBuf[255];  
+  13          
+  14          SERAIL1PARAM  code BCSerialParam =
+  15          {
+  16                  8, VERIFY_NULL, 1, 0x00, 0x96, 0x00
+  17          };
+  18          
+  19          void BCSerialInit( void )
+  20          {       
+  21   1              unsigned char xdata i=0;
+  22   1              //DelayMs(1);
+  23   1              ZhkHardSerialSwitch( 1 );
+  24   1              //DelayMs(1);
+  25   1              for( i=0; i<sizeof( SERAIL1PARAM ); i ++ )
+  26   1              {
+  27   2                      ZhkSerial1Param[ i ] = BCSerialParam[ i ];
+  28   2              }
+  29   1              ZhkSerial1Init();
+  30   1          memset( BCMsgBuf, 0, sizeof(BCMsgBuf) );   
+  31   1      }
+  32          
+  33          
+  34          //CRC caculate  
+  35          unsigned int BC_CalCRC( unsigned char *ptr, unsigned char len )
+  36          {
+  37   1              unsigned char i;
+  38   1          unsigned int  crc = 0;
+  39   1          while( len-- != 0 )
+  40   1          {
+  41   2              for( i=0x80; i!=0; i/=2 )
+  42   2              {
+  43   3                      if( (crc&0x8000)!=0 )
+  44   3                  {
+  45   4                      crc *= 2;
+  46   4                      crc ^= 0x1021;
+  47   4                  }
+  48   3                  else       //余式CRC乘以2再求CRC
+  49   3                  {
+  50   4                      crc *= 2;
+  51   4                              }
+  52   3      
+  53   3                  if((*ptr&i)!=0)
+  54   3                  {
+  55   4                      crc ^= 0x1021;       //再加上本位的CRC
+CX51 COMPILER V7.50   BUSCARD                                                              10/23/2014 09:48:34 PAGE 2   
+
+  56   4                  }   
+  57   3              }
+  58   2                      ptr++;
+  59   2          }
+  60   1          return ( crc );
+  61   1      }
+  62          
+  63          
+  64          //由HEX转换成H-ASCII 或 由BCD转换成B-ASCII函数
+  65          unsigned char BC_Hex_to_HAscii( unsigned char hex )
+  66          {
+  67   1          unsigned char xdata m = 0;
+  68   1          m = hex >> 4;
+  69   1          if( m < 0x0a )
+  70   1          {
+  71   2              m += 0x30;
+  72   2          }
+  73   1          else
+  74   1          {
+  75   2              m += 0x37;
+  76   2          }
+  77   1          return m;
+  78   1      }
+  79          
+  80          
+  81          unsigned char BC_Hex_to_LAscii( unsigned char hex )
+  82          {
+  83   1              unsigned char xdata m = 0;
+  84   1          m = hex & 0x0f;
+  85   1          if( m < 0x0a )
+  86   1          {
+  87   2              m += 0x30;
+  88   2          }
+  89   1          else
+  90   1          {
+  91   2              m += 0x37;
+  92   2          }
+  93   1          return m;
+  94   1      }
+  95          
+  96          //由H-ASCII转换成HEX 或 由B-ASCII转换成BCD函数
+  97          unsigned char BC_Ascii_to_Hex( unsigned char highBit, unsigned char lowBit )
+  98          {
+  99   1      
+ 100   1              unsigned char xdata hexByte = 0;
+ 101   1          //
+ 102   1          if( ( highBit > 0x2f ) && ( highBit < 0x3a ) )
+ 103   1          {
+ 104   2              highBit -= 0x30;
+ 105   2          }
+ 106   1          else
+ 107   1          {
+ 108   2              highBit -= 0x37;        
+ 109   2          }
+ 110   1          //
+ 111   1          if( ( lowBit > 0x2f ) && ( lowBit < 0x3a ) )
+ 112   1          {
+ 113   2              lowBit -= 0x30;
+ 114   2          }
+ 115   1          else
+ 116   1          {
+ 117   2              lowBit -= 0x37;
+CX51 COMPILER V7.50   BUSCARD                                                              10/23/2014 09:48:34 PAGE 3   
+
+ 118   2          }
+ 119   1          //
+ 120   1          hexByte = ( highBit << 4 ) | lowBit;
+ 121   1          return hexByte;
+ 122   1      }
+ 123          
+ 124          
+ 125          unsigned char BCBusUnpack( void )
+ 126          {
+ 127   1              unsigned char xdata  i=0, j=0, k=0, m=0;
+ 128   1              unsigned char xdata  len = 0;
+ 129   1              unsigned char xdata  seq = 0;
+ 130   1              unsigned char xdata  position    = 0;
+ 131   1              unsigned int  xdata crcValueCal = 0;
+ 132   1              unsigned int  xdata crcValueRec = 0;
+ 133   1              unsigned char xdata crcByteL    = 0;
+ 134   1              unsigned char xdata crcByteH    = 0;
+ 135   1          unsigned char xdata len1 = 0;
+ 136   1              //unsigned char xdata newMsg[255];
+ 137   1              
+ 138   1              //return 1;
+ 139   1          //-------------------------------------------------
+ 140   1              /*
+ 141   1          #ifdef BC_DEBUG
+ 142   1              return 1;
+ 143   1          #endif
+ 144   1              */
+ 145   1          //=================================================
+ 146   1      
+ 147   1              while( !ZhkSerial1IsRxBufNull() )
+ 148   1              {
+ 149   2                      for( i=0; i<sizeof( BCMsgBuf )-1; i++ )
+ 150   2                      {
+ 151   3                              BCMsgBuf[i] = BCMsgBuf[i+1];
+ 152   3                      }
+ 153   2                      BCMsgBuf[sizeof(BCMsgBuf)-1] = ZhkSerial1GetCh();
+ 154   2              }
+ 155   1      
+ 156   1          for( i=0; i<=sizeof(BCMsgBuf)-10; i++ )
+ 157   1              {
+ 158   2                  //Check the STX
+ 159   2                      if( BCMsgBuf[i] != BC_MSG_STX ) 
+ 160   2                              continue;
+ 161   2                  //Check the len
+ 162   2                      len  = BC_Ascii_to_Hex( BCMsgBuf[i+1], BCMsgBuf[i+2] );    
+ 163   2                      len1 = len;
+ 164   2                      if( !( (len==0x02) || (len==0x42) ) )
+ 165   2                          continue;
+ 166   2                      if( i+2+len1+4+1 > sizeof( BCMsgBuf ) ) 
+ 167   2                          break;
+ 168   2              
+ 169   2                      //Check the CHK
+ 170   2                  crcValueCal = BC_CalCRC( &BCMsgBuf[i+3], len1 );
+ 171   2              crcByteL    = BC_Ascii_to_Hex( BCMsgBuf[i+2+len1+1], BCMsgBuf[i+2+len1+2] );
+ 172   2                      crcByteH    = BC_Ascii_to_Hex( BCMsgBuf[i+2+len1+3], BCMsgBuf[i+2+len1+4] );
+ 173   2                      crcValueRec = crcByteL + crcByteH*256;
+ 174   2              if( crcValueCal != crcValueRec )
+ 175   2                              break;
+ 176   2                      if( BCMsgBuf[i+2+len1+5] != BC_MSG_ETX )
+ 177   2                  break;
+ 178   2                      //Save the message
+ 179   2              sysBCMission.recDatLen = len/2;       //get the actul data
+CX51 COMPILER V7.50   BUSCARD                                                              10/23/2014 09:48:34 PAGE 4   
+
+ 180   2                      for( j=0; j<sysBCMission.recDatLen; j++ )
+ 181   2                      {
+ 182   3                              sysBCMission.receive.msg[j] = BC_Ascii_to_Hex( BCMsgBuf[i+3+2*j], BCMsgBuf[i+3+2*j+1] );
+ 183   3                      }
+ 184   2                      sysBCMission.recACK = sysBCMission.receive.msg[0];
+ 185   2                      sysBCMission.balance = 0x00;
+ 186   2                      if( len == 0x42 )
+ 187   2                      {
+ 188   3                              sysBCMission.balance = sysBCMission.receive.msg[10]+sysBCMission.receive.msg[11]*0x100+sysBCMission.rec
+             -eive.msg[12]*0x10000+sysBCMission.receive.msg[13]*0x1000000;
+ 189   3                      }
+ 190   2                      //------------------------------------------------
+ 191   2                      sysBCMission.msgLen = 1+2+len+4+1;
+ 192   2                      for( j=0; j<sysBCMission.msgLen; j++ )
+ 193   2                      {
+ 194   3                              sysBCMission.msgBuf[j] = BCMsgBuf[i+j];
+ 195   3                      }
+ 196   2                      memset( BCMsgBuf, 0, sizeof(BCMsgBuf) );
+ 197   2                      return 1;
+ 198   2              }       
+ 199   1              return 0;
+ 200   1                              
+ 201   1      }
+ 202          
+ 203          //Create the CHK and send the message
+ 204          unsigned char BCBusTxMsg( void )
+ 205          {
+ 206   1              unsigned char i = 0;
+ 207   1              unsigned char sendBuf[255];
+ 208   1              unsigned char sendLen = 0;
+ 209   1              unsigned char lenBuf[2];
+ 210   1              unsigned char crcBuf[4];
+ 211   1      
+ 212   1              //1.Pack the message
+ 213   1              memset( sendBuf, 0, sizeof(sendBuf) );
+ 214   1              sysBCMission.send.stx = BC_MSG_STX;
+ 215   1              lenBuf[0] = BC_Hex_to_HAscii( sysBCMission.send.len*2 );  //*2
+ 216   1              lenBuf[1] = BC_Hex_to_LAscii( sysBCMission.send.len*2 );  //*2  
+ 217   1              for( i=0; i<sysBCMission.send.len; i++ )
+ 218   1              {
+ 219   2              sendBuf[2*i]    = BC_Hex_to_HAscii( sysBCMission.send.msg[i] );
+ 220   2                      sendBuf[2*i+1]  = BC_Hex_to_LAscii( sysBCMission.send.msg[i] );
+ 221   2              }
+ 222   1      
+ 223   1          //sysBCMission.send.crc = BC_CalCRC( sysBCMission.send.msg, sysBCMission.send.len );
+ 224   1          sysBCMission.send.crc = BC_CalCRC( sendBuf, sysBCMission.send.len*2 );
+ 225   1        
+ 226   1              crcBuf[0] = BC_Hex_to_HAscii( sysBCMission.send.crc%256 );
+ 227   1              crcBuf[1] = BC_Hex_to_LAscii( sysBCMission.send.crc%256 );
+ 228   1              crcBuf[2] = BC_Hex_to_HAscii( sysBCMission.send.crc/256 );
+ 229   1              crcBuf[3] = BC_Hex_to_LAscii( sysBCMission.send.crc/256 );
+ 230   1          sysBCMission.send.etx = BC_MSG_ETX;
+ 231   1      
+ 232   1              //2.Send the message
+ 233   1          ZhkSerial1PutCh( sysBCMission.send.stx );
+ 234   1              //delay( BC_COM_DELAY );
+ 235   1          ZhkSerial1PutCh( lenBuf[0] );
+ 236   1              //delay( BC_COM_DELAY );
+ 237   1          ZhkSerial1PutCh( lenBuf[1] );
+ 238   1              //delay( BC_COM_DELAY );
+ 239   1              for( i=0; i<sysBCMission.send.len*2; i++ )
+ 240   1              {
+CX51 COMPILER V7.50   BUSCARD                                                              10/23/2014 09:48:34 PAGE 5   
+
+ 241   2                      ZhkSerial1PutCh( sendBuf[i] );
+ 242   2                      //delay( ITL_COM_DELAY );       
+ 243   2              }
+ 244   1      
+ 245   1              ZhkSerial1PutCh( crcBuf[0] );
+ 246   1              //delay( ITL_COM_DELAY );
+ 247   1          ZhkSerial1PutCh( crcBuf[1] );
+ 248   1              //delay( ITL_COM_DELAY );
+ 249   1          ZhkSerial1PutCh( crcBuf[2] );
+ 250   1              //delay( ITL_COM_DELAY );
+ 251   1          ZhkSerial1PutCh( crcBuf[3] );
+ 252   1              //delay( ITL_COM_DELAY );
+ 253   1      
+ 254   1              ZhkSerial1PutCh( sysBCMission.send.etx );
+ 255   1              //delay( ITL_COM_DELAY );
+ 256   1          return 1;
+ 257   1      }
+ 258          
+ 259          unsigned char BCInqMsgPackSend( void )
+ 260          {
+ 261   1         
+ 262   1         sysBCMission.send.len    = 0x01;
+ 263   1         sysBCMission.send.msg[0] = BC_CMD_INQ; 
+ 264   1         BCBusTxMsg();
+ 265   1         return BC_ERR_NULL;
+ 266   1              
+ 267   1      }
+ 268          
+ 269          unsigned char BCTradeMsgPackSend( unsigned int price, unsigned int sn )
+ 270          {
+ 271   1          sysBCMission.send.len    = 0x0e;
+ 272   1              sysBCMission.send.msg[0] = BC_CMD_TRADE;
+ 273   1              sysBCMission.send.msg[1] = 0x00;
+ 274   1              //price
+ 275   1              sysBCMission.send.msg[2] = price%256;
+ 276   1              sysBCMission.send.msg[3] = price/256;
+ 277   1              sysBCMission.send.msg[4] = 0x00;
+ 278   1              sysBCMission.send.msg[5] = 0x00;
+ 279   1              //sn
+ 280   1          sysBCMission.send.msg[6]  = 0x00;   //0x01 for test
+ 281   1              sysBCMission.send.msg[7]  = 0x00;
+ 282   1              sysBCMission.send.msg[8]  = 0x00;
+ 283   1              sysBCMission.send.msg[9]  = 0x00;
+ 284   1              sysBCMission.send.msg[10] = 0x00;
+ 285   1          sysBCMission.send.msg[11] = 0x00;
+ 286   1              //
+ 287   1              sysBCMission.send.msg[12] = sn/256;
+ 288   1          sysBCMission.send.msg[13] = sn%256;
+ 289   1              //sysBCMission.send.msg[12] = 0x00;
+ 290   1          //sysBCMission.send.msg[13] = 0x00;
+ 291   1          
+ 292   1          BCBusTxMsg();
+ 293   1              return BC_ERR_NULL;
+ 294   1      
+ 295   1      
+ 296   1      }
+ 297          
+ 298          unsigned char BCMission_Inq( void )
+ 299          {
+ 300   1          unsigned char retry = 0;
+ 301   1          unsigned char i = 0;
+ 302   1          unsigned char flag = 0;   
+CX51 COMPILER V7.50   BUSCARD                                                              10/23/2014 09:48:34 PAGE 6   
+
+ 303   1          //1.
+ 304   1          BCSerialInit();
+ 305   1          //2.
+ 306   1          retry = BC_COM_RETRY;
+ 307   1      TAB_BCM_INQ_RETRY:
+ 308   1          flag = BCInqMsgPackSend();
+ 309   1          if( flag != BC_ERR_NULL )
+ 310   1          {
+ 311   2                      return BC_ERR_PAR;
+ 312   2              }
+ 313   1          //sysBCMission.msTimer2 = SystemParameter.BCReadTime*1000/10;
+ 314   1          sysBCMission.msTimer2 = 300;
+ 315   1              while( sysBCMission.msTimer2 )   
+ 316   1              {
+ 317   2                      if( BCBusUnpack() )
+ 318   2                      {
+ 319   3                          sysBCMission.comErrNum = 0;
+ 320   3                              goto TAB_BCM_INQ_COM_OK;
+ 321   3                      }
+ 322   2              }
+ 323   1              if( retry-- )
+ 324   1              {
+ 325   2                      goto TAB_BCM_INQ_RETRY;
+ 326   2              }
+ 327   1              else
+ 328   1              {
+ 329   2                      sysBCMission.comErrNum++;
+ 330   2                      if( sysBCMission.comErrNum >= BC_TIME_OUT_NUM )
+ 331   2                      {
+ 332   3                              DeviceStatus.BusCard |= BC_DEV_ERR_COM;
+ 333   3                      }
+ 334   2              return BC_ERR_COM;
+ 335   2              }
+ 336   1      TAB_BCM_INQ_COM_OK:
+ 337   1      
+ 338   1          DeviceStatus.BusCard &= ~BC_DEV_ERR_COM;
+ 339   1      
+ 340   1          if( sysBCMission.recACK == BC_ACK_OK )
+ 341   1              {
+ 342   2                      DeviceStatus.BusCard = BC_DEV_ERR_NULL;
+ 343   2              }
+ 344   1              else if( (sysBCMission.recACK==BC_ACK_NOSIGNED)||(sysBCMission.recACK==BC_ACK_COMMERR)||(sysBCMission.rec
+             -ACK==BC_ACK_DEVERR) )
+ 345   1              {
+ 346   2                  DeviceStatus.BusCard |=  BC_DEV_ERR_HARDWARE;
+ 347   2              }
+ 348   1              else if( (sysBCMission.recACK==BC_ACK_BUSY) )
+ 349   1          {
+ 350   2              DeviceStatus.BusCard |= BC_DEV_ERR_BUSY;
+ 351   2          }
+ 352   1              else
+ 353   1          {
+ 354   2                  DeviceStatus.BusCard = BC_DEV_ERR_NULL;
+ 355   2              }
+ 356   1          return BC_ERR_NULL;
+ 357   1      }
+ 358          
+ 359          
+ 360          unsigned char BCMission_Trade( unsigned int price, unsigned int sn )
+ 361          {
+ 362   1          unsigned char retry = 0;
+ 363   1          unsigned char i = 0;
+CX51 COMPILER V7.50   BUSCARD                                                              10/23/2014 09:48:34 PAGE 7   
+
+ 364   1          unsigned char flag = 0;   
+ 365   1          //1.
+ 366   1          BCSerialInit();
+ 367   1          //2.
+ 368   1          retry = BC_COM_RETRY;
+ 369   1      TAB_BCM_TRADE_RETRY:
+ 370   1          flag = BCTradeMsgPackSend( price, sn );
+ 371   1          if( flag != BC_ERR_NULL )
+ 372   1          {
+ 373   2                      return BC_ERR_PAR;
+ 374   2              }
+ 375   1          //sysBCMission.msTimer2 = SystemParameter.BCReadTime*1000/10;
+ 376   1              sysBCMission.msTimer2 = 300;
+ 377   1              while( sysBCMission.msTimer2 )   
+ 378   1              {
+ 379   2                      if( BCBusUnpack() )
+ 380   2                      {
+ 381   3                          sysBCMission.comErrNum = 0;
+ 382   3                              goto TAB_BCM_TRADE_COM_OK;
+ 383   3                      }
+ 384   2              }
+ 385   1              if( retry-- )
+ 386   1              {
+ 387   2                      goto TAB_BCM_TRADE_RETRY;
+ 388   2              }
+ 389   1              else
+ 390   1              {
+ 391   2                      sysBCMission.comErrNum++;
+ 392   2                      if( sysBCMission.comErrNum >= BC_TIME_OUT_NUM )
+ 393   2                      {
+ 394   3                              DeviceStatus.BusCard |= BC_DEV_ERR_COM;
+ 395   3                      }
+ 396   2              return BC_ERR_COM;
+ 397   2              }
+ 398   1      TAB_BCM_TRADE_COM_OK:
+ 399   1          DeviceStatus.BusCard &= ~BC_DEV_ERR_COM;
+ 400   1          if( sysBCMission.recACK == BC_ACK_OK )
+ 401   1              {
+ 402   2                      DeviceStatus.BusCard = BC_DEV_ERR_NULL;
+ 403   2              }
+ 404   1              else if( (sysBCMission.recACK==BC_ACK_NOSIGNED)||(sysBCMission.recACK==BC_ACK_COMMERR)||(sysBCMission.rec
+             -ACK==BC_ACK_DEVERR) )
+ 405   1              {
+ 406   2                  DeviceStatus.BusCard |=  BC_DEV_ERR_HARDWARE;
+ 407   2              }
+ 408   1              else if( (sysBCMission.recACK==BC_ACK_BUSY) )
+ 409   1          {
+ 410   2              DeviceStatus.BusCard |= BC_DEV_ERR_BUSY;
+ 411   2          }
+ 412   1              else
+ 413   1          {
+ 414   2                  DeviceStatus.BusCard = BC_DEV_ERR_NULL;
+ 415   2              }
+ 416   1          return BC_ERR_NULL;
+ 417   1      }
+ 418          
+ 419          
+ 420          
+ 421          
+ 422          
+
+
+CX51 COMPILER V7.50   BUSCARD                                                              10/23/2014 09:48:34 PAGE 8   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1871    ----
+   CONSTANT SIZE    =      6    ----
+   XDATA SIZE       =    255     289
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,31 @@
+CX51 COMPILER V9.52.0.0   SHORTMSG                                                         09/30/2014 13:43:38 PAGE 1   
+
+
+CX51 COMPILER V9.52.0.0, COMPILATION OF MODULE SHORTMSG
+OBJECT MODULE PLACED IN ShortMsg.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\CX51.EXE ShortMsg.c LARGE OBJECTADVANCED ROM(HUGE) OPTIMIZE(SIZE) BROWSE DEBUG
+
+line level    source
+
+   1          #define SHORTMSG_C
+   2          
+   3          
+   4          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+CX51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
